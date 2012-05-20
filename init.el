@@ -1,6 +1,6 @@
 ;; Preflight
 (require 'cl)
-(defvar *emacs-load-start* (current-time))
+ (defvar *emacs-load-start* (current-time))
 
 ;; Path/install configs
 (setq home-dir "/Users/jstautz/")
@@ -24,6 +24,11 @@
 
 ;; Let's get this party started.
 (server-start)
+
+;; NOTE: fullscreen requires patched Emacs 24
+;; See https://gist.github.com/1397155
+(ns-toggle-fullscreen)
+
 
 ;; Post-flight
 (message "My .emacs loaded in %ds" (destructuring-bind (hi lo ms) (current-time)

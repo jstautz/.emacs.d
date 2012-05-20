@@ -64,11 +64,6 @@
 				tags-file-name
 				register-alist)))
 
-;; Fullscreen!
-;; NOTE: requires patched Emacs 24
-;; See https://gist.github.com/1397155
-(ns-toggle-fullscreen)
-
 ;; Quick ways to restore desktop/windows
 (winner-mode 1)
 
