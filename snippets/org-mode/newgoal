@@ -1,0 +1,15 @@
+#name : newgoal
+# --
+* Goals [`(format-time-string "%Y-%m-%d %a" (current-time))`]
+*** Writing
+***** $0
+*** Work
+***** 
+*** Family
+***** 
+*** Personal
+***** 
+*** Fitness
+***** 
+*** Financial
+***** 

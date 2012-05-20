@@ -1,0 +1,6 @@
+#name : clocktable
+# --
+$0
+#+BEGIN: clocktable :maxlevel 3 :emphasize nil :block `(format-time-string "%Y-%m-%d" (current-time))` :scope agenda :formula %
+#+TBLFM: \$7='(org-clock-time% @2\$4 \$4..\$6);%.1f
+#+END: clocktable
