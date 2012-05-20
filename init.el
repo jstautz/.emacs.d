@@ -342,7 +342,6 @@
                                           ("M-." . comint-dynamic-complete)
                                           ("M-" . term-send-backward-kill-word)
                                           ("M-d" . term-send-forward-kill-word-partial))))))
-
         
         (:name psvn
                :description "svn interface for Emacs"
@@ -407,7 +406,8 @@
                             (add-hook 'markdown-mode-hook 
                                       #'(lambda () 
                                           (local-set-key [tab] 'yas/expand))))
-               :submodule nil)))
+               :submodule nil)
+        ))
 
 
 ;; list all packages you want installed  
@@ -434,8 +434,7 @@
          smex
          yas
         )  
-       (mapcar 'el-get-source-name el-get-sources)))  
-  
+       (mapcar 'el-get-source-name el-get-sources)))
 (el-get 'sync my-el-get-packages)
 
 ;; TODO look at https://github.com/technomancy/ido-ubiquitous/blob/master/ido-ubiquitous.el
@@ -449,8 +448,6 @@
 ;; Org-mode -- This right here is the reason to use emacs
 ;;             (forgive the gnarly messy setup below -- lots of custom configs)
 ;;-----------------------------------------------------------------------------
- ;; (add-to-list 'load-path (concat dotemacs-dir "org"))
- ;; (require 'org-install)
 
 (setq org-directory (concat home-dir "org/"))
 (setq writing-directory (concat home-dir "Documents/Writing/"))
