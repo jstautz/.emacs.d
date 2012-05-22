@@ -93,21 +93,18 @@
 (scroll-bar-mode nil)
 
 ;; TODO -- want to adjust these?
-(setq ;; scrolling
-  scroll-margin 0                        ;; do smooth scrolling, ...
-  scroll-conservatively 0           ;; ... the defaults ...
-  scroll-up-aggressively nil               ;; ... are very ...
-  scroll-down-aggressively nil             ;; ... annoying
-  scroll-preserve-screen-position nil)     ;; preserve screen pos with C-v/M-v
+(setq 
+  scroll-margin 0
+  scroll-conservatively 0
+  scroll-up-aggressively nil
+  scroll-down-aggressively nil
+  scroll-preserve-screen-position nil)
 
 (mouse-avoidance-mode 'jump)
 
-(setq completion-ignore-case t           ;; ignore case when completing...
-  read-file-name-completion-ignore-case t) ;; ...filenames too
-
-(setq initial-scratch-message
-  ";; scratch buffer created -- happy hacking\n")
-
+;; ignore case when completing, including filenames
+(setq completion-ignore-case t           
+  read-file-name-completion-ignore-case t)
 
 ;; Where's my cursor?
 (setq blink-cursor-mode t)
@@ -174,6 +171,14 @@
 (eval-after-load 'dired
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+
+)
 
 
 (provide 'init-customizations)

@@ -1,4 +1,11 @@
-;; Set up Emacs package repositories
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Set up and install external packages using package.el and el-get
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Add a bunch of other repos to my sources list
 (require 'package)
 (dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
                    ("elpa" . "http://tromey.com/elpa/")
@@ -8,6 +15,7 @@
   (add-to-list 'package-archives source t))
 (package-initialize)
 (add-to-list 'load-path (concat dotemacs-dir "elpa"))
+
 
 ;; el-get, install thyself
 (add-to-list 'load-path (concat dotemacs-dir "el-get/el-get"))
@@ -20,7 +28,8 @@
 
 (setq el-get-dir (concat dotemacs-dir "el-get/"))
 
-;; Recipes for packages
+
+;; Recipes for el-get packages
 (setq el-get-sources  
       '(
         (:name android
@@ -99,17 +108,6 @@
                             (autoload 'multi-term-next "multi-term" nil t)
                             (setq multi-term-program "/bin/bash")
                             (setq explicit-bash-args (quote ("--noediting" "-i" "-l")))
-                            (setq exec-path
-                                  (quote ("/usr/bin"
-                                          "/bin"
-                                          "/usr/sbin"
-                                          "/sbin"
-                                          "/usr/local/bin"
-                                          "/usr/X11/bin"
-                                          "/opt/local/bin"
-                                          "/usr/local/git/bin"
-                                          "/Applications/Emacs.app/Contents/MacOS/bin"
-                                          "/Users/jstautz/bin")))
                             ;; for autopair
                             (add-hook 'term-mode-hook
                                       #'(lambda () (setq autopair-dont-activate t)))
@@ -202,7 +200,7 @@
         ))
 
 
-;; list all packages you want installed  
+;; All external packages to install & sync with el-get
 (setq my-el-get-packages  
       (append  
        '(
@@ -216,6 +214,8 @@
          ido
          js2-mode-mooz
          kill-ring-search
+         magit
+         magithub
          markdown-mode
          multi-term
          nxhtml

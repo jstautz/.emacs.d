@@ -1,10 +1,14 @@
 ;;-----------------------------------------------------------------------------
-;; Org-mode -- This right here is the reason to use emacs
-;;             (forgive the gnarly messy setup below -- lots of custom configs)
+;; My Org-mode configs are:
+;; - Idiosyncratic
+;; - Ugly
+;; - Complicated
+;; - Still need to be cleaned up. Here be dragons.
 ;;-----------------------------------------------------------------------------
 
-(setq org-directory (concat home-dir "org/"))
-(setq writing-directory (concat home-dir "Documents/Writing/"))
+(setq org-directory (concat home-dir "org/")
+      writing-directory (concat home-dir "Documents/Writing/"))
+
 
 ;; Standard org-mode setup
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
@@ -12,13 +16,23 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 
+
+;; org modules to load
+(setq org-modules (quote (org-bbdb
+                          org-gnus
+                          org-habit
+                          org-info
+                          org-jsinfo)))
+
+
 ;; highlight current line when in agenda
 (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
 
 ;; My agenda setup (I like managing it here rather than thru custom)
-(setq org-agenda-files (quote ("~/org/flagged.org"
-                               "~/org/inbox.txt"
-                               "~/org/projects.org")))
+(setq org-agenda-files '((concat org-dir "flagged.org")
+                         (concat org-dir "inbox.txt")
+                         (concat org-dir "projects.org")))
+
 
 ;; Search on other files, too
 (setq org-agenda-text-search-extra-files '("~/org/goals.org"
@@ -242,12 +256,8 @@ Skips capture tasks."
 ;; I don't care about possible leakage in autosave files
 (setq org-crypt-disable-auto-save nil)
 
-(defun jcs:org-mobile-decrypt-creds ()
-  (interactive)
-  (require 'secrets))
-
-(add-hook 'org-mobile-pre-push-hook 'jcs:org-mobile-decrypt-creds)
-(add-hook 'org-mobile-pre-pull-hook 'jcs:org-mobile-decrypt-creds)
+(add-hook 'org-mobile-pre-push-hook 'jcs:decrypt-secrets)
+(add-hook 'org-mobile-pre-pull-hook 'jcs:decrypt-secrets)
 
 
 ;; org keybindings
@@ -296,5 +306,108 @@ Skips capture tasks."
 
 ;; Set Agenda view to show Habits again each day at 4am
 (run-at-time "04:00" 86400 '(lambda () (setq org-habit-show-habits t)))
+
+
+;; UI / keys related
+(setq org-level-color-stars-only t)
+(setq org-odd-levels-only t)
+(setq org-return-follows-link t)
+(setq org-special-ctrl-a/e t)
+(setq org-use-speed-commands t)
+(setq org-M-RET-may-split-line t)
+(setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
+(setq org-babel-no-eval-on-ctrl-c-ctrl-c t)
+(setq org-completion-use-ido t)
+(setq org-fast-tag-selection-single-key t)
+(setq org-fontify-done-headline t)
+(setq org-hide-leading-stars t)
+(setq org-show-following-heading (quote ((default))))
+(setq org-show-hierarchy-above (quote ((default . t) (tags-tree))))
+(setq org-tags-column 80)
+(setq org-show-notification-handler (quote (lambda (notification) (growl "org-mode notification" notification))))
+(setq org-show-siblings (quote ((default) (isearch t))))
+
+;; Agenda-related
+(setq org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
+(setq org-agenda-dim-blocked-tasks t)
+(setq org-agenda-include-diary t)
+(setq org-agenda-skip-deadline-if-done t)
+(setq org-agenda-skip-scheduled-if-done t)
+(setq org-agenda-skip-unavailable-files t)
+(setq org-agenda-sorting-strategy (quote ((agenda time-up priority-down) (todo priority-down) (tags priority-down))))
+(setq org-agenda-span (quote week))
+(setq org-agenda-start-with-clockreport-mode nil)
+(setq org-agenda-start-with-follow-mode nil)
+(setq org-agenda-tags-column -120)
+(setq org-agenda-tags-todo-honor-ignore-options t)
+(setq org-agenda-todo-ignore-scheduled (quote future))
+(setq org-agenda-todo-list-sublevels t)
+
+;; Archiving
+(setq org-archive-location (concat org-directory "archives.org::"))
+(setq org-archive-mark-done nil)
+
+;; Tags
+(setq org-attach-auto-tag nil)
+
+;; Refiling/inbox
+(setq org-refile-targets (quote ((("~/org/projects.org" "~/org/someday_maybe.org") :maxlevel . 2))))
+(setq org-reverse-note-order (quote (("inbox" . t))))
+
+;; clocking
+(setq org-clock-history-length 5)
+(setq org-clock-idle-time 5)
+(setq org-clock-in-resume t)
+(setq org-clock-in-switch-to-state (quote bh/clock-in-to-started))
+(setq org-clock-into-drawer t)
+(setq org-clock-modeline-total (quote current))
+(setq org-clock-out-remove-zero-time-clocks t)
+(setq org-clock-persist t)
+(setq org-clock-sound nil)
+
+;; export
+(setq org-combined-agenda-icalendar-file (concat org-directory "org.ics"))
+(setq org-export-with-TeX-macros nil)
+
+(setq org-confirm-shell-link-function (quote y-or-n-p))
+
+;; to-dos
+(setq org-default-priority 69)
+(setq org-lowest-priority 69)
+(setq org-priority-start-cycle-with-default t)
+(setq org-enforce-todo-checkbox-dependencies nil)
+(setq org-enforce-todo-dependencies nil)
+
+(setq org-habit-show-habits-only-for-today nil)
+
+(setq org-global-properties (quote (("Effort_ALL" . "0:05 0:10 0:15 0:25 1:00 2:00 4:00 8:00") ("Focus_ALL" . "High Medium Low"))))
+
+(setq org-id-include-domain nil)
+(setq org-id-method (quote uuidgen))
+
+(setq org-log-done (quote time))
+(setq org-log-into-drawer "LOGBOOK")
+(setq org-log-redeadline (quote note))
+(setq org-log-reschedule (quote note))
+
+
+;; system
+(setq org-file-apps (quote ((auto-mode . emacs)
+                            ("\\.x?html?\\'" . default)
+                            ("\\.pdf\\'" . default)
+                            ("\\.celtx\\'" . system)
+                            ("\\.doc\\'" . system)
+                            ("\\.xls\\'" . system)
+                            ("\\.fdr\\'" . system)
+                            ("\\.dvi\\'" . system))))
+
+
+;; calendar
+(setq org-icalendar-combined-name "Org")
+(setq org-icalendar-include-todo t)
+(setq org-icalendar-store-UID t)
+
+;; table
+(setq org-table-export-default-format "orgtbl-to-csv")
 
 (provide 'init-org)
