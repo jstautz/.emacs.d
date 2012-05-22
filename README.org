@@ -2,12 +2,29 @@
 #+AUTHOR: Jeff Stautz
 
 * Introduction
-
 My emacs config. 
 
+Contains dozens of ideas stolen from various places around the internet, hundreds of tiny tweaks and fiddles, and a
+few hand-written hunks of elisp of which I am not entirely proud.
+
+Makes heavy use of [[http://github.com/dimitri/el-get][el-get]] to manage and install packages.
+
+Very [[http://orgmode.org/][org-mode]] heavy. My org-mode setup is ugly and complicated and personal -- you'll probably want to change a lot of it.
+
 *** Disclaimers
-- Requires Emacs 24. Only tested on Mac OS X
-- Requires ns-toggle-fullscreen patch found here: https://gist.github.com/1397155
-- No attempts have been made to make this setup portable. It's probably full of weird environment idiosyncracies.
+- Requires Emacs 24. Only tested on Mac OS X.
+- Makes use of the [[https://gist.github.com/1397155][ns-toggle-fullscreen patch]] for Emacs 24.
+- First load will require an internet connection to download packages.
+- No attempts have been made to make this setup portable. It might be full of weird environment idiosyncracies.
 - A perpetual work in progress, currently undergoing some heavy refactoring.
 
+*** Installation -- Method One
+- git clone this repo into your home dir.
+- Set path and environment variables in init.el as required.
+- Load init.el -- should bootstrap and load el-get and begin downloading and installing packages.
+- Get a coffee. Installing external packages may take a while.
+- Enjoy and tweak to your liking.
+
+*** Installation -- Method Two
+- git clone this repo somewhere where it won't hurt anyone.
+- Open files with care and steal anything useful for your own init.el
