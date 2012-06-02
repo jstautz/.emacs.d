@@ -1,8 +1,8 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; A random smattering of custom functions
+;; A random smattering of custom/helper functions
 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;-----------------------------------------------------------------------------
@@ -14,34 +14,7 @@
 
 
 ;;-----------------------------------------------------------------------------
-;; Set up Emacs->Growl notifications
-;;-----------------------------------------------------------------------------
-(defvar growl-program "/usr/local/bin/growlnotify")
-
-(defun growl (title message &optional id)
-  (if (eq id nil)
-      (start-process "growl" " growl"
-                     growl-program title "-w" "-a" "iCal.app")
-    (start-process "growl" " growl"
-                   growl-program title "-w" "-a" "iCal.app" "-d" id))
-  (process-send-string " growl" message)
-  (process-send-string " growl" "\n")
-  (process-send-eof " growl"))
-
-
-;;-----------------------------------------------------------------------------
-;; Send Appt reminders to Growl
-;;-----------------------------------------------------------------------------
-(progn
-  (appt-activate 1)
-  (setq appt-display-format 'window)
-  (setq appt-disp-window-function (function my-appt-disp-window))
-  (defun my-appt-disp-window (min-to-app new-time msg)
-    (growl "Reminder" (format "%s" msg))))
-
-
-;;-----------------------------------------------------------------------------
-;; jcs:getcals -- Sync Google Calendars to emacs diary
+;; jcs:getcals -- Sync my Google Calendars to emacs diary
 ;;-----------------------------------------------------------------------------
 (require 'icalendar)
 
@@ -63,6 +36,7 @@
     (dolist (url google-calendars) (getcal url))
     (kill-buffer "calendar.diary"))
 
+
 ;;-----------------------------------------------------------------------------
 ;; jcs:clock functions -- Functions to clock into/out of  a particular item in
 ;; projects.org (OR create a new item and clock into it)
@@ -72,9 +46,9 @@
   (interactive)
   (save-excursion
 	(let (filepath filename mybuffer)
-	  (setq filepath "/Users/jstautz/org/projects.org")
-	  (setq filename (file-name-nondirectory filepath))
-	  (setq mybuffer (find-file filepath))
+	  (setq filepath "/Users/jstautz/org/projects.org"
+            filename (file-name-nondirectory filepath)
+            mybuffer (find-file filepath))
 	  (goto-char (point-min))
 	  (widen) 
 	  ;; if no category defined, try to find string in file and clock in
@@ -95,9 +69,10 @@
 (defun jcs:clock-out (&optional theString theCategory)
   (org-clock-out))
 
+
 ;;-----------------------------------------------------------------------------
 ;; i-search with initial contents.
-;; original source: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
+;; original src: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
 ;;-----------------------------------------------------------------------------
 (defvar isearch-initial-string nil)
 
@@ -117,6 +92,29 @@
         (setq isearch-initial-string (buffer-substring begin end))
         (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
         (isearch-forward regexp-p no-recursive-edit)))))
+
+
+;;-----------------------------------------------------------------------------
+;; Nice functions to change copy-kill region to copy or kill current line
+;; if no active region.
+;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
+;;-----------------------------------------------------------------------------
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (message "Current line is copied.")
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defadvice kill-region (before slick-copy activate compile)
+  "When called interactively with no active region, cut the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
 
 
 (provide 'init-custom-functions)

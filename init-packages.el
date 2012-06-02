@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Set up and install external packages using package.el and el-get
+;; Set up and install external packages using el-get and package.el sources
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -25,7 +25,6 @@
    (lambda (s)
      (goto-char (point-max))
      (eval-print-last-sexp))))
-
 (setq el-get-dir (concat dotemacs-dir "el-get/"))
 
 
@@ -143,6 +142,13 @@
                :post-init (lambda()
                             (setq vc-path (quote ("/sw/bin")))))
 
+        (:name puzzlemacs
+               :description "Emacs editing challenges"
+               :type svn
+               :url "http://lsvn.lysator.liu.se/svnroot/puzzlemacs"
+               :load "game.el"
+               :compile ("game.el"))
+               
         (:name remember
                :description "A mode for quickly jotting down things to remember"
                :type git
@@ -199,7 +205,6 @@
                :submodule nil)
         ))
 
-
 ;; All external packages to install & sync with el-get
 (setq my-el-get-packages  
       (append  
@@ -221,6 +226,7 @@
          nxhtml
          org-mode
          psvn
+         puzzlemacs
          remember
          restclient
          smex

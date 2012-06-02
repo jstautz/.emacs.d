@@ -1,23 +1,19 @@
-;;-----------------------------------------------------------------------------
-;; My Org-mode configs are:
-;; - Idiosyncratic
-;; - Ugly
-;; - Complicated
-;; - Still need to be cleaned up. Here be dragons.
-;;-----------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; My Org-mode configs
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq org-directory (concat home-dir "org/")
-      writing-directory (concat home-dir "Documents/Writing/"))
 
+;; Relevant directories
+(setq org-dir (concat home-dir "org/")
+      writing-dir (concat home-dir "Documents/Writing/"))
 
 ;; Standard org-mode setup
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 
-
-;; org modules to load
+;; Extra org modules to load
 (setq org-modules (quote (org-bbdb
                           org-gnus
                           org-habit
@@ -25,14 +21,77 @@
                           org-jsinfo)))
 
 
-;; highlight current line when in agenda
-(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+;;-----------------------------------------------------------------------------
+;; Org interface tweaks
+;;-----------------------------------------------------------------------------
 
-;; My agenda setup (I like managing it here rather than thru custom)
-(setq org-agenda-files '((concat org-dir "flagged.org")
-                         (concat org-dir "inbox.txt")
-                         (concat org-dir "projects.org")))
+;; Keybindings
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(global-set-key (kbd "<f5>") 'org-narrow-to-subtree)
+(global-set-key (kbd "<M-f5>") 'jcs:org-todo-tree)
+(global-set-key (kbd "<S-f5>") 'jcs:widen)
+(global-set-key (kbd "<f6>") 'org-clock-goto)
 
+;; Outline structure/style
+(setq org-odd-levels-only t
+      org-hide-leading-stars t
+      org-level-color-stars-only t
+      org-fontify-done-headline t
+      org-blank-before-new-entry (quote ((heading) (plain-list-item)))
+      org-tags-column 80)
+
+;; Editing/Movement tweaks -- turn on speed commands, fast tags, and ido
+(setq org-use-speed-commands t
+      org-completion-use-ido t
+      org-fast-tag-selection-single-key t)
+
+;; Editing/Movement tweaks -- handling line navigation, links, code blocks
+(setq org-special-ctrl-a/e t
+      org-M-RET-may-split-line t
+      org-return-follows-link t
+      org-babel-no-eval-on-ctrl-c-ctrl-c t
+      org-confirm-shell-link-function (quote y-or-n-p))
+
+;; Let org know how to open links to certain file types if not in Emacs
+(setq org-file-apps (quote ((auto-mode . emacs)
+                            ("\\.x?html?\\'" . default)
+                            ("\\.pdf\\'" . default)
+                            ("\\.celtx\\'" . system)
+                            ("\\.doc\\'" . system)
+                            ("\\.xls\\'" . system)
+                            ("\\.fdr\\'" . system)
+                            ("\\.dvi\\'" . system))))
+
+;; Show some context when digging into tags-trees / searches
+(setq org-show-following-heading (quote ((default)))
+      org-show-hierarchy-above (quote ((default . t) (tags-tree)))
+      org-show-siblings (quote ((default) (isearch t))))
+
+;; Don't add :ATTACH: tags
+(setq org-attach-auto-tag nil)
+
+;; A couple custom navigation functions
+(defun jcs:org-todo-tree ()
+  (interactive)
+  (org-narrow-to-subtree)
+  (org-show-todo-tree nil))
+
+(defun jcs:widen ()
+  (interactive)
+  (widen)
+  (org-reveal)
+  (org-remove-occur-highlights))
+
+
+;;-----------------------------------------------------------------------------
+;; Agenda setup
+;;-----------------------------------------------------------------------------
+(setq org-agenda-files '("~/org/flagged.org"
+                         "~/org/inbox.txt"
+                         "~/org/projects.org"))
+;; TODO: why can't I replace these with (concat org-dir "filename.org")?
+;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
 
 ;; Search on other files, too
 (setq org-agenda-text-search-extra-files '("~/org/goals.org"
@@ -40,9 +99,34 @@
                                            "~/org/notes/tech_log.txt"
                                            "~/org/notes/reference.org"))
 
+;; Agenda interface tweaks
+(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+(setq org-agenda-dim-blocked-tasks t
+      org-agenda-tags-column -120
+      org-agenda-start-with-follow-mode nil)
+
+;; Default agenda views & sorting
+(setq org-agenda-include-diary t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-unavailable-files t
+      org-agenda-sorting-strategy (quote ((agenda time-up priority-down) (todo priority-down) (tags priority-down)))
+      org-agenda-span (quote week))
+
+;; Agenda TODO options
+(setq org-agenda-tags-todo-honor-ignore-options t
+      org-agenda-todo-ignore-scheduled (quote future)
+      org-agenda-todo-list-sublevels t)
+
+;; Options for clock reports in agenda
+(setq org-agenda-start-with-clockreport-mode nil
+      org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
+
+;; Definition of a "stuck project" for agenda
 (setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS/-DONE"
   ("TODO" "NEXT" "STARTED") ("NOTES") "")))
 
+;; My custom Agenda commands
 (setq org-agenda-custom-commands
            '(
              (" " "Agenda overview"
@@ -136,9 +220,8 @@
 			   ))
 			 ))
 
-;; A couple helper functions for org agendas from Bernt Hansen
-;; http://doc.norang.ca/org-mode.html
-
+;; A couple of helper functions for org agendas from Bernt Hansen
+;;   http://doc.norang.ca/org-mode.html
 (defun bh/is-project-p ()
   "Any task with a todo keyword subtask"
   (let ((has-subtask)
@@ -162,126 +245,11 @@
      (t
       nil))))
 
-;; Resume org clocks if I restart emacs w/ running clock
-(setq org-clock-persist t)
-(org-clock-persistence-insinuate)
-
-;; Change task to STARTED when clocking in
-(setq org-clock-in-switch-to-state 'bh/clock-in-to-started)
-
-(defun bh/clock-in-to-started (kw)
-  "Switch task from TODO or NEXT to STARTED when clocking in.
-Skips capture tasks."
-  (if (and (member (org-get-todo-state) (list "TODO" "NEXT"))
-           (not (and (boundp 'org-capture-mode) org-capture-mode)))
-      "STARTED"))
-
-;; Get rid of empty clock drawers
-(defun bh/remove-empty-drawer-on-clock-out ()
-  (interactive)
-  (save-excursion
-    (beginning-of-line 0)
-    (org-remove-empty-drawer-at "CLOCK" (point))))
-
-(add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
-
-
-;; using remember with org-mode (deprecated, but I like it more than org-capture)
-(org-remember-insinuate)
-(setq org-default-notes-file (concat org-directory "inbox.txt"))
-(define-key global-map "\C-cr" 'org-remember)
-
-(setq remember-annotation-functions '(org-remember-annotation))
-(setq remember-handler-functions '(org-remember-handler))
-(add-hook 'remember-mode-hook 'org-remember-apply-template)
-
-;; remember templates for org-remember:
-;;   t = new TODO item
-;;   j = new journal entry (dated today)
-;;   i = new inbox item
-;;   q = only used via QuickSilver -- new inbox item
-     (setq org-remember-templates
-      '(("Todo" ?t "*** TODO %^{Action to be taken} %^G\n    %?\n    Added: %U" (concat org-directory "projects.org") "Unfiled")
-        ("Journal" ?j "* %U %^{Title} %^g\n\n%?\n" (concat writing-directory "01-composting/journal.txt") top)
-        ("Inbox" ?i "* %U %^{Title}\n  %i%?\n   %a\n\n" (concat org-directory "inbox.txt") top)
-        ("oldQS remember" ?f "* %U %?\n%i\n%a\n\n" (concat org-directory "inbox.txt") top)
-        ("QS remember" ?q "* %i\n\n  Added: %U" (concat org-directory "inbox.txt") top)
-        ("AppleScript remember" ?y "* %:shortdesc\n  %:initial\n   Source: %u, %c\n\n  %?" (concat org-directory "inbox.txt"))
-        ("AppleScript note" ?z "* %?\n\n  Date: %u\n" (concat org-directory "inbox.org"))))
-
-(require 'org-annotation-quicksilver)
-
-;; org-mac-protocol is replacing oaq (eh, haven't got this to work yet)
-;;(require 'org-mac-protocol)
-
-;; trying org-capture instead of remember -- haven't really got too solidly into this yet.
-(setq org-capture-templates
-	  '(("t" "Todo" entry
-		 (file+headline (concat org-directory "projects.org") "Unfiled")
-		 "*** TODO %^{Action to be taken} %^G\n    %?\n    Added: %U" :prepend t)
-		("j" "Journal" entry
-		 (file (concat writing-directory "01-composting/journal.txt"))
-		 "* %U %^{Title} %^g\n\n%?\n" :prepend t)
-		("i" "Inbox" entry
-		 (file (concat org-directory "inbox.txt"))
-		 "* %U %^{Title}\n  %i%?\n   %a\n\n" :prepend t)
-		("q" "QS remember" entry
-		 (file (concat org-directory "inbox.txt"))
-		 "* %U %?\n%i\n%a\n\n" :prepend t)
-		("y" "AppleScript remember" entry
-		 (file+headline
-		  (concat org-directory "inbox.txt")
-		  "")
-		 "* %:shortdesc\n  %:initial\n   Source: %u, %c\n\n  %?" :prepend t)
-		("z" "AppleScript note" entry
-		 (file+headline
-		  (concat org-directory "inbox.txt")
-		  "")
-		 "* %?\n\n  Date: %u\n" :prepend t)
-		("q" "QS Inbox" entry
-		 (file+headline
-		  (concat org-directory "inbox.txt")
-		  "Inbox")
-		 "\n* QS %U%?\n%i\n%a" :prepend t)))
-
-;; remind me of any appointments
-(appt-activate 1) 
-
-
-;; org-mobile settings
-(setq org-mobile-files '("~/org/projects.org""~/org/inbox.txt" "~/org/notes/book_list.org" "~/org/goals.org" "~/org/someday_maybe.org"))
-(setq org-mobile-inbox-for-pull (concat org-directory "flagged.org"))
-(setq org-mobile-directory (concat home-dir "Dropbox/MobileOrg"))
-(setq org-mobile-use-encryption t)
-;; I don't care about possible leakage in autosave files
-(setq org-crypt-disable-auto-save nil)
-
-(add-hook 'org-mobile-pre-push-hook 'jcs:decrypt-secrets)
-(add-hook 'org-mobile-pre-pull-hook 'jcs:decrypt-secrets)
-
-
-;; org keybindings
-(global-set-key (kbd "<f5>") 'org-narrow-to-subtree)
-(global-set-key (kbd "<M-f5>") 'jcs:org-todo-tree)
-(global-set-key (kbd "<S-f5>") 'jcs:widen)
-(global-set-key (kbd "<f6>") 'org-clock-goto)
-
-(defun jcs:org-todo-tree ()
-  (interactive)
-  (org-narrow-to-subtree)
-  (org-show-todo-tree nil))
-
-(defun jcs:widen ()
-  (interactive)
-  (widen)
-  (org-reveal)
-  (org-remove-occur-highlights))
-
 
 ;;-----------------------------------------------------------------------------
-;; Diary and appt settings (integrates with org-mode)
+;; Diary and appt settings
 ;;-----------------------------------------------------------------------------
-(setq diary-file (concat org-directory "calendar.diary"))
+(setq diary-file (concat org-dir "calendar.diary"))
 (add-hook 'diary-display-hook 'fancy-diary-display)
 (setq list-diary-entries-hook
       '(include-other-diary-files sort-diary-entries))
@@ -308,106 +276,181 @@ Skips capture tasks."
 (run-at-time "04:00" 86400 '(lambda () (setq org-habit-show-habits t)))
 
 
-;; UI / keys related
-(setq org-level-color-stars-only t)
-(setq org-odd-levels-only t)
-(setq org-return-follows-link t)
-(setq org-special-ctrl-a/e t)
-(setq org-use-speed-commands t)
-(setq org-M-RET-may-split-line t)
-(setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
-(setq org-babel-no-eval-on-ctrl-c-ctrl-c t)
-(setq org-completion-use-ido t)
-(setq org-fast-tag-selection-single-key t)
-(setq org-fontify-done-headline t)
-(setq org-hide-leading-stars t)
-(setq org-show-following-heading (quote ((default))))
-(setq org-show-hierarchy-above (quote ((default . t) (tags-tree))))
-(setq org-tags-column 80)
-(setq org-show-notification-handler (quote (lambda (notification) (growl "org-mode notification" notification))))
-(setq org-show-siblings (quote ((default) (isearch t))))
+;;-----------------------------------------------------------------------------
+;; TODOs and Tags
+;;-----------------------------------------------------------------------------
+(setq org-default-priority 69
+      org-lowest-priority 69
+      org-priority-start-cycle-with-default t
+      org-enforce-todo-checkbox-dependencies nil
+      org-enforce-todo-dependencies nil)
 
-;; Agenda-related
-(setq org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
-(setq org-agenda-dim-blocked-tasks t)
-(setq org-agenda-include-diary t)
-(setq org-agenda-skip-deadline-if-done t)
-(setq org-agenda-skip-scheduled-if-done t)
-(setq org-agenda-skip-unavailable-files t)
-(setq org-agenda-sorting-strategy (quote ((agenda time-up priority-down) (todo priority-down) (tags priority-down))))
-(setq org-agenda-span (quote week))
-(setq org-agenda-start-with-clockreport-mode nil)
-(setq org-agenda-start-with-follow-mode nil)
-(setq org-agenda-tags-column -120)
-(setq org-agenda-tags-todo-honor-ignore-options t)
-(setq org-agenda-todo-ignore-scheduled (quote future))
-(setq org-agenda-todo-list-sublevels t)
-
-;; Archiving
-(setq org-archive-location (concat org-directory "archives.org::"))
-(setq org-archive-mark-done nil)
-
-;; Tags
-(setq org-attach-auto-tag nil)
-
-;; Refiling/inbox
-(setq org-refile-targets (quote ((("~/org/projects.org" "~/org/someday_maybe.org") :maxlevel . 2))))
-(setq org-reverse-note-order (quote (("inbox" . t))))
-
-;; clocking
-(setq org-clock-history-length 5)
-(setq org-clock-idle-time 5)
-(setq org-clock-in-resume t)
-(setq org-clock-in-switch-to-state (quote bh/clock-in-to-started))
-(setq org-clock-into-drawer t)
-(setq org-clock-modeline-total (quote current))
-(setq org-clock-out-remove-zero-time-clocks t)
-(setq org-clock-persist t)
-(setq org-clock-sound nil)
-
-;; export
-(setq org-combined-agenda-icalendar-file (concat org-directory "org.ics"))
-(setq org-export-with-TeX-macros nil)
-
-(setq org-confirm-shell-link-function (quote y-or-n-p))
-
-;; to-dos
-(setq org-default-priority 69)
-(setq org-lowest-priority 69)
-(setq org-priority-start-cycle-with-default t)
-(setq org-enforce-todo-checkbox-dependencies nil)
-(setq org-enforce-todo-dependencies nil)
-
+;; Org-habit options for tracking repeating 'habit' tasks
 (setq org-habit-show-habits-only-for-today nil)
 
-(setq org-global-properties (quote (("Effort_ALL" . "0:05 0:10 0:15 0:25 1:00 2:00 4:00 8:00") ("Focus_ALL" . "High Medium Low"))))
-
-(setq org-id-include-domain nil)
-(setq org-id-method (quote uuidgen))
-
-(setq org-log-done (quote time))
-(setq org-log-into-drawer "LOGBOOK")
-(setq org-log-redeadline (quote note))
-(setq org-log-reschedule (quote note))
+;; Options for setting IDs on TODO items when exporting
+(setq org-id-include-domain nil
+      org-id-method (quote uuidgen))
 
 
-;; system
-(setq org-file-apps (quote ((auto-mode . emacs)
-                            ("\\.x?html?\\'" . default)
-                            ("\\.pdf\\'" . default)
-                            ("\\.celtx\\'" . system)
-                            ("\\.doc\\'" . system)
-                            ("\\.xls\\'" . system)
-                            ("\\.fdr\\'" . system)
-                            ("\\.dvi\\'" . system))))
+;;-----------------------------------------------------------------------------
+;; Time tracking, logging, & effort estimates
+;;-----------------------------------------------------------------------------
+(setq org-clock-into-drawer t
+      org-clock-sound nil
+      org-clock-modeline-total (quote current)
+      org-clock-history-length 5)
+
+;; My values for time estimates and focus levels
+(setq org-global-properties (quote (("Effort_ALL" .
+                                     "0:05 0:10 0:15 0:30 1:00 2:00 4:00 8:00")
+                                    ("Focus_ALL" . "High Medium Low"))))
+
+;; Idle time / resume options
+(setq org-clock-idle-time 5
+      org-clock-in-resume t)
+
+;;org clocks if I restart emacs w/ running clock
+(setq org-clock-persist t)
+(org-clock-persistence-insinuate)
+
+;; When and how to log TODO changes and scheduling changes
+(setq org-log-done (quote time)
+      org-log-into-drawer "LOGBOOK"
+      org-log-redeadline (quote note)
+      org-log-reschedule (quote note))
+
+;; Change task to STARTED when clocking in -- from Bernt Hansen
+(setq org-clock-in-switch-to-state 'bh/clock-in-to-started)
+
+(defun bh/clock-in-to-started (kw)
+  "Switch task from TODO or NEXT to STARTED when clocking in.
+Skips capture tasks."
+  (if (and (member (org-get-todo-state) (list "TODO" "NEXT"))
+           (not (and (boundp 'org-capture-mode) org-capture-mode)))
+      "STARTED"))
+
+;; Get rid of empty clock drawers -- from Bernt Hansen
+(defun bh/remove-empty-drawer-on-clock-out ()
+  (active)
+  (save-excursion
+    (beginning-of-line 0)
+    (org-remove-empty-drawer-at "CLOCK" (point))))
+
+(add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
+(setq org-clock-out-remove-zero-time-clocks t)
 
 
-;; calendar
-(setq org-icalendar-combined-name "Org")
-(setq org-icalendar-include-todo t)
-(setq org-icalendar-store-UID t)
+;;-----------------------------------------------------------------------------
+;; Capture, Refile, Archive
+;;-----------------------------------------------------------------------------
 
-;; table
-(setq org-table-export-default-format "orgtbl-to-csv")
+;; Use Remember for note capture
+;;   (technically deprecated, but I like it more than org-capture)
+(org-remember-insinuate)
+(setq org-default-notes-file (concat org-dir "inbox.txt"))
+(define-key global-map "\C-cr" 'org-remember)
+(setq remember-annotation-functions '(org-remember-annotation))
+(setq remember-handler-functions '(org-remember-handler))
+(add-hook 'remember-mode-hook 'org-remember-apply-template)
+
+;; Remember templates for org-remember:
+;;   t = new TODO item
+;;   j = new journal entry (dated today)
+;;   i = new inbox item
+;;   q = only used via QuickSilver -- new inbox item
+     (setq org-remember-templates
+      '(("Todo" ?t "*** TODO %^{Action to be taken} %^G\n    %?\n    Added: %U"
+         (concat org-dir "projects.org") "Unfiled")
+        ("Journal" ?j "* %U %^{Title} %^g\n\n%?\n"
+         (concat writing-dir "01-composting/journal.txt") top)
+        ("Inbox" ?i "* %U %^{Title}\n  %i%?\n   %a\n\n"
+         (concat org-dir "inbox.txt") top)
+        ("oldQS remember" ?f "* %U %?\n%i\n%a\n\n"
+         (concat org-dir "inbox.txt") top)
+        ("QS remember" ?q "* %i\n\n  Added: %U"
+         (concat org-dir "inbox.txt") top)
+        ("AppleScript remember" ?y "* %:shortdesc\n  %:initial\n   Source: %u, %c\n\n  %?"
+         (concat org-dir "inbox.txt"))
+        ("AppleScript note" ?z "* %?\n\n  Date: %u\n"
+         (concat org-dir "inbox.org"))))
+
+;; When taking notes in inbox, put newest at top
+(setq org-reverse-note-order (quote (("inbox" . t))))
+
+;; Use org-annotation-quicksilver to send items from QS (or Alfred, etc)
+;;   (also deprecated, but haven't got its successor, org-mac-protocol,
+;;    to work the way I want it yet.)
+(require 'org-annotation-quicksilver)
+
+;; Where to look for refile targets
+(setq org-refile-targets (quote ((("~/org/projects.org"
+                                   "~/org/someday_maybe.org") :maxlevel . 2))))
+
+;; Archiving options
+(setq org-archive-location (concat org-dir "archives.org::")
+      org-archive-mark-done nil)
+
+
+;;-----------------------------------------------------------------------------
+;; Exporting and Publishing
+;;-----------------------------------------------------------------------------
+(setq org-export-with-TeX-macros nil
+      org-table-export-default-format "orgtbl-to-csv")
+
+;; Export calendar options
+(setq org-combined-agenda-icalendar-file (concat org-dir "org.ics")
+      org-icalendar-combined-name "Org"
+      org-icalendar-include-todo t
+      org-icalendar-store-UID t)
+
+
+;;-----------------------------------------------------------------------------
+;; Notifications -- use Growl to send org & calendar notifications
+;;-----------------------------------------------------------------------------
+(defvar growl-program "/usr/local/bin/growlnotify")
+
+(defun growl (title message &optional id)
+  (if (eq id nil)
+      (start-process "growl" " growl"
+                     growl-program title "-w" "-a" "iCal.app")
+    (start-process "growl" " growl"
+                   growl-program title "-w" "-a" "iCal.app" "-d" id))
+  (process-send-string " growl" message)
+  (process-send-string " growl" "\n")
+  (process-send-eof " growl"))
+
+;; Send org notifications to Growl
+(setq org-show-notification-handler (quote (lambda (notification) (growl "org-mode notification" notification))))
+
+;; Send Appt reminders to Growl
+(progn
+  (appt-activate 1)
+  (setq appt-display-format 'window
+        appt-disp-window-function (function my-appt-disp-window))
+  (defun my-appt-disp-window (min-to-app new-time msg)
+    (growl "Reminder" (format "%s" msg))))
+
+
+;;-----------------------------------------------------------------------------
+;; org-mobile settings -- for export/sync to iOS app
+;;-----------------------------------------------------------------------------
+
+(setq org-mobile-files '("~/org/projects.org"
+                         "~/org/inbox.txt"
+                         "~/org/notes/book_list.org"
+                         "~/org/goals.org"
+                         "~/org/someday_maybe.org")
+      org-mobile-inbox-for-pull (concat org-dir "flagged.org")
+      org-mobile-directory (concat home-dir "Dropbox/MobileOrg")
+      org-mobile-use-encryption t)
+
+;; decrypt using keys in my secrets.el file
+(add-hook 'org-mobile-pre-push-hook 'jcs:decrypt-secrets)
+(add-hook 'org-mobile-pre-pull-hook 'jcs:decrypt-secrets)
+
+;; I don't care about possible leakage in autosave files
+(setq org-crypt-disable-auto-save nil)
+
 
 (provide 'init-org)

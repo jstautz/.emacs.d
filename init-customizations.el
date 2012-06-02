@@ -1,10 +1,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; System / Editing Prefs
+;; Editing options, UI config, custom keybindings, 
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Put backups & autosaves in their place
+;;-----------------------------------------------------------------------------
+;; System / Editing Prefs
+;;-----------------------------------------------------------------------------
+
+;; Put backups & autosaves in their place (not in current dir)
 (defvar backup-dir (concat home-dir ".emacs.backup/"))
 (defvar autosave-dir (concat home-dir ".emacs.autosave/"))
 (setq backup-directory-alist `((".*" . ,backup-dir)))
@@ -23,6 +27,9 @@
 (setq ns-command-modifier (quote meta))
 (setq eol-mnemonic-mac "(Mac)")
 (setq x-select-enable-clipboard t)
+
+;; M-x locate use OS X's Spotlight
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
 
 ;; If I drag n' drop a file onto Emacs, visit the file (instead of append to buffer)
 (define-key global-map [ns-drag-file] 'ns-find-file) 
@@ -171,6 +178,10 @@
 (eval-after-load 'dired
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
+
+
+
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
