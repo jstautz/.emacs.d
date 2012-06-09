@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Editing options, UI config, custom keybindings, 
+;; Editing options, UI config, custom keybindings, custom faces.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -34,7 +34,7 @@
 ;; If I drag n' drop a file onto Emacs, visit the file (instead of append to buffer)
 (define-key global-map [ns-drag-file] 'ns-find-file) 
 
-;; Tabs insert 4 spaces, sentences have one space.
+;; Tabs insert 4 spaces, sentences have one space (as God intended).
 ;;   TODO may want to look at using smart-tabs-mode
 ;;   See http://www.emacswiki.org/emacs/SmartTabs and
 ;;   https://github.com/jcsalomon/smarttabs
@@ -102,10 +102,10 @@
 ;; TODO -- want to adjust these?
 (setq 
   scroll-margin 0
-  scroll-conservatively 0
-  scroll-up-aggressively nil
-  scroll-down-aggressively nil
-  scroll-preserve-screen-position nil)
+  scroll-conservatively 100000
+  scroll-up-aggressively 0
+  scroll-down-aggressively 0
+  scroll-preserve-screen-position t)
 
 (mouse-avoidance-mode 'jump)
 
@@ -115,6 +115,8 @@
 
 ;; Where's my cursor?
 (setq blink-cursor-mode t)
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "grey93")
 
 ;; Don't make me type "y-e-s"
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -181,15 +183,19 @@
 
 
 
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ )
 
-)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mode-line ((t (:background "grey20" :foreground "white" :box (:line-width -1 :style released-button))))))
 
 
 (provide 'init-customizations)
