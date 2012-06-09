@@ -1,8 +1,7 @@
 #+Title: .emacs.d README
 #+AUTHOR: Jeff Stautz
 
-* Introduction
-My emacs config. 
+* My emacs config 
 
 Contains dozens of ideas stolen from various places around the internet, hundreds of tiny tweaks and fiddles, and a
 few hand-written hunks of elisp of which I am not entirely proud.

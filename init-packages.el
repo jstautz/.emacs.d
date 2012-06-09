@@ -83,7 +83,7 @@
                             (setq ido-record-ftp-work-directories nil)
                             (setq ido-show-dot-for-dired t)
                             (put 'ido-exit-minibuffer 'disabled nil)))
-        
+
         (:name js2-mode-mooz
                :description "Improved JavaScript mode -- forked from Steve Yegge's."
                :type git  
@@ -113,7 +113,8 @@
                             (global-set-key (kbd "C-c t") 'multi-term-next)
                             (global-set-key (kbd "C-c T") 'multi-term)
                             (setq term-bind-key-alist
-                                  (quote (("C-c C-c" . term-interrupt-subjob)
+                                  (quote (("C-y" . my-term-paste)
+                                          ("C-c C-c" . term-interrupt-subjob)
                                           ("C-p" . previous-line)
                                           ("C-n" . next-line)
                                           ("C-s" . isearch-forward)
@@ -131,6 +132,14 @@
                                           ("M-." . comint-dynamic-complete)
                                           ("M-" . term-send-backward-kill-word)
                                           ("M-d" . term-send-forward-kill-word-partial))))))
+
+        (:name php+-mode
+               :description "A better PHP mode with Zend Framework support"
+               :type elpa
+               :features php+-mode
+               :post-init (lambda()
+                            (require 'php+-mode)
+                            (php+-mode-setup)))
         
         (:name psvn
                :description "svn interface for Emacs"
@@ -142,13 +151,12 @@
                :post-init (lambda()
                             (setq vc-path (quote ("/sw/bin")))))
 
-        (:name puzzlemacs
-               :description "Emacs editing challenges"
-               :type svn
-               :url "http://lsvn.lysator.liu.se/svnroot/puzzlemacs"
-               :load "game.el"
-               :compile ("game.el"))
-               
+        (:name rainbow-mode
+               :description "Colorize color names in buffers"
+               :type git
+               :url "https://github.com/emacsmirror/rainbow-mode"
+               :features rainbow-mode)
+        
         (:name remember
                :description "A mode for quickly jotting down things to remember"
                :type git
@@ -168,24 +176,8 @@
                :description "M-x interface with Ido-style fuzzy matching."
                :type git
                :url "http://github.com/nonsequitur/smex.git"
-               :features smex
-               :post-init (lambda ()
-                            (smex-initialize)
-                            (global-set-key (kbd "M-x") 'smex)
-                            (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-                            (global-set-key "\C-x\C-m" 'smex)
-                            (global-set-key "\C-c\C-m" 'smex)
-                            (add-hook 'org-mode-hook
-                                                (lambda()
-                                                  (define-key org-mode-map
-                                                    (kbd "\C-c\C-m") 'smex)))
-                            (add-hook 'org-mode-hook
-                                      (lambda()
-                                        (define-key org-mode-map
-                                          (kbd "\C-x\C-m") 'smex)))
-                            ;; This is your old M-x.
-                            (global-set-key
-                             (kbd "C-c C-c M-x") 'execute-extended-command)))
+               :features smex)
+        
         (:name yas
                :description "Yet Another Snippet"
                :type git
@@ -225,14 +217,41 @@
          multi-term
          nxhtml
          org-mode
+         php+-mode
          psvn
-         puzzlemacs
          remember
          restclient
          smex
+         smooth-scrolling
          yas
         )  
        (mapcar 'el-get-source-name el-get-sources)))
 (el-get 'sync my-el-get-packages)
+
+;;-----------------------------------------------------------------------------
+;; Additional package setup
+;;-----------------------------------------------------------------------------
+
+;; Don't load smex until I try to use it
+(defun jcs:smex-init ()
+  (interactive)
+  (condition-case description
+      (progn
+        (smex-initialize)
+        (global-set-key (kbd "M-x") 'smex)
+        (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+        (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+        (add-hook 'org-mode-hook
+                  (lambda()
+                    (define-key org-mode-map
+                      (kbd "\C-c\C-m") 'smex)))
+        (add-hook 'org-mode-hook
+                  (lambda()
+                    (define-key org-mode-map
+                      (kbd "\C-x\C-m") 'smex)))
+        (smex))
+    (error (execute-extended-command))))
+(global-set-key (kbd "M-x") 'jcs:smex-init)
+
 
 (provide 'init-packages)

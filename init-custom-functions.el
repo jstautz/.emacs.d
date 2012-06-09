@@ -117,4 +117,59 @@
        (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
 
 
+;;-----------------------------------------------------------------------------
+;; Fix yanking into Emacs terminal
+;; Mad props to Brian Zwahr
+;; http://emacs-journey.blogspot.ca/2012/06/improving-ansi-term.html?m=1
+;;-----------------------------------------------------------------------------
+
+(defun my-term-paste (&optional string)
+ (interactive)
+ (process-send-string
+  (get-buffer-process (current-buffer))
+  (if string string (current-kill 0))))
+
+
+;;-----------------------------------------------------------------------------
+;; Nice window-splitting and moving functions
+;; Thanks to Ignacio Paz Posse
+;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
+;;-----------------------------------------------------------------------------
+
+;; Switch (zoom) between split window config and a single window
+(defun toggle-windows-split()
+"Switch back and forth between one window and whatever split of
+windows we might have in the frame. The idea is to maximize the
+current buffer, while being able to go back to the previous split
+of windows in the frame simply by calling this command again."
+(interactive)
+(if (not(window-minibuffer-p (selected-window)))
+(progn
+(if (< 1 (count-windows))
+(progn
+(window-configuration-to-register ?u)
+(delete-other-windows))
+(jump-to-register ?u))))
+(my-iswitchb-close))
+(define-key global-map (kbd "C-`") 'toggle-windows-split)
+(define-key global-map (kbd "C-~") 'toggle-windows-split)
+
+;; Window shifting. C-x-o lets us go forward a window (or several).
+;; This one lets us go back one or more windows. From Glickstein.
+(defun other-window-backward (&optional n)
+"Select previous Nth window."
+(interactive "P")
+(other-window (- (prefix-numeric-value n))))
+(global-set-key [prior] 'other-window)
+(global-set-key [next] 'other-window-backward)
+(global-set-key [(control tab)] 'other-window)
+(global-set-key [(shift control tab)] 'other-window-backward)
+
+;; Also (stolen from someone else’s dot file) this is used to shrink/expand windows without using the mouse.
+(define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
+(define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
+(define-key global-map (kbd "C-M-<up>") 'enlarge-window)
+(define-key global-map (kbd "C-M-<down>") 'shrink-window)
+
+
 (provide 'init-custom-functions)
