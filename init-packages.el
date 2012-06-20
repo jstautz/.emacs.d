@@ -28,7 +28,7 @@
 (setq el-get-dir (concat dotemacs-dir "el-get/"))
 
 
-;; Recipes for el-get packages
+  ;; Recipes for el-get packages
 (setq el-get-sources  
       '(
         (:name android
@@ -67,6 +67,14 @@
                :url "https://raw.github.com/emacsmirror/elip/master/source/elip.el"
                :depends edb
                :features elip)
+
+        (:name expand-region
+               :description "Increase selected region by semantic units."
+               :type git
+               :url "https://github.com/magnars/expand-region.el"
+               :features expand-region
+               :post-init (lambda()
+                            (global-set-key (kbd "C-=") 'er/expand-region)))
         
         (:name ido
                :description "Interactively Do Things. Fuzzy match buffers/files/etc."
@@ -84,6 +92,11 @@
                             (setq ido-show-dot-for-dired t)
                             (put 'ido-exit-minibuffer 'disabled nil)))
 
+        (:name ido-ubiquitous
+               :description "Use ido (nearly) everywhere."
+               :type elpa
+               :depends ido)
+        
         (:name js2-mode-mooz
                :description "Improved JavaScript mode -- forked from Steve Yegge's."
                :type git  
@@ -97,7 +110,21 @@
                :type elpa
                :post-init (lambda()
                             (global-set-key "\M-\C-y" 'kill-ring-search)))
-        
+
+        (:name mark-multiple
+               :description "An emacs extension that sorta lets you mark several regions at once."
+               :type git
+               :url "https://github.com/magnars/mark-multiple.el.git"
+               :features ("inline-string-rectangle" "mark-more-like-this" "rename-sgml-tag")
+               :post-init (lambda()
+                           (global-set-key (kbd "C-x r t") 'inline-string-rectangle)
+                           (global-set-key (kbd "C-<") 'mark-previous-like-this)
+                           (global-set-key (kbd "C->") 'mark-next-like-this)
+                           (global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
+                           (global-set-key (kbd "C-*") 'mark-all-like-this)
+                          ;; (define-key sgml-mode-map (kbd "C-c C-r") 'rename-sgml-tag)
+))
+
         (:name multi-term
                :description "Manage multiple terminal buffers. Plays nicely with gnuscreen."
                :type git
@@ -133,6 +160,18 @@
                                           ("M-" . term-send-backward-kill-word)
                                           ("M-d" . term-send-forward-kill-word-partial))))))
 
+        (:name multiple-cursors
+               :description "An experiment in multiple cursors for emacs. Still very much in beta."
+               :type git
+               :url "https://github.com/magnars/multiple-cursors.el.git"
+               :features ("multiple-cursors" "multiple-cursors-core"
+                          "mc-mark-multiple-integration"
+                          "mc-edit-lines")
+               :post-init (lambda()
+                            ;; Experimental multiple-cursors
+                            (global-set-key (kbd "C-x a e") 'mc/edit-ends-of-lines)
+                            (global-set-key (kbd "C-x a a") 'mc/edit-beginnings-of-lines)))
+        
         (:name php+-mode
                :description "A better PHP mode with Zend Framework support"
                :type elpa
@@ -177,6 +216,20 @@
                :type git
                :url "http://github.com/nonsequitur/smex.git"
                :features smex)
+
+        (:name unbound
+               :description "Find convenient unbound keybindings."
+               :type http
+               :url "http://www.emacswiki.org/emacs/download/unbound.el"
+               :features unbound)
+
+        (:name wgrep
+               :description "Writable grep buffer, apply the changes to files."
+               :type git
+               :url "https://github.com/magnars/Emacs-wgrep.git"
+               :features wgrep
+               :post-init (lambda()
+                            (setq wgrep-enable-key "r")))
         
         (:name yas
                :description "Yet Another Snippet"
@@ -205,16 +258,21 @@
          android
          android-mode
          browse-kill-ring
+         color-theme-solarized
          css-mode
          edb
          elip
+         expand-region
          ido
+         ido-ubiquitous
          js2-mode-mooz
          kill-ring-search
          magit
          magithub
+         mark-multiple
          markdown-mode
          multi-term
+         multiple-cursors
          nxhtml
          org-mode
          php+-mode
@@ -223,7 +281,11 @@
          restclient
          smex
          smooth-scrolling
+         unbound
+         undo-tree
+         wgrep
          yas
+         yaml-mode
         )  
        (mapcar 'el-get-source-name el-get-sources)))
 (el-get 'sync my-el-get-packages)
