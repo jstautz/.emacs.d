@@ -83,6 +83,9 @@
 ;; Tramp defaults
 (setq tramp-default-method "ssh")
 
+;; Make sure diff works with .org files and others
+(setq diff-switches "-a -c")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Interface Tweaks

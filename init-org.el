@@ -20,7 +20,6 @@
                           org-info
                           org-jsinfo)))
 
-
 ;;-----------------------------------------------------------------------------
 ;; Org interface tweaks
 ;;-----------------------------------------------------------------------------
@@ -89,9 +88,12 @@
 ;;-----------------------------------------------------------------------------
 (setq org-agenda-files '("~/org/flagged.org"
                          "~/org/inbox.txt"
-                         "~/org/projects.org"))
+                         "~/org/projects.org"
+                         "~/org/inbox/"))
 ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
 ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
+
+;;(setq org-agenda-file-regexp "\\`[^.].*\\.org\\'\\|\\.txt\\'")
 
 ;; Search on other files, too
 (setq org-agenda-text-search-extra-files '("~/org/goals.org"
@@ -102,7 +104,7 @@
 ;; Agenda interface tweaks
 (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
 (setq org-agenda-dim-blocked-tasks t
-      org-agenda-tags-column -120
+      org-agenda-tags-column 80
       org-agenda-start-with-follow-mode nil)
 
 ;; Default agenda views & sorting
@@ -303,7 +305,7 @@
 
 ;; My values for time estimates and focus levels
 (setq org-global-properties (quote (("Effort_ALL" .
-                                     "0:05 0:10 0:15 0:30 1:00 2:00 4:00 8:00")
+                                     "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
                                     ("Focus_ALL" . "High Medium Low"))))
 
 ;; Idle time / resume options
@@ -332,7 +334,7 @@ Skips capture tasks."
 
 ;; Get rid of empty clock drawers -- from Bernt Hansen
 (defun bh/remove-empty-drawer-on-clock-out ()
-  (active)
+  (interactive)
   (save-excursion
     (beginning-of-line 0)
     (org-remove-empty-drawer-at "CLOCK" (point))))

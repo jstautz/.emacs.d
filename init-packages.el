@@ -28,7 +28,7 @@
 (setq el-get-dir (concat dotemacs-dir "el-get/"))
 
 
-  ;; Recipes for el-get packages
+;; Recipes for el-get packages
 (setq el-get-sources  
       '(
         (:name android
@@ -42,6 +42,12 @@
                :description "Minor mode for Android development"
                :type elpa)
         
+        (:name async
+               :description "Asynchronous processing in Emacs"
+               :type git
+               :url "https://github.com/jwiegley/emacs-async"
+               :features async)
+        
         (:name browse-kill-ring
                :description "View kill-ring with M-y"
                :type elpa
@@ -49,7 +55,26 @@
                             (browse-kill-ring-default-keybindings)))
         
         (:name css-mode :type elpa)
-        
+
+        (:name cucumber
+               :description "Emacs mode for editing plain text user stories"
+               :type git
+               :url "https://github.com/michaelklishin/cucumber.el"
+               :features feature-mode
+               :post-init (lambda()
+                            (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))))
+
+        (:name ecukes
+               :description "Cucumber integration testing framework for Emacs"
+               :type git
+               :url "https://github.com/rejeep/ecukes"
+               :build `(,"ln -s ~/.emacs.d/el-get/ecukes/ecukes ~/Dropbox/bin/ecukes"))
+
+        (:name espuds
+               :description "Ecukes step definitions"
+               :type git
+               :url "https://github.com/rejeep/espuds")
+
         (:name edb
                :description "Emacs database mode"
                :type git
@@ -83,13 +108,15 @@
                :compile ("ido.el")
                :post-init (lambda()
                             (ido-mode t)
-                            (setq ido-enable-flex-matching t)
-                            (setq ido-enable-tramp-completion nil)
-                            (setq ido-everywhere t)
-                            (setq ido-is-tramp-root nil)
-                            (setq ido-max-prospects 10)
-                            (setq ido-record-ftp-work-directories nil)
-                            (setq ido-show-dot-for-dired t)
+                            (setq ido-enable-flex-matching t
+                                  ido-enable-tramp-completion nil
+                                  ido-everywhere t
+                                  ido-is-tramp-root nil
+                                  ido-max-prospects 10
+                                  ido-record-ftp-work-directories nil
+                                  ido-show-dot-for-dired t
+                                  ido-use-virtual-buffers t)
+                            (recentf-mode t)
                             (put 'ido-exit-minibuffer 'disabled nil)))
 
         (:name ido-ubiquitous
@@ -230,6 +257,9 @@
                :features wgrep
                :post-init (lambda()
                             (setq wgrep-enable-key "r")))
+
+        ;; TODO -- pulling in snips from yas git, plus cucumber git, plus my own.
+        ;;  need to manage/consolidate these better.
         
         (:name yas
                :description "Yet Another Snippet"
@@ -239,6 +269,7 @@
                :post-init (lambda()
                             (yas/initialize)
                             (yas/load-directory (concat dotemacs-dir "/snippets/"))
+                            (yas/load-directory (concat dotemacs-dir "/el-get/cucumber/snippets"))
                             ;; Yasnippet's tab-completion should override org-mode's
                             (add-hook 'org-mode-hook 
                                       #'(lambda () 
@@ -257,9 +288,13 @@
          ace-jump-mode
          android
          android-mode
+         async
          browse-kill-ring
          color-theme-solarized
          css-mode
+         cucumber
+         ecukes
+         espuds
          edb
          elip
          expand-region
