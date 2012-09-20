@@ -18,7 +18,8 @@
                           org-gnus
                           org-habit
                           org-info
-                          org-jsinfo)))
+                          org-jsinfo
+                          org-mac-message)))
 
 ;;-----------------------------------------------------------------------------
 ;; Org interface tweaks
@@ -88,12 +89,9 @@
 ;;-----------------------------------------------------------------------------
 (setq org-agenda-files '("~/org/flagged.org"
                          "~/org/inbox.txt"
-                         "~/org/projects.org"
-                         "~/org/inbox/"))
+                         "~/org/projects.org"))
 ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
 ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
-
-;;(setq org-agenda-file-regexp "\\`[^.].*\\.org\\'\\|\\.txt\\'")
 
 ;; Search on other files, too
 (setq org-agenda-text-search-extra-files '("~/org/goals.org"
@@ -113,7 +111,7 @@
       org-agenda-skip-scheduled-if-done t
       org-agenda-skip-unavailable-files t
       org-agenda-sorting-strategy (quote ((agenda time-up priority-down) (todo priority-down) (tags priority-down)))
-      org-agenda-span (quote week))
+      org-agenda-span (quote day))
 
 ;; Agenda TODO options
 (setq org-agenda-tags-todo-honor-ignore-options t
@@ -136,7 +134,7 @@
 			   (tags "REFILE" 
 					 ((org-agenda-overriding-header "Tasks to Refile")))
 			   (org-agenda-list-stuck-projects) 
-			   (tags-todo "-REFILE+Focus=\"\""
+			   (tags-todo "-REFILE+Effort=\"\""
 						  ((org-agenda-overriding-header "Tasks to Estimate")
 						   (org-agenda-skip-function 'bh/skip-projects)
 						   (org-tags-match-list-sublevels t)
