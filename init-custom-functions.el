@@ -138,38 +138,69 @@
 
 ;; Switch (zoom) between split window config and a single window
 (defun toggle-windows-split()
-"Switch back and forth between one window and whatever split of
+  "Switch back and forth between one window and whatever split of
 windows we might have in the frame. The idea is to maximize the
 current buffer, while being able to go back to the previous split
 of windows in the frame simply by calling this command again."
-(interactive)
-(if (not(window-minibuffer-p (selected-window)))
-(progn
-(if (< 1 (count-windows))
-(progn
-(window-configuration-to-register ?u)
-(delete-other-windows))
-(jump-to-register ?u))))
-(my-iswitchb-close))
+  (interactive)
+  (if (not(window-minibuffer-p (selected-window)))
+      (progn
+        (if (< 1 (count-windows))
+            (progn
+              (window-configuration-to-register ?u)
+              (delete-other-windows))
+          (jump-to-register ?u))))
+  (my-iswitchb-close))
+
 (define-key global-map (kbd "C-`") 'toggle-windows-split)
 (define-key global-map (kbd "C-~") 'toggle-windows-split)
 
 ;; Window shifting. C-x-o lets us go forward a window (or several).
 ;; This one lets us go back one or more windows. From Glickstein.
 (defun other-window-backward (&optional n)
-"Select previous Nth window."
-(interactive "P")
-(other-window (- (prefix-numeric-value n))))
+  "Select previous Nth window."
+  (interactive "P")
+  (other-window (- (prefix-numeric-value n))))
+
 (global-set-key [prior] 'other-window)
 (global-set-key [next] 'other-window-backward)
 (global-set-key [(control tab)] 'other-window)
 (global-set-key [(shift control tab)] 'other-window-backward)
 
-;; Also (stolen from someone else’s dot file) this is used to shrink/expand windows without using the mouse.
+;; Also (stolen from someone else's dot file) this is used to shrink/expand windows without using the mouse.
 (define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
 (define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
 (define-key global-map (kbd "C-M-<up>") 'enlarge-window)
 (define-key global-map (kbd "C-M-<down>") 'shrink-window)
+
+
+;;-----------------------------------------------------------------------------
+;; Open in Marked.app -- Stolen from https://github.com/mattsears/emacs
+;;-----------------------------------------------------------------------------
+
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked.app %s"
+           (shell-quote-argument (buffer-file-name)))))
+
+(global-set-key "\C-cm" 'markdown-preview-file)
+
+;;-----------------------------------------------------------------------------
+;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
+;;-----------------------------------------------------------------------------
+
+(defun byte-compile-current-buffer ()
+  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+  (interactive)
+  (when (and (eq major-mode 'emacs-lisp-mode)
+             (file-exists-p (byte-compile-dest-file buffer-file-name)))
+    (byte-compile-file buffer-file-name)))
+
+(add-hook 'after-save-hook 'byte-compile-current-buffer)
+
+
 
 
 (provide 'init-custom-functions)
