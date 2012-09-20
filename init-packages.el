@@ -206,6 +206,17 @@
                :post-init (lambda()
                             (require 'php+-mode)
                             (php+-mode-setup)))
+
+        (:name powerline
+	       :description "Emacs version of the Vim powerline."
+	       :type git
+	       :url "git://github.com/milkypostman/powerline.git"
+	       :load "powerline.el"
+	       :compile ("powerline.el")
+           :features powerline
+           :post-init (lambda()
+                        (require 'powerline)
+                        (powerline-default-theme)))
         
         (:name psvn
                :description "svn interface for Emacs"
@@ -302,13 +313,13 @@
          js2-mode-mooz
          kill-ring-search
          magit
-         magithub
          mark-multiple
          markdown-mode
          multi-term
          multiple-cursors
          nxhtml
          org-mode
+         powerline
          php+-mode
          psvn
          remember
