@@ -88,13 +88,13 @@
                :features ("multiple-cursors" "multiple-cursors-core"
                           "mc-mark-multiple-integration"
                           "mc-edit-lines"))
-        
-;; TODO -- will fork this to my own github and pull from there.
-        ;; (:name org-mac-protocol
-        ;;        :description "Allows creation of org notes from other applications via Quicksilver and remember-mode."
-        ;;        :type http
-        ;;        :url "https://raw.github.com/claviclaws/org-mac-protocol/bf1320958eb2c081b46aa55919de715a22a01c60/org-annotation-quicksilver.el"
-        ;;        :depends "org-mode")
+
+;; TODO troubleshoot this a bit
+        (:name org-annotation-quicksilver
+               :description "Allows creation of org notes from other applications via Quicksilver and remember-mode."
+               :type git
+               :url "https://github.com/jstautz/org-mac-protocol.git"
+               :depends org-mode)
         
         (:name powerline
                :description "Emacs version of the Vim powerline."
@@ -133,12 +133,7 @@
               ))
 
 ;; All packages to install
-
 ;; TODO -- troubleshoot/test multi-term (yanking seemed weird) -- maybe problem with kill?
-;; TODO -- fix nxhtml
-;; TODO -- install and fix yas
-;; TODO -- can probably put org-mac-protocol recipe in here now since dependencies should work...
-
 (unwind-protect
     (let (retval)
       (condition-case ex
@@ -158,7 +153,7 @@
                     mark-multiple
                     markdown-mode
                     multi-term
-;;                    nxhtml
+                    nxhtml
                     org-mode
                     psvn
                     rainbow-mode
