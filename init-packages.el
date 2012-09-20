@@ -97,7 +97,7 @@
                :description "Increase selected region by semantic units."
                :type git
                :url "https://github.com/magnars/expand-region.el"
-               :features expand-region
+               :features ("expand-region" "text-mode-expansions" "org-mode-expansions" "nxml-mode-expansions" "latex-mode-expansions" "js2-mode-expansions" "html-mode-expansions" "feature-mode-expansions" "css-mode-expansions")
                :post-init (lambda()
                             (global-set-key (kbd "C-=") 'er/expand-region)))
         
