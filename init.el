@@ -20,16 +20,16 @@
                         "/Users/jstautz/bin")))
 
 (setq home-dir "/Users/jstautz/"
-      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
+      dotemacs-dir (file-name-directory (or
+      load-file-name (buffer-file-name)))
       emacs-dir "/Applications/Emacs.app/Contents/"
       custom-file (concat dotemacs-dir "init-customizations.el")
-      emacs-bin (concat emacs-dir "MacOS/Emacs")
-      info-dir (concat emacs-dir "Resources/info/"))
+      emacs-bin (concat emacs-dir "MacOS/Emacs") info-dir (concat
+      emacs-dir "Resources/info/"))
 
 (add-to-list 'load-path dotemacs-dir)
 
 (require 'init-packages)
-(require 'init-org)
 (require 'init-customizations)
 (require 'init-custom-functions)
 

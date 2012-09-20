@@ -118,19 +118,6 @@
 
 
 ;;-----------------------------------------------------------------------------
-;; Fix yanking into Emacs terminal
-;; Mad props to Brian Zwahr
-;; http://emacs-journey.blogspot.ca/2012/06/improving-ansi-term.html?m=1
-;;-----------------------------------------------------------------------------
-
-(defun my-term-paste (&optional string)
- (interactive)
- (process-send-string
-  (get-buffer-process (current-buffer))
-  (if string string (current-kill 0))))
-
-
-;;-----------------------------------------------------------------------------
 ;; Nice window-splitting and moving functions
 ;; Thanks to Ignacio Paz Posse
 ;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
@@ -199,8 +186,6 @@ of windows in the frame simply by calling this command again."
     (byte-compile-file buffer-file-name)))
 
 (add-hook 'after-save-hook 'byte-compile-current-buffer)
-
-
 
 
 (provide 'init-custom-functions)
