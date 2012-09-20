@@ -89,7 +89,13 @@
                           "mc-mark-multiple-integration"
                           "mc-edit-lines"))
         
-;; TODO -- add init-powerline.el config file that changes some faces
+;; TODO -- will fork this to my own github and pull from there.
+        ;; (:name org-mac-protocol
+        ;;        :description "Allows creation of org notes from other applications via Quicksilver and remember-mode."
+        ;;        :type http
+        ;;        :url "https://raw.github.com/claviclaws/org-mac-protocol/bf1320958eb2c081b46aa55919de715a22a01c60/org-annotation-quicksilver.el"
+        ;;        :depends "org-mode")
+        
         (:name powerline
                :description "Emacs version of the Vim powerline."
                :type git
@@ -128,9 +134,10 @@
 
 ;; All packages to install
 
-;; TODO -- troubleshoot/test multi-term (yanking seemed weird)
+;; TODO -- troubleshoot/test multi-term (yanking seemed weird) -- maybe problem with kill?
 ;; TODO -- fix nxhtml
 ;; TODO -- install and fix yas
+;; TODO -- can probably put org-mac-protocol recipe in here now since dependencies should work...
 
 (unwind-protect
     (let (retval)
@@ -158,7 +165,8 @@
                     smex
                     smooth-scrolling
                     undo-tree
-                    yaml-mode)
+                    yaml-mode
+                    yasnippet)
 			      (mapcar 'el-get-source-name el-get-sources))))
         ('error (message (format "Caught exception: [%s]" ex))))
         retval)
