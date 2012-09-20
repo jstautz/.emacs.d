@@ -41,13 +41,13 @@
         (:name android-mode
                :description "Minor mode for Android development"
                :type elpa)
-        
-        (:name async
-               :description "Asynchronous processing in Emacs"
+
+        (:name applescript-mode
+               :description "Major mode for editing AppleScript source"
                :type git
-               :url "https://github.com/jwiegley/emacs-async"
-               :features async)
-        
+               :url "https://github.com/kalifg/applescript-mode"
+               :features applescript-mode)
+                
         (:name browse-kill-ring
                :description "View kill-ring with M-y"
                :type elpa
@@ -288,9 +288,8 @@
          ace-jump-mode
          android
          android-mode
-         async
+         applescript-mode
          browse-kill-ring
-         color-theme-solarized
          css-mode
          cucumber
          ecukes
