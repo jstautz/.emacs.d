@@ -42,7 +42,6 @@
                :features android)
 
 ;; TODO -- fix this build script so it performs a sed replace of ECUKES_EL and ECUKES_EMACS vars on install.
-;;         will also need to troubleshoot setup again.
         (:name ecukes
                :description "Cucumber integration testing framework for Emacs"
                :type git
@@ -81,13 +80,13 @@
                :description "Search the kill ring in the minibuffer."
                :type elpa)
 
-        (:name multiple-cursors
-               :description "An experiment in multiple cursors for emacs. Still very much in beta."
-               :type git
-               :url "https://github.com/magnars/multiple-cursors.el.git"
-               :features ("multiple-cursors" "multiple-cursors-core"
-                          "mc-mark-multiple-integration"
-                          "mc-edit-lines"))
+        ;; (:name multiple-cursors
+        ;;        :description "An experiment in multiple cursors for emacs. Still very much in beta."
+        ;;        :type git
+        ;;        :url "https://github.com/magnars/multiple-cursors.el.git"
+        ;;        :load ("multiple-cursors" "multiple-cursors-core"
+        ;;                   "mc-mark-multiple-integration"
+        ;;                   "mc-edit-lines"))
 
 ;; TODO troubleshoot this a bit
         (:name org-annotation-quicksilver
@@ -95,7 +94,7 @@
                :type git
                :url "https://github.com/jstautz/org-mac-protocol.git"
                :depends org-mode)
-        
+
         (:name powerline
                :description "Emacs version of the Vim powerline."
                :type git
@@ -129,7 +128,20 @@
                :type git
                :url "https://github.com/magnars/Emacs-wgrep.git"
                :features wgrep)
-        
+
+        (:name writer-names
+               :description "Generate random names (for fiction writers)"
+               :type git
+               :url "https://github.com/jstautz/writer-names.git"
+               :before (progn
+                         (defvar writer-male-names
+                           (concat el-get-dir "writer-names/census_data/dist.male.first"))
+                         (defvar writer-female-names
+                           (concat el-get-dir "writer-names/census_data/dist.female.first"))
+                         (defvar writer-last-names
+                           (concat el-get-dir "writer-names/census_data/dist.all.last")))
+               :load "writer-names.el")
+               
               ))
 
 ;; All packages to install
