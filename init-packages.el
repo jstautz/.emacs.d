@@ -80,14 +80,6 @@
                :description "Search the kill ring in the minibuffer."
                :type elpa)
 
-        ;; (:name multiple-cursors
-        ;;        :description "An experiment in multiple cursors for emacs. Still very much in beta."
-        ;;        :type git
-        ;;        :url "https://github.com/magnars/multiple-cursors.el.git"
-        ;;        :load ("multiple-cursors" "multiple-cursors-core"
-        ;;                   "mc-mark-multiple-integration"
-        ;;                   "mc-edit-lines"))
-
 ;; TODO troubleshoot this a bit
         (:name org-annotation-quicksilver
                :description "Allows creation of org notes from other applications via Quicksilver and remember-mode."
@@ -165,6 +157,7 @@
                     mark-multiple
                     markdown-mode
                     multi-term
+                    multiple-cursors
                     nxhtml
                     org-mode
                     psvn
