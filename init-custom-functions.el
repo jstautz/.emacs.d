@@ -175,6 +175,22 @@ of windows in the frame simply by calling this command again."
 (global-set-key "\C-cm" 'markdown-preview-file)
 
 ;;-----------------------------------------------------------------------------
+;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
+;;-----------------------------------------------------------------------------
+
+(defun tramp-sudo-reopen ()
+  "Re-open the current with tramp."
+  (interactive)
+  (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
+        (line (line-number-at-pos))
+        (column (current-column)))
+    (kill-buffer)
+    (find-file file-name)
+    (goto-line line)
+    (goto-char (+ (point) column))))
+
+
+;;-----------------------------------------------------------------------------
 ;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
 ;;-----------------------------------------------------------------------------
 
