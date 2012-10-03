@@ -286,7 +286,8 @@
       org-enforce-todo-dependencies nil)
 
 ;; Org-habit options for tracking repeating 'habit' tasks
-(setq org-habit-show-habits-only-for-today nil)
+(setq org-habit-show-habits-only-for-today nil
+      org-habit-show-all-today t)
 
 ;; Options for setting IDs on TODO items when exporting
 (setq org-id-include-domain nil
@@ -299,7 +300,8 @@
 (setq org-clock-into-drawer t
       org-clock-sound nil
       org-clock-modeline-total (quote current)
-      org-clock-history-length 5)
+      org-clock-history-length 5
+      org-clock-continuously t)
 
 ;; My values for time estimates and focus levels
 (setq org-global-properties (quote (("Effort_ALL" .
