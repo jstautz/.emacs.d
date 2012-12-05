@@ -154,7 +154,6 @@
                     ido-ubiquitous
                     js2-mode
                     magit
-                    mark-multiple
                     markdown-mode
                     multi-term
                     multiple-cursors

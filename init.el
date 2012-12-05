@@ -40,7 +40,9 @@
 (ns-toggle-fullscreen)
 
 (message "My .emacs loaded in %ds" (destructuring-bind (hi lo ms) (current-time)
-                             (- (+ hi lo) (+ (first *emacs-load-start*) (second
-                             *emacs-load-start*)))))
+                             (- (+ hi lo) (+ (first *emacs-load-start*)
+                                             (second *emacs-load-start*)))))
 
 
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
