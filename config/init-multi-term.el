@@ -11,6 +11,7 @@
               ("C-c C-c" . term-interrupt-subjob)
               ("C-p" . previous-line)
               ("C-n" . next-line)
+              ("<tab>" . term-dynamic-complete)
               ("C-s" . isearch-forward)
               ("C-r" . isearch-backward)
               ("C-m" . term-send-raw)
