@@ -86,6 +86,11 @@
 ;; Make sure diff works with .org files and others
 (setq diff-switches "-a -c")
 
+;; Let me upcase/downcase regions
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Interface Tweaks
