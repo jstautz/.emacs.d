@@ -40,7 +40,7 @@
                :url "https://raw.github.com/evnm/emacs/master/vendor/android.el"
                :compile ("android.el")
                :features android)
-
+        
 ;; TODO -- fix this build script so it performs a sed replace of ECUKES_EL and ECUKES_EMACS vars on install.
         (:name ecukes
                :description "Cucumber integration testing framework for Emacs"
@@ -149,7 +149,9 @@
                     browse-kill-ring
                     css-mode
                     edb
+                    elisp-slime-nav
                     expand-region
+                    diminish
                     feature-mode
                     ido-ubiquitous
                     js2-mode
