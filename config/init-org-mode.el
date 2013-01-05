@@ -454,7 +454,8 @@ Skips capture tasks."
                          "~/org/inbox.txt"
                          "~/org/notes/book_list.org"
                          "~/org/goals.org"
-                         "~/org/someday_maybe.org")
+                         "~/org/someday_maybe.org"
+                         "~/org/notes/gift_ideas.org")
       org-mobile-inbox-for-pull (concat org-dir "flagged.org")
       org-mobile-directory (concat home-dir "Dropbox/MobileOrg")
       org-mobile-use-encryption t)
