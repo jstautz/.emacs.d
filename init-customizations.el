@@ -14,12 +14,22 @@
 (setq backup-directory-alist `((".*" . ,backup-dir)))
 (setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
 
+;; Make backups of files, even when they're in version control
+(setq vc-make-backup-files t)
+
 ;; When deleting files, move them to Trash
 (setq delete-by-moving-to-trash t)
 (setq trash-directory (concat home-dir ".Trash"))
 
-;; Revert any buffer when file on disk changes 
-(setq global-auto-revert-mode 1)             
+;; Refresh any buffer when file on disk changes
+(setq global-auto-revert-mode 1)
+
+;; ...Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+
+;; ...Also rebuild Tags files, and be quiet about it
+(setq tags-revert-without-query t)
 
 ;; Make mouse/keyboard/EOL/clipboard work sanely on OS X
 (setq mac-emulate-three-button-mouse t)
@@ -28,7 +38,7 @@
 (setq eol-mnemonic-mac "(Mac)")
 (setq x-select-enable-clipboard t)
 
-;; M-x locate use OS X's Spotlight
+;; M-x locate uses OS X's Spotlight
 (setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
 
 ;; If I drag n' drop a file onto Emacs, visit the file (instead of append to buffer)

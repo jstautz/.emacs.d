@@ -118,7 +118,19 @@
 
 
 ;;-----------------------------------------------------------------------------
-;; Nice window-splitting and moving functions
+;; Make zap-to-char act more like "zap-up-to-char"
+;; Thanks to Eric Himmelreich
+;; http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/
+;;-----------------------------------------------------------------------------
+(defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
+  "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
+  The CHAR is replaced and the point is put before CHAR."
+  (insert char)
+  (forward-char -1))
+
+
+;;-----------------------------------------------------------------------------
+;; Window-splitting and moving functions
 ;; Thanks to Ignacio Paz Posse
 ;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
 ;;-----------------------------------------------------------------------------
@@ -164,7 +176,6 @@ of windows in the frame simply by calling this command again."
 ;;-----------------------------------------------------------------------------
 ;; Open in Marked.app -- Stolen from https://github.com/mattsears/emacs
 ;;-----------------------------------------------------------------------------
-
 (defun markdown-preview-file ()
   "run Marked on the current file and revert the buffer"
   (interactive)
@@ -174,10 +185,10 @@ of windows in the frame simply by calling this command again."
 
 (global-set-key "\C-cm" 'markdown-preview-file)
 
+
 ;;-----------------------------------------------------------------------------
 ;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
 ;;-----------------------------------------------------------------------------
-
 (defun tramp-sudo-reopen ()
   "Re-open the current with tramp."
   (interactive)
@@ -193,7 +204,6 @@ of windows in the frame simply by calling this command again."
 ;;-----------------------------------------------------------------------------
 ;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
 ;;-----------------------------------------------------------------------------
-
 (defun byte-compile-current-buffer ()
   "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
   (interactive)
@@ -202,6 +212,40 @@ of windows in the frame simply by calling this command again."
     (byte-compile-file buffer-file-name)))
 
 (add-hook 'after-save-hook 'byte-compile-current-buffer)
+
+
+;;-----------------------------------------------------------------------------
+;; A smarter find-tag that automagically reruns etags when it cant find a
+;; requested item and then makes a new try to locate it.
+;; by Jonas.Jarnestrom<at>ki.ericsson.se
+;; Fri Mar 15 09:52:14 2002
+;; -----------------------------------------------------------------------------
+(defadvice find-tag (around refresh-etags activate)
+  "Rerun etags and reload tags if tag not found and redo find-tag.
+   If buffer is modified, ask about save before running etags."
+  (let ((extension (file-name-extension (buffer-file-name))))
+    (condition-case err
+        ad-do-it
+      (error (and (buffer-modified-p)
+                  (not (ding))
+                  (y-or-n-p "Buffer is modified, save it? ")
+                  (save-buffer))
+             (er-refresh-etags extension)
+             ad-do-it))))
+
+(defun er-refresh-etags (&optional extension)
+  "Run etags on all peer files in current dir and reload them silently."
+  (interactive)
+  (shell-command (format "etags *.%s" (or extension "el")))
+  (let ((tags-revert-without-query t))  ; don't query, revert silently
+    (visit-tags-table default-directory nil)))
+
+;; While we're at it, modify pop-tag-mark to stay centered on cursor
+(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+  "After popping back to where find-tag was invoked,
+   center screen on cursor"
+  (let ((current-prefix-arg '(4)))
+  (call-interactively 'recenter-top-bottom)))
 
 
 (provide 'init-custom-functions)
