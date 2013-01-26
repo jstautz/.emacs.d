@@ -17,7 +17,7 @@
 (setq exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin"
                         "/usr/X11/bin" "/opt/local/bin" "/usr/local/git/bin"
                         "/Applications/Emacs.app/Contents/MacOS/bin"
-                        "/Users/jstautz/bin")))
+                        "/Users/jstautz/bin" "/usr/texbin")))
 
 (setq home-dir "/Users/jstautz/"
       dotemacs-dir (file-name-directory (or

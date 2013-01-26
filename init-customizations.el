@@ -163,6 +163,9 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Unset C-x C-c -- I hit this by accident way too often.
+(global-unset-key "\C-x\C-c")
+
 ;; Rebind M-s to save-buffer -- I never center lines
 (global-set-key (kbd "M-s") 'save-buffer)
 (add-hook 'text-mode-hook

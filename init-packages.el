@@ -70,12 +70,22 @@
                :description "Ecukes step definitions"
                :type git
                :url "https://github.com/rejeep/espuds")
+
+        (:name htmlize
+               :description "Convert buffer text and decorations to HTML."
+               :type git
+               :url "http://fly.srk.fer.hr/~hniksic/emacs/htmlize.git")
         
         (:name ido
                :description "Interactively Do Things. Fuzzy match buffers/files/etc."
                :type http
                :url "http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/ido.el")
 
+        (:name impatient-mode
+               :description "See your html rendered in browser as yout type"
+               :type git
+               :url "https://github.com/netguy204/imp.el.git")
+        
         (:name kill-ring-search
                :description "Search the kill ring in the minibuffer."
                :type elpa)
@@ -108,6 +118,11 @@
                :url "http://repo.or.cz/r/remember-el.git"
                :compile ("remember.el")
                :features remember)
+
+        (:name simple-httpd
+               :description "A simple Emacs webserver"
+               :type git
+               :url "https://github.com/skeeto/emacs-http-server.git")
 
         (:name unbound
                :description "Find convenient unbound keybindings."
@@ -146,6 +161,10 @@
 			      '(ace-jump-mode
                     android-mode
                     applescript-mode
+                    auto-complete
+                    auto-complete-css
+                    auto-complete-emacs-lisp
+                    auto-complete-yasnippet
                     browse-kill-ring
                     css-mode
                     edb
@@ -183,5 +202,5 @@
         ('error (message (format "Caught exception: [%s]" ex))))
         retval)
   (message "Attempting el-get sync..."))
-
+ 
 (provide 'init-packages)
