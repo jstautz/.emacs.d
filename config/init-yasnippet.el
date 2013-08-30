@@ -7,3 +7,7 @@
 (add-hook 'markdown-mode-hook 
           #'(lambda () 
               (local-set-key [tab] 'yas-expand)))
+
+;; disable yas in org-mode agenda -- may be causing crashes
+(setq yas-dont-activate "*Org Agenda*")
+
