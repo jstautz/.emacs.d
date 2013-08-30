@@ -11,9 +11,8 @@ Makes heavy use of [[http://github.com/dimitri/el-get][el-get]] to manage and in
 Very [[http://orgmode.org/][org-mode]] heavy. My org-mode setup is ugly and complicated and personal -- you'll probably want to change a lot of it.
 
 *** Disclaimers
-- Requires Emacs 24. Only tested on Mac OS X.
-- Makes use of the [[https://gist.github.com/1397155][ns-toggle-fullscreen patch]] for Emacs 24.
-- First load will require an internet connection to download packages (this will take a while).
+- Requires Emacs 24.3 Only tested on Mac OS X.
+- First load will require an internet connection to download packages (this will take a while and may blow up).
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies.
 - secrets.el.gpg is an encrypted store containing passwords, etc. You'll want to replace that with your own.
-- A perpetual work in progress, currently undergoing some heavy refactoring.
+- A perpetual work in progress.
