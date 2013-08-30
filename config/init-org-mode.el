@@ -87,8 +87,7 @@
 ;;-----------------------------------------------------------------------------
 ;; Agenda setup
 ;;-----------------------------------------------------------------------------
-(setq org-agenda-files '("~/org/flagged.org"
-                         "~/org/inbox.txt"
+(setq org-agenda-files '("~/org/inbox.txt"
                          "~/org/projects.org"))
 ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
 ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
@@ -165,33 +164,13 @@
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
-			   (tags-todo "@cpu-REFILE"
-						  ((org-agenda-overriding-header "Computer Tasks")
-						   (org-tags-match-list-sublevels t)
-						   (org-agenda-todo-ignore-scheduled 'future)
-						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
 			   (tags-todo "@errands-REFILE"
 						  ((org-agenda-overriding-header "Errands")
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
-			   (tags-todo "@transit-REFILE"
-						  ((org-agenda-overriding-header "Transit Tasks")
-						   (org-tags-match-list-sublevels t)
-						   (org-agenda-todo-ignore-scheduled 'future)
-						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
 			   ))
-			 ("c" "@cpu + calendar"
-              ((agenda "")
-			   (tags-todo "@cpu-REFILE" 
-						  ((org-agenda-overriding-header "All Computer Tasks")
-						   (org-agenda-todo-ignore-scheduled 'future)
-						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
-               ))
 			 ("d" "@desk"
               ((tags-todo "@desk-REFILE" 
 						  ((org-agenda-overriding-header "All Desk/Writing Tasks")
@@ -208,16 +187,74 @@
 							'(todo-state-down effort-up category-keep))))
 			   ))
              ("r" "@errands" tags-todo "@errands")
-             ("z" "@transit" tags-todo "@transit")
              ("w" "@work + agenda"
               ((agenda "")
-			   (tags-todo "@work-REFILE" 
-						  ((org-agenda-overriding-header "All Work Tasks")
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-08-01]\"+CLOSED<=\"[2013-08-02]\""
+                     ((org-agenda-overriding-header "Completed Today")))
+               (tags-todo "@work-REFILE/!STARTED" 
+						  ((org-agenda-overriding-header "Doing")
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
-
-			   ))
+               (tags-todo "@work-REFILE/!NEXT"
+                          ((org-agenda-overriding-header "To Do Today")
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags-todo "@work-REFILE/!WAITING"
+                          ((org-agenda-overriding-header "Impeded / Waiting Response")
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags-todo "@work-REFILE/!TODO"
+                          ((org-agenda-overriding-header "Queue")
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               ))
+             ("p" "public @work todos"
+              ((tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-08-01]\"+CLOSED<=\"[2013-08-02]\""
+                     ((org-agenda-overriding-header "Completed Today")))
+               (tags-todo "@work-REFILE-noexport/!STARTED" 
+                          ((org-agenda-overriding-header "Doing")
+                           (org-agenda-todo-ignore-scheduled 'future)
+                           (org-agenda-sorting-strategy
+                            '(todo-state-down effort-up category-keep))))
+               (tags-todo "@work-REFILE-noexport/!NEXT"
+                          ((org-agenda-overriding-header "To Do Today")
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags-todo "@work-REFILE-noexport/!WAITING"
+                          ((org-agenda-overriding-header "Impeded / Waiting Response")
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags-todo "@work-REFILE-noexport/!TODO"
+                          ((org-agenda-overriding-header "Queue")
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-31]\"+CLOSED<=\"[2013-08-01]\""
+                     ((org-agenda-overriding-header "Completed Yesterday")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-30]\"+CLOSED<=\"[2013-07-31]\""
+                     ((org-agenda-overriding-header "Completed [2013-07-30]")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-29]\"+CLOSED<=\"[2013-07-30]\""
+                     ((org-agenda-overriding-header "Completed [2013-07-29]")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-26]\"+CLOSED<=\"[2013-07-27]\""
+                     ((org-agenda-overriding-header "Completed [2013-07-26]")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-25]\"+CLOSED<=\"[2013-07-26]\""
+                     ((org-agenda-overriding-header "Completed [2013-07-25]")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-24]\"+CLOSED<=\"[2013-07-25]\""
+                     ((org-agenda-overriding-header "Completed [2013-06-24]")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-23]\"+CLOSED<=\"[2013-07-24]\""
+                     ((org-agenda-overriding-header "Completed [2013-06-23]")))
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-22]\"+CLOSED<=\"[2013-07-23]\""
+                     ((org-agenda-overriding-header "Completed [2013-06-22]")))
+               
+			   )
+               nil
+               ("~/Desktop/work.html"))
 			 ))
 
 ;; A couple of helper functions for org agendas from Bernt Hansen
@@ -374,7 +411,7 @@ Skips capture tasks."
         ("AppleScript remember" ?y "* %:shortdesc\n  %:initial\n   Source: %u, %c\n\n  %?"
          (concat org-dir "inbox.txt"))
         ("AppleScript note" ?z "* %?\n\n  Date: %u\n"
-         (concat org-dir "inbox.org"))))
+         (concat org-dir "inbox.txt"))))
 
 ;; When taking notes in inbox, put newest at top
 (setq org-reverse-note-order (quote (("inbox" . t))))
@@ -418,6 +455,32 @@ Skips capture tasks."
       org-icalendar-include-todo t
       org-icalendar-store-UID t)
 
+;; Testing some agenda export functions
+(setq org-agenda-exporter-settings
+                '((htmlize-output-type 'css)))
+
+;; Set styles for htmlize agenda export
+(setq org-agenda-export-html-style "<style type="text/css">
+       p { font-weight: normal; color: gray; }
+       .org-agenda-structure {
+          font-size: 110%;
+          color: #003399;
+          font-weight: 600;
+       }
+       .org-todo {
+          color: #cc6666;
+          font-weight: bold;
+       }
+       .org-agenda-done {
+          color: #339933;
+       }
+       .org-done {
+          color: #339933;
+       }
+       .title { text-align: center; }
+       .todo, .deadline { color: red; }
+       .done { color: green; }
+    </style>")
 
 ;;-----------------------------------------------------------------------------
 ;; Notifications -- use Growl to send org & calendar notifications
@@ -456,8 +519,8 @@ Skips capture tasks."
                          "~/org/goals.org"
                          "~/org/someday_maybe.org"
                          "~/org/notes/gift_ideas.org")
-      org-mobile-inbox-for-pull (concat org-dir "flagged.org")
-      org-mobile-directory (concat home-dir "Dropbox/MobileOrg")
+      org-mobile-inbox-for-pull (concat org-dir "inbox.txt")
+      org-mobile-directory (concat home-dir "Dropbox/Apps/MobileOrg")
       org-mobile-use-encryption t)
 
 ;; decrypt using keys in my secrets.el file
