@@ -20,14 +20,15 @@
                         "/Users/jstautz/bin" "/usr/texbin")))
 
 (setq home-dir "/Users/jstautz/"
-      dotemacs-dir (file-name-directory (or
-      load-file-name (buffer-file-name)))
+      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
       emacs-dir "/Applications/Emacs.app/Contents/"
       custom-file (concat dotemacs-dir "init-customizations.el")
-      emacs-bin (concat emacs-dir "MacOS/Emacs") info-dir (concat
-      emacs-dir "Resources/info/"))
+      emacs-bin (concat emacs-dir "MacOS/Emacs")
+      info-dir (concat emacs-dir "Resources/info/"))
 
 (add-to-list 'load-path dotemacs-dir)
+
+
 
 (require 'init-packages)
 (require 'init-customizations)
@@ -35,10 +36,20 @@
 
 (server-start)
 
-;; NOTE: fullscreen requires patched Emacs 24
-;; See https://gist.github.com/1397155
-(ns-toggle-fullscreen)
-
-(message "My .emacs loaded in %ds" (destructuring-bind (hi lo ms) (current-time)
-                             (- (+ hi lo) (+ (first *emacs-load-start*)
-                                             (second *emacs-load-start*)))))
+;; TODO clean this up a bit.
+(message "My .emacs loaded in %ds" 
+         (let ((emacs-sub-version 
+                (string-to-number (nth 2 (split-string emacs-version "\\.")))))
+           (if (and (>= emacs-major-version 24)
+                    (>= emacs-minor-version 2)
+                    (>= emacs-sub-version 1))
+               (destructuring-bind              
+                   (hi lo ms ps)
+                   (current-time)
+                 (- (+ hi lo) (+ (first *emacs-load-start*)
+                                 (second *emacs-load-start*))))
+             (destructuring-bind              
+                 (hi lo ms)
+                 (current-time)
+               (- (+ hi lo) (+ (first *emacs-load-start*)
+                               (second *emacs-load-start*)))))))
