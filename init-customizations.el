@@ -19,7 +19,7 @@
 
 ;; When deleting files, move them to Trash
 (setq delete-by-moving-to-trash t)
-(setq trash-directory (concat home-dir ".Trash"))
+(setq trash-directory (concat home-dir ".Trash/"))
 
 ;; Refresh any buffer when file on disk changes
 (setq global-auto-revert-mode 1)
@@ -114,16 +114,15 @@
 (setq inhibit-splash-screen 1)               
 (setq visible-bell 1)                        
 (setq ring-bell-function (lambda ()))
-(tool-bar-mode 0)
-(scroll-bar-mode nil)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
 
 ;; TODO -- want to adjust these?
-(setq 
-  scroll-margin 0
-  scroll-conservatively 100000
-  scroll-up-aggressively 0
-  scroll-down-aggressively 0
-  scroll-preserve-screen-position t)
+(setq scroll-margin 0
+      scroll-conservatively 100000
+      scroll-up-aggressively nil
+      scroll-down-aggressively nil
+      scroll-preserve-screen-position t)
 
 (mouse-avoidance-mode 'jump)
 
@@ -166,6 +165,9 @@
 ;; Unset C-x C-c -- I hit this by accident way too often.
 (global-unset-key "\C-x\C-c")
 
+;; Up yours, read-only toggle
+(global-unset-key "\C-x\C-q")
+
 ;; Rebind M-s to save-buffer -- I never center lines
 (global-set-key (kbd "M-s") 'save-buffer)
 (add-hook 'text-mode-hook
@@ -201,6 +203,12 @@
 (eval-after-load 'dired
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
+
+;; Join following lines to this one. Neat!
+(global-set-key (kbd "M-j")
+            (lambda ()
+                  (interactive)
+                  (join-line -1)))
 
 
 
