@@ -65,7 +65,7 @@
                :url "https://raw.github.com/emacsmirror/elip/master/source/elip.el"
                :depends edb
                :features elip)
-        
+
         (:name espuds
                :description "Ecukes step definitions"
                :type git
@@ -86,6 +86,13 @@
                :type git
                :url "https://github.com/netguy204/imp.el.git")
         
+        (:name kanban
+               :description "Parse org-todo headlines to use org-tables as Kanban tables"
+               :type http
+               :url "https://bitbucket.org/ArneBab/kanban.el/raw/ce256090a5a4ef6db00a8ba78d9bd5838571d4ea/kanban.el"
+               :depends org-mode
+               :features kanban)
+        
         (:name kill-ring-search
                :description "Search the kill ring in the minibuffer."
                :type elpa)
@@ -96,13 +103,6 @@
                :type git
                :url "https://github.com/jstautz/org-mac-protocol.git"
                :depends org-mode)
-
-        (:name powerline
-               :description "Emacs version of the Vim powerline."
-               :type git
-               :url "git://github.com/milkypostman/powerline.git"
-               :load "powerline.el"
-               :compile ("powerline.el"))
 
         (:name restclient
                :description "Manually explore and test HTTP REST webservices"
@@ -130,6 +130,12 @@
                :url "http://www.emacswiki.org/emacs/download/unbound.el"
                :features unbound)
 
+        (:name wc-mode
+               :description "Running word count with goals (minor mode)"
+               :type git
+               :url "https://github.com/bnbeckwith/wc-mode.git"
+               :features wc-mode)
+        
         (:name wgrep
                :description "Writable grep buffer, apply the changes to files."
                :type git
@@ -142,11 +148,11 @@
                :url "https://github.com/jstautz/writer-names.git"
                :before (progn
                          (defvar writer-male-names
-                           (concat el-get-dir "writer-names/census_data/dist.male.first"))
+                           (concat el-get-dir "/writer-names/census_data/dist.male.first"))
                          (defvar writer-female-names
-                           (concat el-get-dir "writer-names/census_data/dist.female.first"))
+                           (concat el-get-dir "/writer-names/census_data/dist.female.first"))
                          (defvar writer-last-names
-                           (concat el-get-dir "writer-names/census_data/dist.all.last")))
+                           (concat el-get-dir "/writer-names/census_data/dist.all.last")))
                :load "writer-names.el")
                
               ))
@@ -167,11 +173,15 @@
                     auto-complete-yasnippet
                     browse-kill-ring
                     css-mode
+                    diminish
                     edb
                     elisp-slime-nav
+                    ;;ensime
                     expand-region
-                    diminish
                     feature-mode
+                    git-modes
+                    ghc-mod
+                    haskell-mode
                     ido-ubiquitous
                     js2-mode
                     magit
@@ -182,6 +192,7 @@
                     org-mode
                     psvn
                     rainbow-mode
+                    scala-mode2
                     smex
                     smooth-scrolling
                     undo-tree
