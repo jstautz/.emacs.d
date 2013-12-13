@@ -71,6 +71,20 @@
 
 
 ;;-----------------------------------------------------------------------------
+;; Eval and replace -- replace current sexp with its value
+;;-----------------------------------------------------------------------------
+
+(defun eval-and-replace ()
+  "Replace the preceding sexp with its value."
+  (interactive)
+  (backward-kill-sexp)
+  (prin1 (eval (read (current-kill 0)))
+         (current-buffer)))
+
+(global-set-key (kbd "C-c e") 'eval-and-replace)
+
+
+;;-----------------------------------------------------------------------------
 ;; i-search with initial contents.
 ;; original src: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
 ;;-----------------------------------------------------------------------------
@@ -148,8 +162,7 @@ of windows in the frame simply by calling this command again."
             (progn
               (window-configuration-to-register ?u)
               (delete-other-windows))
-          (jump-to-register ?u))))
-  (my-iswitchb-close))
+          (jump-to-register ?u)))))
 
 (define-key global-map (kbd "C-`") 'toggle-windows-split)
 (define-key global-map (kbd "C-~") 'toggle-windows-split)
@@ -215,7 +228,7 @@ of windows in the frame simply by calling this command again."
 
 
 ;;-----------------------------------------------------------------------------
-;; A smarter find-tag that automagically reruns etags when it cant find a
+;; A smarter find-tag that automagically reruns etags when it can't find a
 ;; requested item and then makes a new try to locate it.
 ;; by Jonas.Jarnestrom<at>ki.ericsson.se
 ;; Fri Mar 15 09:52:14 2002
