@@ -444,9 +444,10 @@ Skips capture tasks."
 ;;-----------------------------------------------------------------------------
 ;; Custom link types
 ;;-----------------------------------------------------------------------------
-(org-add-link-type "jira" 'org-jira-open)
 
-(setq org-jira-url "http://jira.hootsuitemedia.com/")
+(jcs:decrypt-secrets)
+(org-add-link-type "jira" 'org-jira-open)
+(setq org-jira-url org-jira-url)
 
 (defun org-jira-open (issue)
   "Visit details page for JIRA issue on HootSuite's Jira site
