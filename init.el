@@ -12,7 +12,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'cl)
-(defvar *emacs-load-start* (current-time))
 
 (setq exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin"
                         "/usr/X11/bin" "/opt/local/bin" "/usr/local/git/bin"
@@ -28,28 +27,8 @@
 
 (add-to-list 'load-path dotemacs-dir)
 
-
-
 (require 'init-packages)
 (require 'init-customizations)
 (require 'init-custom-functions)
 
 (server-start)
-
-;; TODO clean this up a bit.
-(message "My .emacs loaded in %ds" 
-         (let ((emacs-sub-version 
-                (string-to-number (nth 2 (split-string emacs-version "\\.")))))
-           (if (and (>= emacs-major-version 24)
-                    (>= emacs-minor-version 2)
-                    (>= emacs-sub-version 1))
-               (destructuring-bind              
-                   (hi lo ms ps)
-                   (current-time)
-                 (- (+ hi lo) (+ (first *emacs-load-start*)
-                                 (second *emacs-load-start*))))
-             (destructuring-bind              
-                 (hi lo ms)
-                 (current-time)
-               (- (+ hi lo) (+ (first *emacs-load-start*)
-                               (second *emacs-load-start*)))))))
