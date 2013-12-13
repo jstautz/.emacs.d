@@ -124,8 +124,6 @@
       scroll-down-aggressively nil
       scroll-preserve-screen-position t)
 
-(mouse-avoidance-mode 'jump)
-
 ;; ignore case when completing, including filenames
 (setq completion-ignore-case t           
   read-file-name-completion-ignore-case t)
