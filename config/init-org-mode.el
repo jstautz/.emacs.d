@@ -88,13 +88,16 @@
 ;; Agenda setup
 ;;-----------------------------------------------------------------------------
 (setq org-agenda-files '("~/org/inbox.txt"
-                         "~/org/projects.org"))
+                         "~/org/personal/"
+                         "~/org/work/"))
+
 ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
 ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
 
 ;; Search on other files, too
 (setq org-agenda-text-search-extra-files '("~/org/goals.org"
                                            "~/org/someday_maybe.org"
+                                           "~/org/notes/gift_ideas.org"
                                            "~/org/notes/tech_log.txt"
                                            "~/org/notes/reference.org"))
 
@@ -189,7 +192,9 @@
              ("r" "@errands" tags-todo "@errands")
              ("w" "@work + agenda"
               ((agenda "")
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-08-01]\"+CLOSED<=\"[2013-08-02]\""
+               (tags (concat "@work-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
                      ((org-agenda-overriding-header "Completed Today")))
                (tags-todo "@work-REFILE/!STARTED" 
 						  ((org-agenda-overriding-header "Doing")
@@ -211,9 +216,32 @@
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
+               (tags (concat "@work-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 1)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]") "\"")
+                     ((org-agenda-overriding-header "Completed Yesterday")))
+               (tags (concat "@work-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 2)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 1))) "\"")
+                     ((org-agenda-overriding-header "Completed Two Days Ago")))
+               (tags (concat "@work-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 3)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 2))) "\"")
+                     ((org-agenda-overriding-header "Completed Three Days Ago")))
+               
                ))
              ("p" "public @work todos"
-              ((tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-08-01]\"+CLOSED<=\"[2013-08-02]\""
+              ((tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
                      ((org-agenda-overriding-header "Completed Today")))
                (tags-todo "@work-REFILE-noexport/!STARTED" 
                           ((org-agenda-overriding-header "Doing")
@@ -235,23 +263,29 @@
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-31]\"+CLOSED<=\"[2013-08-01]\""
+               (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 1)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]") "\"")
                      ((org-agenda-overriding-header "Completed Yesterday")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-30]\"+CLOSED<=\"[2013-07-31]\""
-                     ((org-agenda-overriding-header "Completed [2013-07-30]")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-29]\"+CLOSED<=\"[2013-07-30]\""
-                     ((org-agenda-overriding-header "Completed [2013-07-29]")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-26]\"+CLOSED<=\"[2013-07-27]\""
-                     ((org-agenda-overriding-header "Completed [2013-07-26]")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-25]\"+CLOSED<=\"[2013-07-26]\""
-                     ((org-agenda-overriding-header "Completed [2013-07-25]")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-24]\"+CLOSED<=\"[2013-07-25]\""
-                     ((org-agenda-overriding-header "Completed [2013-06-24]")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-23]\"+CLOSED<=\"[2013-07-24]\""
-                     ((org-agenda-overriding-header "Completed [2013-06-23]")))
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CATEGORY=\"Work\"+CLOSED>=\"[2013-07-22]\"+CLOSED<=\"[2013-07-23]\""
-                     ((org-agenda-overriding-header "Completed [2013-06-22]")))
-               
+               (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 2)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 1))) "\"")
+                     ((org-agenda-overriding-header "Completed Two Days Ago")))
+               (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 3)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 2))) "\"")
+                     ((org-agenda-overriding-header "Completed Three Days Ago")))
+
+               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\"[2013-11-28]\"+CLOSED<=\"[2013-11-27]\""
+                     ((org-agenda-overriding-header "Completed 2013-11-28")))
 			   )
                nil
                ("~/Desktop/work.html"))
@@ -349,7 +383,8 @@
       org-clock-in-resume t)
 
 ;;org clocks if I restart emacs w/ running clock
-(setq org-clock-persist t)
+(setq org-clock-persist t
+      org-clock-persist-file "~/.emacs.d/.org-clock-save.el")
 (org-clock-persistence-insinuate)
 
 ;; When and how to log TODO changes and scheduling changes
@@ -383,47 +418,23 @@ Skips capture tasks."
 ;; Capture, Refile, Archive
 ;;-----------------------------------------------------------------------------
 
-;; Use Remember for note capture
-;;   (technically deprecated, but I like it more than org-capture)
-(org-remember-insinuate)
-(setq org-default-notes-file (concat org-dir "inbox.txt"))
-(define-key global-map "\C-cr" 'org-remember)
-(setq remember-annotation-functions '(org-remember-annotation))
-(setq remember-handler-functions '(org-remember-handler))
-(add-hook 'remember-mode-hook 'org-remember-apply-template)
-
-;; Remember templates for org-remember:
-;;   t = new TODO item
-;;   j = new journal entry (dated today)
-;;   i = new inbox item
-;;   q = only used via QuickSilver -- new inbox item
-     (setq org-remember-templates
-      '(("Todo" ?t "*** TODO %^{Action to be taken} %^G\n    %?\n    Added: %U"
-         (concat org-dir "projects.org") "Unfiled")
-        ("Journal" ?j "* %U %^{Title} %^g\n\n%?\n"
-         (concat writing-dir "01-composting/journal.txt") top)
-        ("Inbox" ?i "* %U %^{Title}\n  %i%?\n   %a\n\n"
-         (concat org-dir "inbox.txt") top)
-        ("oldQS remember" ?f "* %U %?\n%i\n%a\n\n"
-         (concat org-dir "inbox.txt") top)
-        ("QS remember" ?q "* %i\n\n  Added: %U"
-         (concat org-dir "inbox.txt") top)
-        ("AppleScript remember" ?y "* %:shortdesc\n  %:initial\n   Source: %u, %c\n\n  %?"
-         (concat org-dir "inbox.txt"))
-        ("AppleScript note" ?z "* %?\n\n  Date: %u\n"
-         (concat org-dir "inbox.txt"))))
-
-;; When taking notes in inbox, put newest at top
-(setq org-reverse-note-order (quote (("inbox" . t))))
-
-;; Use org-annotation-quicksilver to send items from QS (or Alfred, etc)
-;;   (also deprecated, but haven't got its successor, org-mac-protocol,
-;;    to work the way I want it yet.)
-;;(require 'org-annotation-quicksilver)
-
 ;; Where to look for refile targets
-(setq org-refile-targets (quote ((("~/org/projects.org"
-                                   "~/org/someday_maybe.org") :maxlevel . 2))))
+;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
+(setq org-refile-targets (quote ((("/Users/jstautz/org/personal/condo.org"
+                                   "/Users/jstautz/org/personal/family.org"
+                                   "/Users/jstautz/org/personal/finance.org"
+                                   "/Users/jstautz/org/personal/friends.org"
+                                   "/Users/jstautz/org/personal/habits.org"
+                                   "/Users/jstautz/org/personal/org-system.org"
+                                   "/Users/jstautz/org/personal/programming.org"
+                                   "/Users/jstautz/org/personal/writing-projects.org"
+                                   "/Users/jstautz/org/work/engineering-mgmt.org"
+                                   "/Users/jstautz/org/work/leadership-team.org"
+                                   "/Users/jstautz/org/work/learning.org"
+                                   "/Users/jstautz/org/work/notes-reference.org"
+                                   "/Users/jstautz/org/work/product.org"
+                                   "/Users/jstautz/org/work/recruiting.org"
+                                   "/Users/jstautz/org/someday_maybe.org") :maxlevel . 2))))
 
 ;; Archiving options
 (setq org-archive-location (concat org-dir "archives.org::")
@@ -438,7 +449,7 @@ Skips capture tasks."
 (setq org-jira-url "http://jira.hootsuitemedia.com/")
 
 (defun org-jira-open (issue)
-  "Visit details page for JIRA issue.
+  "Visit details page for JIRA issue on HootSuite's Jira site
      Issue agrument should be a valid issue ID, e.g. AND-123"
   (org-open-link-from-string (concat org-jira-url "browse/" issue)))
 
@@ -513,12 +524,8 @@ Skips capture tasks."
 ;; org-mobile settings -- for export/sync to iOS app
 ;;-----------------------------------------------------------------------------
 
-(setq org-mobile-files '("~/org/projects.org"
-                         "~/org/inbox.txt"
-                         "~/org/notes/book_list.org"
-                         "~/org/goals.org"
-                         "~/org/someday_maybe.org"
-                         "~/org/notes/gift_ideas.org")
+(setq org-mobile-files '(org-agenda-files
+                         org-agenda-text-search-extra-files)
       org-mobile-inbox-for-pull (concat org-dir "inbox.txt")
       org-mobile-directory (concat home-dir "Dropbox/Apps/MobileOrg")
       org-mobile-use-encryption t)
@@ -531,4 +538,4 @@ Skips capture tasks."
 (setq org-crypt-disable-auto-save nil)
 
 
-(provide 'init-org)
+(provide 'init-org-mode)
