@@ -202,28 +202,19 @@
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
 
-;; Join following lines to this one. Neat!
-(global-set-key (kbd "M-j")
-            (lambda ()
-                  (interactive)
-                  (join-line -1)))
-
-
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(mode-line ((t (:background "DeepSkyBlue3" :foreground "white" :box (:line-width -1 :style released-button)))))
- '(mode-line-inactive ((t (:inherit mode-line :background "grey29" :foreground "grey50" :box (:line-width -1 :color "grey50") :weight light)))))
-
+ )
 
 (provide 'init-customizations)
