@@ -1,4 +1,3 @@
-#+Title: .emacs.d README
 #+AUTHOR: Jeff Stautz
 
 * My emacs config 
