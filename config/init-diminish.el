@@ -1,1 +1,0 @@
-;;(diminish 'yas-minor-mode)
