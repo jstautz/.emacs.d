@@ -128,6 +128,30 @@
 (setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS/-DONE"
   ("TODO" "NEXT" "STARTED") ("NOTES") "")))
 
+;; Custom function to return agenda header strings based on WIP limit
+(defun jcs:wip-text (tags todo limit)
+  "Return string to indicate whether WIP limit is exceeded for a
+particular tag/todo keyword/limit. For use in
+agenda-overriding-header functions. If limit exceeded, string
+returned is wrapped in #s"
+  (cond
+   ((equal "TODO" todo)
+    (setq org-wip-header-text "Queue"))
+   ((equal "STARTED" todo)
+    (setq org-wip-header-text "Doing"))
+   ((equal "NEXT" todo)
+    (setq org-wip-header-text "To Do Today"))
+   ((equal "WAITING" "WAITING")
+    (setq org-wip-header-text "Impeded / Waiting Response"))
+   (t
+    (setq org-wip-header-text "Queue"))
+   )
+  (if (<= (length (org-map-entries t (concat tags "/+" todo) 'agenda)) limit)
+      org-wip-header-text
+    (concat "# " org-wip-header-text " #")))
+
+
+
 ;; My custom Agenda commands
 (setq org-agenda-custom-commands
            '(
@@ -197,22 +221,22 @@
                              (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
                      ((org-agenda-overriding-header "Completed Today")))
                (tags-todo "@work-REFILE/!STARTED" 
-						  ((org-agenda-overriding-header "Doing")
+						  ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!NEXT"
-                          ((org-agenda-overriding-header "To Do Today")
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 3))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!WAITING"
-                          ((org-agenda-overriding-header "Impeded / Waiting Response")
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!TODO"
-                          ((org-agenda-overriding-header "Queue")
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 15))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))

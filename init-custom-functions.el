@@ -6,14 +6,6 @@
 
 
 ;;-----------------------------------------------------------------------------
-;; Decrypt and load secrets.el.gpg file containing passwords, etc.
-;;-----------------------------------------------------------------------------
-(defun jcs:decrypt-secrets ()
-  (interactive)
-  (require 'secrets))
-
-
-;;-----------------------------------------------------------------------------
 ;; jcs:getcals -- Sync my Google Calendars to emacs diary
 ;;-----------------------------------------------------------------------------
 (require 'icalendar)

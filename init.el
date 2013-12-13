@@ -27,6 +27,11 @@
 
 (add-to-list 'load-path dotemacs-dir)
 
+;; Decrypt and load secrets.el.gpg file containing passwords, etc.
+(defun jcs:decrypt-secrets ()
+  (interactive)
+  (require 'secrets))
+
 (require 'init-packages)
 (require 'init-customizations)
 (require 'init-custom-functions)
