@@ -54,6 +54,26 @@
         (:name kill-ring-search
                :description "Search the kill ring in the minibuffer."
                :type elpa)
+
+        (:name gmail-message-mode
+               :description "Edit Gmail messages with markdown syntax. For use with Chrome 'Edit with Emacs' extension."
+               :type github
+               :pkgname "Bruce-Connor/gmail-mode"
+               :depends (ham-mode)
+               :features gmail-message-mode)
+
+        (:name ham-mode
+               :description "Seamlessly edit an html file using markdown."
+               :type github
+               :pkgname "Bruce-Connor/ham-mode"
+               :depends (html-to-markdown markdown-mode)
+               :features ham-mode)
+
+        (:name html-to-markdown
+               :description ""
+               :type github
+               :pkgname "Bruce-Connor/html-to-markdown"
+               :features html-to-markdown)
         
         (:name restclient
                :description "Manually explore and test HTTP REST webservices"
@@ -92,6 +112,7 @@
          browse-kill-ring
          dash
          diminish
+         edit-server
          expand-region
          f
          ido-ubiquitous
