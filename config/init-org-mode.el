@@ -88,8 +88,8 @@
 ;; Agenda setup
 ;;-----------------------------------------------------------------------------
 (setq org-agenda-files '("~/org/inbox.txt"
-                         "~/org/personal/"
-                         "~/org/work/"))
+                         "~/org/personal.org"
+                         "~/org/work.org"))
 
 ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
 ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
@@ -346,7 +346,7 @@ returned is wrapped in #s"
 ;;-----------------------------------------------------------------------------
 (setq diary-file (concat org-dir "calendar.diary"))
 (add-hook 'diary-display-hook 'fancy-diary-display)
-(setq list-diary-entries-hook
+(setq diary-list-entries-hook
       '(include-other-diary-files sort-diary-entries))
 (add-hook 'mark-diary-entries-hook 'mark-included-diary-files)
 
@@ -394,8 +394,9 @@ returned is wrapped in #s"
 ;;-----------------------------------------------------------------------------
 (setq org-clock-into-drawer t
       org-clock-sound nil
-      org-clock-modeline-total (quote current)
-      org-clock-history-length 5)
+      org-clock-mode-line-total 'current
+      org-clock-history-length 5
+      org-clock-clocked-in-display 'mode-line)
 
 ;; My values for time estimates and focus levels
 (setq org-global-properties (quote (("Effort_ALL" .
@@ -432,7 +433,7 @@ Skips capture tasks."
   (interactive)
   (save-excursion
     (beginning-of-line 0)
-    (org-remove-empty-drawer-at "CLOCK" (point))))
+    (org-remove-empty-drawer-at (point))))
 
 (add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
 (setq org-clock-out-remove-zero-time-clocks t)
@@ -444,20 +445,8 @@ Skips capture tasks."
 
 ;; Where to look for refile targets
 ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
-(setq org-refile-targets (quote ((("/Users/jstautz/org/personal/condo.org"
-                                   "/Users/jstautz/org/personal/family.org"
-                                   "/Users/jstautz/org/personal/finance.org"
-                                   "/Users/jstautz/org/personal/friends.org"
-                                   "/Users/jstautz/org/personal/habits.org"
-                                   "/Users/jstautz/org/personal/org-system.org"
-                                   "/Users/jstautz/org/personal/programming.org"
-                                   "/Users/jstautz/org/personal/writing-projects.org"
-                                   "/Users/jstautz/org/work/engineering-mgmt.org"
-                                   "/Users/jstautz/org/work/leadership-team.org"
-                                   "/Users/jstautz/org/work/learning.org"
-                                   "/Users/jstautz/org/work/notes-reference.org"
-                                   "/Users/jstautz/org/work/product.org"
-                                   "/Users/jstautz/org/work/recruiting.org"
+(setq org-refile-targets (quote ((("/Users/jstautz/org/personal.org"
+                                   "/Users/jstautz/org/work.org"
                                    "/Users/jstautz/org/someday_maybe.org") :maxlevel . 2))))
 
 ;; Archiving options
