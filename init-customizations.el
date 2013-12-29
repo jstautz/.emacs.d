@@ -146,11 +146,6 @@
 ;; Keep emacs server from opening new frame each time
 (setq ns-pop-up-frames nil)
 
-;; Raise emacs function
-(defun ns-raise-emacs ()
-  (ns-do-applescript "tell application \"Emacs\" to activate"))
-(add-hook 'server-visit-hook 'ns-raise-emacs)
-
 ;; Let me narrow to region -- I use this a bunch
 (put 'narrow-to-region 'disabled nil)
 

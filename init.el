@@ -3,11 +3,11 @@
 ;; Jeff's .emacs init file
 ;;
 ;; - Sets up load paths, etc.
+;; - Defines my "decrypt-secrets" function for use in other files
 ;; - Loads all packages (init-packages.el)
-;; - Sets up org-mode the way I like it (init-org.el)
 ;; - Loads custom keybindings, UI, and editing prefs (init-customizations.el)
 ;; - Loads custom + util functions (init-custom-functions.el)
-;; - Fires up Emacs server and goes fullscreen
+;; - Fires up Emacs server
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
