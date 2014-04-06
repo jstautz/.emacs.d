@@ -64,8 +64,16 @@
 ;; auto-fill options 
 (setq fill-column 120)
 (setq default-fill-column 120)
-(auto-fill-mode 1)
-(add-hook 'text-mode-hook 'turn-on-auto-fill)
+
+;; Testing wrap-to-fill options instead of auto-fill
+;; note: I think wrap-to-fill is only included in nxhtml-mode,
+;;       so we need packages installed before this works.
+;; 
+;;(auto-fill-mode 1)
+;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(wrap-to-fill-column-mode 1)
+(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 ;; Desktop saving options
 (desktop-save-mode 1)
