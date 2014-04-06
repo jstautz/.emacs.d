@@ -1,0 +1,77 @@
+#+TITLE: Jeff's Org-Mode Config -- How I Get Work Done
+#+LANGUAGE: en
+#+AUTHOR: Jeff Stautz
+#+EMAIL: jeff.stautz@hootsuite.com
+#+OPTIONS: toc:2 num:nil ^:nil
+
+* Introduction
+** What this is
+** Special thanks to
+Bernt Hansen
+
+* Why Org-Mode?
+** Getting Things Done
+** Other non-plaintext tools
+** Thinking in Outlines -- Notes and Tasks together
+** Kanban and work in progress concepts
+** Customizability and Extendability
+
+* Basic org-mode setup
+** Installation & activation
+** My file structure
+** Basic agenda setup
+** Context Tags
+- that covers the basic use cases: notes/outlines, todos that get piled into agenda
+
+* Dealing with inputs
+** Where new tasks come from
+** inbox.txt
+** Gmail -> Zapier -> inbox.txt
+** Alfred.app -> inbox.txt
+** org-capture
+** Reviewing inboxes
+- clean them out regularly
+- do it (if under 2 mins)
+- defer it (refile and do it later)
+- delegate it (becomes a task to delegate it, and sometimes another task to follow up on it)
+- delete it (if no longer relevant. delete or archive)
+** Refile targets
+
+* Tasks
+** Task states
+** Kanban style flow
+** Fast todo selection
+** Speed keys
+** Logging
+** Projects and subtasks
+** checklists
+* Tags
+** Tags
+** File tags
+* Agenda
+** Getting stuff done
+** Custom views
+** Work in progress limits
+** How I work from the agenda
+* Deadlines and Scheduling
+** Deadlines on agenda
+** Scheduling = remind me later
+** Appointments and reminders
+** Google Cal sync
+* Habits and Recurring Tasks
+** org-habit
+** 
+* Time Tracking
+* 
+* Notes
+** General note taking
+** Journal
+** Tech log
+** Evernote
+* Attachments
+* The Archive
+* Exporting and Publishing
+* Mobile
+* 
+
+
