@@ -120,6 +120,7 @@
       (append
        '(
          ansi
+         auto-complete
          browse-kill-ring
          dash
          diminish
