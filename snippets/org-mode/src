@@ -1,0 +1,7 @@
+#name : src
+# --
+#+begin_src $0
+$1
+#+end_src
+
+

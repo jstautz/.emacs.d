@@ -12,8 +12,11 @@
 ;; Standard org-mode setup
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-hook 'org-mode-hook 'turn-on-font-lock)
+(add-hook 'org-mode-hook '(lambda()
+                            (local-unset-key (kbd "C-c SPC"))))
 
 ;; Extra org modules to load
+;; TODO figure out why org-habit didn't load on startup
 (setq org-modules (quote (org-bbdb
                           org-gnus
                           org-habit
@@ -32,14 +35,19 @@
 (global-set-key (kbd "<M-f5>") 'jcs:org-todo-tree)
 (global-set-key (kbd "<S-f5>") 'jcs:widen)
 (global-set-key (kbd "<f6>") 'org-clock-goto)
+;; Because typos. When switching between laptop keyboard and USB keyboard
+(global-set-key (kbd "<C-S-f5>") 'jcs:widen)
+
 
 ;; Outline structure/style
-(setq org-odd-levels-only t
-      org-hide-leading-stars t
+(setq org-startup-indented t
+      org-odd-levels-only nil
+      org-hide-leading-stars nil
       org-level-color-stars-only t
       org-fontify-done-headline t
       org-blank-before-new-entry (quote ((heading) (plain-list-item)))
-      org-tags-column 80)
+      org-tags-column 80
+      org-cycle-separator-lines 0)
 
 ;; Editing/Movement tweaks -- turn on speed commands, fast tags, and ido
 (setq org-use-speed-commands t
@@ -51,7 +59,8 @@
       org-M-RET-may-split-line t
       org-return-follows-link t
       org-babel-no-eval-on-ctrl-c-ctrl-c t
-      org-confirm-shell-link-function (quote y-or-n-p))
+      org-confirm-shell-link-function (quote y-or-n-p)
+      org-catch-invisible-edits 'smart)
 
 ;; Let org know how to open links to certain file types if not in Emacs
 (setq org-file-apps (quote ((auto-mode . emacs)
@@ -105,7 +114,8 @@
 (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
 (setq org-agenda-dim-blocked-tasks t
       org-agenda-tags-column 80
-      org-agenda-start-with-follow-mode nil)
+      org-agenda-start-with-follow-mode nil
+      org-agenda-compact-blocks nil)
 
 ;; Default agenda views & sorting
 (setq org-agenda-include-diary t
@@ -116,7 +126,7 @@
       org-agenda-span (quote day))
 
 ;; Agenda TODO options
-(setq org-agenda-tags-todo-honor-ignore-options t
+(setq org-agenda-tags-todo-honor-ignore-options nil
       org-agenda-todo-ignore-scheduled (quote future)
       org-agenda-todo-list-sublevels t)
 
@@ -148,7 +158,7 @@ returned is wrapped in #s"
    )
   (if (<= (length (org-map-entries t (concat tags "/+" todo) 'agenda)) limit)
       org-wip-header-text
-    (concat "# " org-wip-header-text " #")))
+    (concat "### " org-wip-header-text  " -- over WIP limit (" (int-to-string limit) ") ###")))
 
 
 
@@ -162,13 +172,13 @@ returned is wrapped in #s"
 			   (org-agenda-list-stuck-projects) 
 			   (tags-todo "-REFILE+Effort=\"\""
 						  ((org-agenda-overriding-header "Tasks to Estimate")
-						   (org-agenda-skip-function 'bh/skip-projects)
+						   (org-agenda-skip-function 'jcs:skip-projects)
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
 			   (tags-todo "-REFILE/!NEXT|STARTED"
 			    		  ((org-agenda-overriding-header "Next Tasks")
-			    		   (org-agenda-skip-function 'bh/skip-projects)
+			    		   (org-agenda-skip-function 'jcs:skip-projects)
 			    		   (org-agenda-todo-ignore-scheduled 'future)
 			    		   (org-tags-match-list-sublevels t)
 			    		   (org-agenda-sorting-strategy
@@ -205,14 +215,54 @@ returned is wrapped in #s"
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
               ))
-             ("h" "@home + calendar"
+             ("h" "@home + agenda"
               ((agenda "")
-			   (tags-todo "@home-REFILE" 
-						  ((org-agenda-overriding-header "All Home Tasks")
+               (tags (concat "@home-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
+                     ((org-agenda-overriding-header "Completed Today")))
+               (tags-todo "@home-REFILE/!STARTED" 
+						  ((org-agenda-overriding-header (jcs:wip-text "@home" "STARTED" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
-			   ))
+               (tags-todo "@home-REFILE/!NEXT"
+                          ((org-agenda-overriding-header (jcs:wip-text "@home" "NEXT" 3))
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags-todo "@home-REFILE/!WAITING"
+                          ((org-agenda-overriding-header (jcs:wip-text "@home" "WAITING" 1))
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags-todo "@home-REFILE/!TODO"
+                          ((org-agenda-overriding-header (jcs:wip-text "@home" "TODO" 20))
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
+               (tags (concat "@home-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 1)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]") "\"")
+                     ((org-agenda-overriding-header "Completed Yesterday")))
+               (tags (concat "@home-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 2)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 1))) "\"")
+                     ((org-agenda-overriding-header "Completed Two Days Ago")))
+               (tags (concat "@home-REFILE+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 3)))
+                             "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]"
+                                                 (time-subtract (current-time) (days-to-time 2))) "\"")
+                     ((org-agenda-overriding-header "Completed Three Days Ago")))
+               
+               ))
              ("r" "@errands" tags-todo "@errands")
              ("w" "@work + agenda"
               ((agenda "")
@@ -236,7 +286,7 @@ returned is wrapped in #s"
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!TODO"
-                          ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 15))
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 20))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
@@ -262,28 +312,28 @@ returned is wrapped in #s"
                      ((org-agenda-overriding-header "Completed Three Days Ago")))
                
                ))
-             ("p" "public @work todos"
-              ((tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
+             ("p" "Public @work todos"
+               ((tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
                              (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
                              (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
                      ((org-agenda-overriding-header "Completed Today")))
                (tags-todo "@work-REFILE-noexport/!STARTED" 
-                          ((org-agenda-overriding-header "Doing")
-                           (org-agenda-todo-ignore-scheduled 'future)
-                           (org-agenda-sorting-strategy
-                            '(todo-state-down effort-up category-keep))))
+						  ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!NEXT"
-                          ((org-agenda-overriding-header "To Do Today")
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 3))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!WAITING"
-                          ((org-agenda-overriding-header "Impeded / Waiting Response")
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!TODO"
-                          ((org-agenda-overriding-header "Queue")
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 15))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
@@ -306,18 +356,14 @@ returned is wrapped in #s"
                              "\"+CLOSED<=\""
                              (format-time-string "[%Y-%m-%d]"
                                                  (time-subtract (current-time) (days-to-time 2))) "\"")
-                     ((org-agenda-overriding-header "Completed Three Days Ago")))
-
-               (tags "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\"[2013-11-28]\"+CLOSED<=\"[2013-11-27]\""
-                     ((org-agenda-overriding-header "Completed 2013-11-28")))
-			   )
+                     ((org-agenda-overriding-header "Completed Three Days Ago"))))
                nil
                ("~/Desktop/work.html"))
 			 ))
 
 ;; A couple of helper functions for org agendas from Bernt Hansen
 ;;   http://doc.norang.ca/org-mode.html
-(defun bh/is-project-p ()
+(defun jcs:is-project-p ()
   "Any task with a todo keyword subtask"
   (let ((has-subtask)
         (subtree-end (save-excursion (org-end-of-subtree t)))
@@ -331,11 +377,11 @@ returned is wrapped in #s"
           (setq has-subtask t))))
     (and is-a-task has-subtask)))
 
-(defun bh/skip-projects ()
+(defun jcs:skip-projects ()
   "Skip trees that are projects"
   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
     (cond
-     ((bh/is-project-p)
+     ((jcs:is-project-p)
       next-headline)
      (t
       nil))))
@@ -392,16 +438,86 @@ returned is wrapped in #s"
 ;;-----------------------------------------------------------------------------
 ;; Time tracking, logging, & effort estimates
 ;;-----------------------------------------------------------------------------
-(setq org-clock-into-drawer t
-      org-clock-sound nil
-      org-clock-mode-line-total 'current
-      org-clock-history-length 5
-      org-clock-clocked-in-display 'mode-line)
 
 ;; My values for time estimates and focus levels
 (setq org-global-properties (quote (("Effort_ALL" .
                                      "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
                                     ("Focus_ALL" . "High Medium Low"))))
+
+;; Some basic clocking display options
+(setq org-clock-into-drawer t
+      org-clock-sound nil
+      org-clock-mode-line-total 'current
+      org-clock-history-length 10
+      org-clock-clocked-in-display 'mode-line)
+
+;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+(setq org-clock-out-remove-zero-time-clocks t)
+
+;; Set the default task while at work -- This is the "General organization" task in work.org
+(defvar jcs:work-org-task-id "DB00839E-39A9-4023-8494-25EA0BDCF16D")
+
+(setq jcs:keep-clock-running nil)
+
+(defun jcs:clock-in-organization-task-as-default ()
+  (interactive)
+  (org-with-point-at (org-id-find jcs:work-org-task-id 'marker)
+    (org-clock-in '(16))))
+
+
+(defun jcs:punch-in (arg)
+  "Start continuous clocking and set the default task to the
+selected task.  If no task is selected set the Organization task
+as the default task."
+  (interactive "p")
+  (setq jcs:keep-clock-running t)
+  (if (equal major-mode 'org-agenda-mode)
+      ;;
+      ;; We're in the agenda
+      ;;
+      (let* ((marker (org-get-at-bol 'org-hd-marker))
+             (tags (org-with-point-at marker (org-get-tags-at))))
+        (if (and (eq arg 4) tags)
+            (org-agenda-clock-in '(16))
+          (jcs:clock-in-organization-task-as-default)))
+    ;;
+    ;; We are not in the agenda
+    ;;
+    (save-restriction
+      (widen)
+      ; Find the tags on the current task
+      (if (and (equal major-mode 'org-mode) (not (org-before-first-heading-p)) (eq arg 4))
+          (org-clock-in '(16))
+        (jcs:clock-in-organization-task-as-default)))))
+
+(defun jcs:punch-out ()
+  (interactive)
+  (setq jcs:keep-clock-running nil)
+  (when (org-clock-is-active)
+    (org-clock-out))
+  (org-agenda-remove-restriction-lock))
+
+
+(defun jcs:clock-in-default-task ()
+  (save-excursion
+    (org-with-point-at org-clock-default-task
+      (org-clock-in))))
+
+
+(defun jcs:clock-out-maybe ()
+  (when (and jcs:keep-clock-running
+             (not org-clock-clocking-in)
+             (marker-buffer org-clock-default-task)
+             (not org-clock-resolving-clocks-due-to-idleness))
+    (jcs:clock-in-organization-task-as-default)))
+
+(add-hook 'org-clock-out-hook 'jcs:clock-out-maybe 'append)
+
+
+(setq org-time-stamp-rounding-minutes (quote (5 5)))
+
+;; Clock out when moving task to a done state
+(setq org-clock-out-when-done t)
 
 ;; Idle time / resume options
 (setq org-clock-idle-time 5
@@ -411,17 +527,29 @@ returned is wrapped in #s"
 (setq org-clock-persist t
       org-clock-persist-file "~/.emacs.d/.org-clock-save.el")
 (org-clock-persistence-insinuate)
+;; Do not prompt to resume an active clock
+(setq org-clock-persist-query-resume nil)
+
+;; Enable auto clock resolution for finding open clocks
+(setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
+
+;; Include current clocking task in clock reports
+(setq org-clock-report-include-clocking-task t)
+
 
 ;; When and how to log TODO changes and scheduling changes
 (setq org-log-done (quote time)
       org-log-into-drawer "LOGBOOK"
+      org-log-repeat (quote time)
       org-log-redeadline (quote note)
       org-log-reschedule (quote note))
 
-;; Change task to STARTED when clocking in -- from Bernt Hansen
-(setq org-clock-in-switch-to-state 'bh/clock-in-to-started)
 
-(defun bh/clock-in-to-started (kw)
+
+;; Change task to STARTED when clocking in -- from Bernt Hansen
+(setq org-clock-in-switch-to-state 'jcs:clock-in-to-started)
+
+(defun jcs:clock-in-to-started (kw)
   "Switch task from TODO or NEXT to STARTED when clocking in.
 Skips capture tasks."
   (if (and (member (org-get-todo-state) (list "TODO" "NEXT"))
@@ -429,14 +557,13 @@ Skips capture tasks."
       "STARTED"))
 
 ;; Get rid of empty clock drawers -- from Bernt Hansen
-(defun bh/remove-empty-drawer-on-clock-out ()
+(defun jcs:remove-empty-drawer-on-clock-out ()
   (interactive)
   (save-excursion
     (beginning-of-line 0)
     (org-remove-empty-drawer-at (point))))
 
-(add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
-(setq org-clock-out-remove-zero-time-clocks t)
+(add-hook 'org-clock-out-hook 'jcs:remove-empty-drawer-on-clock-out 'append)
 
 
 ;;-----------------------------------------------------------------------------
@@ -485,7 +612,7 @@ Skips capture tasks."
                 '((htmlize-output-type 'css)))
 
 ;; Set styles for htmlize agenda export
-(setq org-agenda-export-html-style "<style type="text/css">
+(setq org-agenda-export-html-style "<style type=\"text/css\">
        p { font-weight: normal; color: gray; }
        .org-agenda-structure {
           font-size: 110%;
@@ -523,7 +650,7 @@ Skips capture tasks."
   (process-send-eof " growl"))
 
 ;; Send org notifications to Growl
-(setq org-show-notification-handler (quote (lambda (notification) (growl "org-mode notification" notification))))
+(setq org-show-notification-handler '(lambda (notification) (growl "org-mode notification" notification)))
 
 ;; Send Appt reminders to Growl
 (progn
