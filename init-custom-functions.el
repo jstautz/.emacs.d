@@ -192,6 +192,15 @@ of windows in the frame simply by calling this command again."
 
 
 ;;-----------------------------------------------------------------------------
+;; Unfill paragraph -- From https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org
+;;-----------------------------------------------------------------------------
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+;;-----------------------------------------------------------------------------
 ;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
 ;;-----------------------------------------------------------------------------
 (defun tramp-sudo-reopen ()
