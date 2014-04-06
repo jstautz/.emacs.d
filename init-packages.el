@@ -89,6 +89,13 @@
                :pkgname "Bruce-Connor/smart-mode-line"
                :depends (dash)
                :features smart-mode-line)
+
+        (:name virtualenvwrapper
+               :description "virtualenv tool for emacs python development"
+               :type github
+               :pkgname "porterjamesj/virtualenvwrapper.el"
+               :features virtualenvwrapper)
+        
         
         (:name writer-names
                :description "Generate random names (for fiction writers)"
@@ -115,7 +122,7 @@
          edit-server
          expand-region
          f
-         ido-ubiquitous
+         jedi
          js2-mode
          js2-refactor
          magit
