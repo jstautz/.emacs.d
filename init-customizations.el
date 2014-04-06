@@ -48,9 +48,6 @@
 (define-key global-map [ns-drag-file] 'ns-find-file) 
 
 ;; Tabs insert 4 spaces, sentences have one space (as God intended).
-;;   TODO may want to look at using smart-tabs-mode
-;;   See http://www.emacswiki.org/emacs/SmartTabs and
-;;   https://github.com/jcsalomon/smarttabs
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (setq sentence-end-double-space nil)
@@ -121,12 +118,17 @@
 ;; Make display feel faster
 (setq redisplay-dont-pause t)
 
-;; No splash screen, no beeping, no toolbar/scrollbar
+;; No splash screen, no beeping, no toolbar/scrollbar, white fringe
 (setq inhibit-splash-screen 1)               
 (setq visible-bell 1)                        
 (setq ring-bell-function (lambda ()))
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(custom-set-faces '(fringe ((t (:background"white")))))
+
+;; No startup messages
+(setq initial-scratch-message "")
+(setq inhibit-startup-message t)
 
 ;; TODO -- want to adjust these?
 (setq scroll-margin 0
