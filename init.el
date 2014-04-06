@@ -1,39 +1,43 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Jeff's .emacs init file
+;; Jeff's init.el file --- Where the magic begins
 ;;
-;; - Sets up load paths, etc.
-;; - Defines my "decrypt-secrets" function for use in other files
-;; - Loads all packages (init-packages.el)
-;; - Loads custom keybindings, UI, and editing prefs (init-customizations.el)
-;; - Loads custom + util functions (init-custom-functions.el)
-;; - Fires up Emacs server
+;; This is the first file Emacs loads.
 ;;
+;; The only thing done in this file is to load org-mode via the ORG_HOME
+;; environment variable, if set, then use org-babel to load org-mode files
+;; containing the rest of my setup.
+;;
+;; Ideas and elisp stolen from Eric Schulte's literate fork of
+;; emacs-starter-kit: https://github.com/eschulte/emacs24-starter-kit
+;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'cl)
 
-(setq exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin"
-                        "/usr/X11/bin" "/opt/local/bin" "/usr/local/git/bin"
-                        "/Applications/Emacs.app/Contents/MacOS/bin"
-                        "/Users/jstautz/bin" "/usr/texbin")))
+;; Ugly hack to get access to ORG_HOME env variable
+(let ((jcs:org-home (shell-command-to-string ". ~/.bashrc; echo -n $ORG_HOME")))
+  (setenv "ORG_HOME" jcs:org-home))
 
-(setq home-dir "/Users/jstautz/"
-      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
-      emacs-dir "/Applications/Emacs.app/Contents/"
-      custom-file (concat dotemacs-dir "init-customizations.el")
-      emacs-bin (concat emacs-dir "MacOS/Emacs")
-      info-dir (concat emacs-dir "Resources/info/"))
+;; Load Org-mode from source when the ORG_HOME environment variable is set
+(when (getenv "ORG_HOME")
+  (let ((org-lisp-dir (expand-file-name "lisp" (getenv "ORG_HOME"))))
+    (when (file-directory-p org-lisp-dir)
+      (add-to-list 'load-path org-lisp-dir)
+      (require 'org))))
 
-(add-to-list 'load-path dotemacs-dir)
+;; Load the rest of my init from the `after-init-hook' so all packages
+;; are loaded
+(add-hook 'after-init-hook
+ `(lambda ()
+    ;; remember this directory
+    (setq dotemacs-dir
+          ,(file-name-directory (or load-file-name (buffer-file-name))))
+    ;; only load org-mode later if we didn't load it just now
+    ,(unless (and (getenv "ORG_HOME")
+                  (file-directory-p (expand-file-name "lisp"
+                                                      (getenv "ORG_HOME"))))
+       '(require 'org))
+    ;; load up the rest of my emacs init
+    (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))))
 
-;; Decrypt and load secrets.el.gpg file containing passwords, etc.
-(defun jcs:decrypt-secrets ()
-  (interactive)
-  (require 'secrets))
-
-(require 'init-packages)
-(require 'init-customizations)
-(require 'init-custom-functions)
-
-(server-start)
+;;; init.el ends here
