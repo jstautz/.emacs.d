@@ -8,6 +8,9 @@
 ;; System / Editing Prefs
 ;;-----------------------------------------------------------------------------
 
+;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
+(setq gc-cons-threshold 20000000)
+
 ;; Put backups & autosaves in their place (not in current dir)
 (defvar backup-dir (concat home-dir ".emacs.backup/"))
 (defvar autosave-dir (concat home-dir ".emacs.autosave/"))
