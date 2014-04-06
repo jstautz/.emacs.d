@@ -95,6 +95,11 @@
                :pkgname "porterjamesj/virtualenvwrapper.el"
                :features virtualenvwrapper)
         
+        (:name wordsmith-mode
+               :description "emacs package for syntax analysis"
+               :type github
+               :pkgname "istib/wordsmith-mode"
+               :features wordsmith-mode)
         
         (:name writer-names
                :description "Generate random names (for fiction writers)"
