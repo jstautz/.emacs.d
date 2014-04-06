@@ -1,0 +1,6 @@
+# name: <script>...</script>
+# key: script
+# --
+<script$1>
+  $0
+</script>

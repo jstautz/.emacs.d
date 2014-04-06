@@ -132,9 +132,11 @@
          magit
          markdown-mode
          multiple-cursors
+         nxhtml
          org-mode
          psvn
          s
+         skewer-mode
          smex
          yasnippet
          )
