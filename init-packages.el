@@ -51,10 +51,30 @@
                :type http
                :url "http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/ido.el")
 
+        (:name ido-ubiquitous
+               :description "Fancy completion all over Emacs, not just for buffers and files."
+               :type git
+               :url "https://github.com/DarwinAwardWinner/ido-ubiquitous"
+               :depends ido
+               :features ido-ubiquitous)
+
+        (:name ido-vertical-mode
+               :description "Makes ido-mode display vertically"
+               :type git
+               :url "https://github.com/gempesaw/ido-vertical-mode.el.git"
+               :depends ido
+               :features ido-vertical-mode)
+        
         (:name kill-ring-search
                :description "Search the kill ring in the minibuffer."
                :type elpa)
 
+        (:name fountain-mode
+               :description "Major mode for editing screenplays in Fountain markup format"
+               :type github
+               :pkgname "rnkn/fountain-mode"
+               :features fountain-mode)
+        
         (:name gmail-message-mode
                :description "Edit Gmail messages with markdown syntax. For use with Chrome 'Edit with Emacs' extension."
                :type github
