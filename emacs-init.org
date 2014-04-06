@@ -2,16 +2,15 @@
 #+OPTIONS: toc:2 num:nil ^:nil
 
 #+begin_quote
-  People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen - the
-  editor should get used to us.
+  People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen - the editor should get used to us.
 
   -- [[http://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Hadlar]]
 #+end_quote
 
 * Introduction
-  :PROPERTIES:
-  :CUSTOM_ID: introduction
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
 
 *** What is this?
 
@@ -27,35 +26,44 @@ My current setup borrows liberally from Emacs users far smarter than I am, inclu
 
 *** Disclaimers and Warnings
 
-You probably *don't* want to try and use my setup straight out of the box. 
+You probably *don't* want to try and use my configs straight out of the box. 
 
 - This is a perpetual work in progress. 
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
 - Requires Emacs 24.3. Only tested on Mac OS X.
 - First load will require an internet connection to download packages (this will take a while).
 
+
 *** What I use Emacs for
 
-Lots of things. 
+**** Org-mode
 
-**** org-mode
+I spend 90% of my time in Emacs inside org-mode. I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a whole section of my Emacs config dedicated to the ins and outs of my [[file:./config/init-org-mode.el][org-mode configuration.]]
 
-I spend probably 90% of my time in Emacs inside org-mode. I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a whole section of my Emacs config dedicated to the ins and outs of 
+**** Writing Fiction
 
-***** note-taking
-***** to-do lists
-***** planning
-***** goal setting
-***** time tracking
-***** publishing and more
-**** writing fiction
-***** plain text + LaTeX
-***** documented elsewhere
-**** programming
-***** elisp
-***** python
-***** web dev
-**** manipulating text of all kinds
+For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
+
+Instead of using Microsoft Word or Pages, I write in plain text using either:
+1. [[https://daringfireball.net/projects/markdown/][Markdown syntax]], and viewing the formatted results in [[http://markedapp.com/][Marked.app]]
+2. Minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers.
+
+The details of how I use Emacs for fiction writing are [[file:./emacs-init.org][documented here]].
+
+**** Programming
+
+I love hacking around and pretending like I know how to program. A couple of languages I use:
+
+- I work with Elisp quite a bit (of course)
+- I'm learning python
+- I play around with javascript (and HTML/CSS)
+
+My Emacs settings for software dev should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
+
+**** Manipulating files and text of all kinds
+
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my swiss army knife for text transformations.
+
 *** Structure 
    :PROPERTIES:
    :CUSTOM_ID: structure
@@ -63,16 +71,16 @@ I spend probably 90% of my time in Emacs inside org-mode. I've been using it for
 The =init.el= file is loaded automatically by Emacs on startup. It fires up org-mode and then loads the elisp snippets embedded in this emacs-init.org file.
 
 Packages are loaded using el-get. Configurations for each package live in the /config/init-package-name.el files -- each of these loads the corresponding package-config.org file to configure the package.
+
+
+
 **** .emacs.d directory structure
+
+
+
+
 **** how things get loaded
 **** 
-
-*** Installation
-   :PROPERTIES:
-   :CUSTOM_ID: installation
-   :END:
-Installation instructions go here   
-
 
 * Implementation  
   :PROPERTIES:
