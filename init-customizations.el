@@ -171,7 +171,7 @@
 ;; Unset C-x C-c -- I hit this by accident way too often.
 (global-unset-key "\C-x\C-c")
 
-;; Up yours, read-only toggle
+;; Up yours, read-only toggle!
 (global-unset-key "\C-x\C-q")
 
 ;; Rebind M-s to save-buffer -- I never center lines
