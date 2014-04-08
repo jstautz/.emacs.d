@@ -18,3 +18,4 @@ tramp
 /.cask/24.3.50.1/bootstrap/*
 /.emacs.desktop.lock
 /skewer-cache/*
+/emacs-init.html
