@@ -15,57 +15,141 @@ People talk about getting used to a new editor, but over time, it is precisely t
 :CUSTOM_ID: introduction
 :END:
 
-*** What is this?
+** What is this?
+:PROPERTIES:
+:CUSTOM_ID: what_is_this
+:END:
 
-A [[http://en.wikipedia.org/wiki/Literate_programming][Literate Programming]] version of my Emacs config files.
+A [[http://en.wikipedia.org/wiki/Literate_programming][literate programming]] version of my Emacs config files.
 
 My current setup borrows liberally from Emacs users far smarter than I am, including:
-- [[https://github.com/magnars/.emacs.d][Magnar Sveen]]
 - [[http://doc.norang.ca/org-mode.html][Bernt Hansen]] 
 - [[https://github.com/eschulte/emacs24-starter-kit][Eric Schulte]]
+- [[https://github.com/magnars/.emacs.d][Magnar Sveen]]
 - [[http://dl.dropboxusercontent.com/u/3968124/sacha-emacs.html][Sacha Chua]]
 - [[https://github.com/technomancy/dotfiles][Phil Hagelberg]]
-- And a ton of others I'm forgetting.
+- [[https://github.com/bodil/emacs.d][Bodil Stokke]]
+- [[http://www.masteringemacs.org/][Mickey Petersen]]
+- And a ton of others. 
 
-*** Disclaimers and Warnings
+Props and thank-yous and praises are scattered through my config in places where I can remember who I stole something from.
 
-You probably *don't* want to try and use my configs straight out of the box. 
+** What the hell is literate programming?
+:PROPERTIES:
+:CUSTOM_ID: what_is_literate
+:END: 
+
+Short answer: instead of writing separate documentation, the documentation /contains/ the program. 
+
+Or as Knuth puts it:
+
+#+begin_quote 
+I believe that the time is ripe for significantly better documentation of programs, and that we can best achieve this by considering programs to be works of literature. Hence, my title: "Literate Programming."
+
+Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to humans what we want the computer to do.
+
+ Donald E. Knuth, Literate Programming, 1984
+#+end_quote
+
+Okay, so Knuth takes it to a bit of an extreme. I've got an MFA in creative writing, and even /I/ think that "considering progams to be works of literature" is nutso. 
+
+But improving documentation in a way that makes it easier for humans to understand? Hell yeah, let's do it.
+
+** Disclaimers and Warnings
+:PROPERTIES:
+:CUSTOM_ID: disclaimer
+:END:
+
+You /don't/ want to try and use my configs straight out of the box. 
 
 - This is a perpetual work in progress. 
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
 - Requires Emacs 24.3. Only tested on Mac OS X.
 - First load will require an internet connection to download packages (this will take a while).
+- I'm not responsible if any of this blows up on you (see [[License]] below).
+
+** Why use literate programming for my Emacs config?
+:PROPERTIES:
+:CUSTOM_ID: why-literate
+:END:
+
+It's an experiment. We'll see how well it works out.
+
+I've been inspired by [[http://dl.dropboxusercontent.com/u/3968124/sacha-emacs.html][Sacha Chua's literate emacs config]], as well as by [[http://doc.norang.ca/org-mode.html][Bernt Hansen's amazingly thorough and detailed documentation of his org-mode setup]].
+
+I've also read some pretty stunning documentation in the Javascript world that is pretty "literate," even if it doesn't fully conform to Knuth's ideals. Good examples are [[http://jashkenas.github.io/coffee-script/documentation/docs/grammar.html][Coffeescript]] and [[http://underscorejs.org/docs/underscore.html][Underscore.js]].
+
+Using a literate programming approach using org-babel has a number of advantages that appeal to me:
+
+1. *Better organization of my .emacs lisp files*
+   - My elisp code snippets are embedded within the fold-able goodness of org-mode's outline structure.
+   - I'm able to add headers and subsections to better organize my code -- way better than using giant banner-style comment blocks.
+   - My configuration is easier to read and understand. It also looks good on github!
+2. *I'm better able to follow my own thought processes.*
+   - Code is organized according to how I think, not how the interpreter thinks -- I can explain code snippets in an order that makes sense to me, and org-babel later compiles these into the correct order.
+   - Explanations take priority, code is secondary.
+   - When I revisit code I wrote ten years ago, I have a hope of understanding not just what it does, but /what the hell I was thinking./
+3. *Sharing my setup is easier*
+   - Org-mode's publishing features mean that it's pretty simple to export my documentation and publish it.
+   - I have one file that generates nice-looking documentation and the code itself.
+   - Better, more detailed explanations of my code mean it's easier for others to understand it and benefit from it.
 
 
-*** What I use Emacs for
 
-**** Org-mode
 
-I spend 90% of my time in Emacs inside org-mode. I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a whole section of my Emacs config dedicated to the ins and outs of my [[file:./config/init-org-mode.el][org-mode configuration.]]
 
-**** Writing Fiction
 
-For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
+My emacs config has gone through a couple of iterations over the years. I started learning Emacs in 2000 while I was taking CS courses in school. My first Emacs config was pretty simplistic:
 
-Instead of using Microsoft Word or Pages, I write in plain text using either:
-1. [[https://daringfireball.net/projects/markdown/][Markdown syntax]], and viewing the formatted results in [[http://markedapp.com/][Marked.app]]
-2. Minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers.
+*Single-file + manually-installed packages*
+   - A giant .emacs file
+   - badly-organized
+   - badly-commented
+   - full of a mishmash of elisp scraps collected from the interwebs
+   - 3rd party packages were manually installed -- everything lived together in a jumble
 
-The details of how I use Emacs for fiction writing are [[file:./emacs-init.org][documented here]].
+After Emacs 24 came out, I started playing around with the built-in package manager. It's amazing. But then I made an even more amazing discovery: el-get.
 
-**** Programming
+I then reworked my config pretty extensively around el-get:
 
-I love hacking around and pretending like I know how to program. A couple of languages I use:
+*Multiple files + el-get packages*
+   - Split my config into separate files for basic setup, loading packages, custom functions, etc.
+   - Using el-get to download, install, manage packages
+   - configs for each package contained in /config directory
 
-- I work with Elisp quite a bit (of course)
-- I'm learning python
-- I play around with javascript (and HTML/CSS)
 
-My Emacs settings for software dev should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
 
-**** Manipulating files and text of all kinds
 
-Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my swiss army knife for text transformations.
+
+
+
+
+
+** License
+:PROPERTIES:
+:CUSTOM_ID: license
+:END:
+#+begin_example
+Copyright (C)  2014  Jeff Stautz
+
+Permission is granted to copy, distribute and/or modify this document under the
+terms of the GNU Free Documentation License, Version 1.3 or any later version
+published by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts, and no Back-Cover Texts.
+  
+Code in this document is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+  
+This code is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#+end_example 
+
+This document (including HTML format or raw org-mode format) is licensed under the GNU Free Documentation License version 1.3 or later (http://www.gnu.org/copyleft/fdl.html).
+
+The code examples and CSS stylesheets are licensed under the GNU General Public License v3 or later (http://www.gnu.org/licenses/gpl.html).
 
 *** Structure 
    :PROPERTIES:
