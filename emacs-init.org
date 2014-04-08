@@ -218,7 +218,7 @@ That re-arranging bit is important. Expressions in my config file need to be in 
 
 I can define that Emacs-friendly code order here, using "noweb" syntax, which looks something like:
 
-#+begin_src emacs-lisp :tangle yes :noweb tangle :exports none
+#+begin_src emacs-lisp :tangle yes :noweb tangle
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
 <<Sync external packages with el-get, load them, and configure them>>
 <<Load some editor customizations, UI tweaks, and custom keybindings>>
