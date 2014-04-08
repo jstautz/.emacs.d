@@ -72,6 +72,11 @@ Bernt Hansen
 * The Archive
 * Exporting and Publishing
 * Mobile
-* 
+* Things I still need to figure out / bugs / issues
+** TODO why does my work agenda now take 15+ seconds to load?
+- Too large a file?
+- Too many to-do items not yet archived?
+- Too many blocks/sections? (probably not, used to be faster)
 
-
+** TODO why doesn't org-habit load when loading it as a module?
+I literally have to find the file and load the buffer manually after startup.
