@@ -122,6 +122,53 @@ This document (including HTML format or raw org-mode format) is licensed under t
 The code examples and CSS stylesheets are licensed under the GNU General Public License v3 or later (http://www.gnu.org/licenses/gpl.html).
 
 
+* What I use Emacs for
+:PROPERTIES:
+:CUSTOM_ID: what-i-do-in-emacs
+:END:
+
+#+begin_quote
+This is my rifle. There are many like it, but this one is mine.
+
+--Major General William H. Rupertus, "The Rifleman's Creed," 1942
+#+end_quote
+
+I use Emacs differently than you probably do, and my setup will reflect that to some extent.
+
+In order to understand why I've configured things to way I did, it might help to understand some things I do in Emacs.
+
+** Org-mode
+
+I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a whole section of my Emacs config dedicated to the ins and outs of my [[file:./config/init-org-mode.el][org-mode configuration.]]
+
+It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
+
+** Writing Fiction
+
+For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
+
+Instead of using Microsoft Word or Pages, I write in plain text using either:
+1. [[https://daringfireball.net/projects/markdown/][Markdown syntax]], viewing the formatted results in [[http://markedapp.com/][Marked.app]]
+2. Minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers.
+
+The details of how I use Emacs for fiction writing are [[file:./emacs-init.org][documented here]]. 
+
+** Programming
+
+Unlike most Emacs users, I don't do a ton of development in Emacs. I only dabble, and only occasionally when I want to hack around and pretend like I know how to program. 
+
+A couple of languages I use:
+
+- I work with Emacs lisp quite a bit (of course)
+- I'm learning python
+- I play around with javascript (and HTML/CSS)
+
+My Emacs settings for software dev should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
+
+** Manipulating files and text of all kinds
+
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my swiss army knife for text transformations. There are large chunks of my config that deal with sharpening various blades of said swiss army knife.
+
 * Structure 
 :PROPERTIES:
 :CUSTOM_ID: structure
@@ -244,36 +291,6 @@ El-get is a little like homebrew for Emacs. It lets you install and manage packa
 Packages loaded with el-get look for their configs in appropriately-named files in the =config/= directory. For example, markdown-mode looks for its settings in =config/init-markdown-mode.el=.
 
 As I consolidate settings a little more in a literate configuration, I may pull these configs back into the el-get setup when possible.
-
-* What I use Emacs for
-
-** Org-mode
-
-I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a whole section of my Emacs config dedicated to the ins and outs of my [[file:./config/init-org-mode.el][org-mode configuration.]]
-
-** Writing Fiction
-
-For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
-
-Instead of using Microsoft Word or Pages, I write in plain text using either:
-1. [[https://daringfireball.net/projects/markdown/][Markdown syntax]], and viewing the formatted results in [[http://markedapp.com/][Marked.app]]
-2. Minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers.
-
-The details of how I use Emacs for fiction writing are [[file:./emacs-init.org][documented here]].
-
-** Programming
-
-I love hacking around and pretending like I know how to program. A couple of languages I use:
-
-- I work with Emacs lisp quite a bit (of course)
-- I'm learning python
-- I play around with javascript (and HTML/CSS)
-
-My Emacs settings for software dev should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
-
-** Manipulating files and text of all kinds
-
-Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my swiss army knife for text transformations.
 
 * Implementation  
   :PROPERTIES:
