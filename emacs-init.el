@@ -1,10 +1,5 @@
 (require 'cl)
 
-;; (setq exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin"
-;;                         "/usr/X11/bin" "/opt/local/bin" "/usr/local/git/bin"
-;;                         "/Applications/Emacs.app/Contents/MacOS/bin"
-;;                         "/Users/jstautz/bin" "/usr/texbin")))
-
 (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
