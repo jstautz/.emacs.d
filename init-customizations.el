@@ -182,6 +182,9 @@
  )
 )
 
+;; Rebind M-o to other-window. C-x o is too clunky.
+(global-set-key (kbd "M-o") 'other-window)
+
 ;; Bind C-esc to 'top-level for exiting from debugger, etc.
 (global-set-key (kbd "<C-escape>") 'top-level)  
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
