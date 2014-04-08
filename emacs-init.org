@@ -123,9 +123,9 @@ The code examples and CSS stylesheets are licensed under the GNU General Public 
 
 
 * Structure 
-   :PROPERTIES:
-   :CUSTOM_ID: structure
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: structure
+:END:
 
 Okay, so how does my config actually work?
 
@@ -147,7 +147,6 @@ My .emacs.d directory structure looks a little something like this:
     - =init-*.el=
   - =el-get/= -- El-get will install packages here.
 
-
 ** =init.el=
 
 The elisp in this file only has one purpose: set things up to load the rest of my configuration via org-babel.
@@ -156,14 +155,14 @@ The important part is the last s-expression:
 
 #+begin_src emacs-lisp :tangle no
 (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
-#+end_src
+#+end_src 
 
 This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
 
 Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. This is easy enough on the face of it -- Emacs comes with org-mode built in. 
 
 However, I'm running the latest version of org-mode (installed & maintained w/ el-get) and my config depends on some of its more recent features. This means I've got to do a bit of finagling before calling =org-babel-load-file=:
-
+`
 #+begin_src emacs-lisp :tangle no
 ;; Load Org-mode from source when the ORG_HOME environment variable is set
 (when (getenv "ORG_HOME")
@@ -221,39 +220,30 @@ I can define that Emacs-friendly code order here, using "noweb" syntax, which lo
 
 #+begin_src emacs-lisp :tangle yes :noweb yes :exports none
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
-
 <<Sync external packages with el-get, load them, and configure them>>
-
 <<Load some editor customizations, UI tweaks, and custom keybindings>>
-
 <<Load a bunch of custom functions>>
-
 <<Post-flight: load Emacs desktop and start server>>
 #+end_src
 
-#+begin_example 
-<<Prerequisites and setup -- load basic support libraries, set some useful variables>>
+I try to treat the resulting =emacs-init.el= file almost like /compiled code/. It's the machine-readable file that I never really look at. 
 
-<<Sync external packages with el-get, load them, and configure them>>
+Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
 
-<<Load some editor customizations, UI tweaks, and custom keybindings>>
+*** TODO possible bug with noweb and comments
+If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. Would be best if they linked to the custom_id perperty of the subtree they're in.
 
-<<Load a bunch of custom functions>>
-
-<<Post-flight: load Emacs desktop and start server>>
-#+end_example
-
-
-I try to treat the resulting =emacs-init.el= file almost like /compiled code/. It's the machine-readable file that I never really look at. Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
-
-
-
-
-
- 
 ** =el-get/= and =config/=
 
-I use el-get 
+I used to find and install third-party elisp packages manually. This got nasty pretty quickly.
+
+Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[https://github.com/dimitri/el-get][el-get]].
+
+El-get is a little like homebrew for Emacs. It lets you install and manage packages from multiple sources (MELPA, github, Emacswiki, wherever), set dependencies, generate autoloads, etc. 
+
+Packages loaded with el-get look for their configs in appropriately-named files in the =config/= directory. For example, markdown-mode looks for its settings in =config/init-markdown-mode.el=.
+
+As I consolidate settings a little more in a literate configuration, I may pull these configs back into the el-get setup when possible.
 
 * What I use Emacs for
 
@@ -308,9 +298,9 @@ I use a somewhat gross hack to grab the $PATH environment variable from my ~/.ba
 
 #+name: setup-path :comments both
 #+begin_src emacs-lisp
-  (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
-    (setenv "PATH" jcs:shell-path)
-    (setq exec-path (split-string jcs:shell-path ":")))
+(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+  (setenv "PATH" jcs:shell-path)
+  (setq exec-path (split-string jcs:shell-path ":")))
 #+end_src
  
 *** Set a few variables for directories
@@ -451,7 +441,6 @@ And set some directory vars
 
 #+name: init-packages
 #+begin_src emacs-lisp
-;; test
 (require 'init-custom-functions)
 #+end_src
 ** Final steps
