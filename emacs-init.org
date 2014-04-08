@@ -218,7 +218,7 @@ That re-arranging bit is important. Expressions in my config file need to be in 
 
 I can define that Emacs-friendly code order here, using "noweb" syntax, which looks something like:
 
-#+begin_src emacs-lisp :tangle yes :noweb yes :exports none
+#+begin_src emacs-lisp :tangle yes :noweb tangle :exports none
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
 <<Sync external packages with el-get, load them, and configure them>>
 <<Load some editor customizations, UI tweaks, and custom keybindings>>
@@ -320,14 +320,11 @@ I use these =*-dir= variables all over the place in my config.
 
 *** Tell 'customize' where to save changes
 
-Emacs has a neat customize feature, accessible via =M-x customize=, which lets you modify user-configurable variables in
-a simpler (read: non-elisp) interface.
+Emacs has a neat customize feature, accessible via =M-x customize=, which lets you modify user-configurable variables in a simpler (read: non-elisp) interface.
 
-I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle
-with settings in customize to try things out.
+I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle with settings in customize to try things out.
 
-When I do so, I'd like customize to save things at the bottom of my init-customizations.el file. If I like the changes,
-I'll pull them out of the customize section of this file and place them in the appropriate places in my config.
+When I do so, I'd like customize to save things at the bottom of my init-customizations.el file. If I like the changes, I'll pull them out of the customize section of this file and place them in the appropriate places in my config.
 
 #+name: setup-custom-file
 #+begin_src emacs-lisp
@@ -345,8 +342,7 @@ I'll pull them out of the customize section of this file and place them in the a
 
 *** Finally, decrypt secrets.el.gpg
 
-Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this
-using the keys in my .gnupg keyring.
+Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
 
 I do this before I begin loading packages so that package configs can access variables stored in the secrets file.
 
