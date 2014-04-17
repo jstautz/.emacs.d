@@ -276,7 +276,7 @@ returned is wrapped in #s"
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!NEXT"
-                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 3))
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
@@ -323,7 +323,7 @@ returned is wrapped in #s"
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!NEXT"
-                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 3))
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down effort-up category-keep))))
