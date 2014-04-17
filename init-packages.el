@@ -5,9 +5,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
-
-
 ;; My custom el-get recipes 
 (setq el-get-sources
       '(
@@ -18,12 +15,33 @@
                :pkgname "winterTTr/ace-jump-mode"
                :features ace-jump-mode ace-jump-mode-pop-mark)
 
+        (:name browse-kill-ring
+               :description "Interactively insert items from kill ring"
+               :type git
+               :url "https://github.com/browse-kill-ring/browse-kill-ring.git"
+               :features browse-kill-ring
+               :prepare (progn
+                  (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")))
+        
         (:name commander
                :type github
                :description "Emacs command line parser"
                :pkgname "rejeep/commander.el"
                :depends (f s dash ansi)
                :features commander)
+
+        (:name easy-kill
+               :description "Kill/Copy/Mark things easily"
+               :type git
+               :url "https://github.com/leoliu/easy-kill.git"
+               :features easy-kill)
+        
+        (:name guide-key
+               :description "Guide following keys to an input key sequence automatically and dynamically in Emacs."
+               :type git
+               :url "https://github.com/kbkbkbkb1/guide-key.git"
+               :depends popwin
+               :features guide-key)
         
         (:name ido
                :description "Interactively Do Things. Fuzzy match buffers/files/etc."
@@ -69,11 +87,17 @@
                :features ham-mode)
 
         (:name html-to-markdown
-               :description ""
+               :description "Convert HTML to markdown"
                :type github
                :pkgname "Bruce-Connor/html-to-markdown"
                :features html-to-markdown)
         
+        (:name popwin
+               :description "Popup Window Manager for Emacs"
+               :type git
+               :url "https://github.com/m2ym/popwin-el.git"
+               :features popwin)
+
         (:name restclient
                :description "Manually explore and test HTTP REST webservices"
                :type git
@@ -121,7 +145,6 @@
        '(
          ansi
          auto-complete
-         browse-kill-ring
          dash
          diminish
          edit-server
