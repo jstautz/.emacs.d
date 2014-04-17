@@ -99,6 +99,8 @@
         (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
         (isearch-forward regexp-p no-recursive-edit)))))
 
+(global-set-key (kbd "C-c C-s") 'isearch-forward-at-point)
+
 
 ;;-----------------------------------------------------------------------------
 ;; Nice functions to change copy-kill region to copy or kill current line
@@ -111,7 +113,7 @@
    (if mark-active
        (list (region-beginning) (region-end))
      (progn
-       (message "Current line is copied.")
+       (message "Current line copied to kill-ring.")
        (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
 
 (defadvice kill-region (before slick-copy activate compile)
