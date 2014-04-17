@@ -1,5 +1,5 @@
-#+TITLE: jstautz's Emacs config
-#+OPTIONS: toc:nil num:nil ^:nil
+#+TITLE: Jeff's Emacs config
+#+OPTIONS: toc:nil num:t ^:nil
 
 #+begin_quote
 People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -- the editor should get used to us.
@@ -20,7 +20,7 @@ People talk about getting used to a new editor, but over time, it is precisely t
 :CUSTOM_ID: what_is_this
 :END:
 
-A [[http://en.wikipedia.org/wiki/Literate_programming][literate programming]] version of my Emacs config files.
+It's a [[http://en.wikipedia.org/wiki/Literate_programming][literate programming]] version of my Emacs config files.
 
 My current setup borrows liberally from Emacs users far smarter than I am, including:
 - [[http://doc.norang.ca/org-mode.html][Bernt Hansen]] 
@@ -32,7 +32,7 @@ My current setup borrows liberally from Emacs users far smarter than I am, inclu
 - [[http://www.masteringemacs.org/][Mickey Petersen]]
 - And a ton of others. 
 
-Props and thank-yous and praises are scattered through my config in places where I can remember who I stole something from.
+Props and praises are scattered throughout my config in places where I can remember who I stole something from.
 
 ** Disclaimers and Warnings
 :PROPERTIES:
@@ -45,7 +45,7 @@ You /don't/ want to try and use my configs straight out of the box.
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
 - Requires Emacs 24.3. Only tested on Mac OS X.
 - First load will require an internet connection to download packages (this will take a while).
-- I'm not responsible if any of this blows up on you (see [[License]] below).
+- I'm not responsible if any of this blows up on you.
 
 ** What the hell is literate programming?
 :PROPERTIES:
@@ -64,7 +64,9 @@ Let us change our traditional attitude to the construction of programs: Instead 
 —Donald E. Knuth, Literate Programming, 1984
 #+end_quote
 
-The document you're reading now is an HTML version of an org-mode text file that contains both code and documentation. On startup, emacs pulls out ("tangles") the code snippets in this file and uses them to configure the editor.
+The document you're reading now is an org-mode text file that contains both code and documentation. 
+
+On startup, emacs pulls out ("tangles") the code snippets in this file and uses them to configure the editor.
 
 ** Why use literate programming for my Emacs config?
 :PROPERTIES:
@@ -97,7 +99,7 @@ Using a literate programming approach using org-babel has a number of advantages
 :CUSTOM_ID: license
 :END:
 
-I probably don't need a license for this, but I feel /way/ cooler having one here.
+I don't actually need a license for this, but I feel /way/ cooler having one here.
 
 #+begin_example
 Copyright (C)  2014  Jeff Stautz
@@ -121,7 +123,6 @@ This document (including HTML format or raw org-mode format) is licensed under t
 
 The code examples and CSS stylesheets are licensed under the GNU General Public License v3 or later (http://www.gnu.org/licenses/gpl.html).
 
-
 * What I use Emacs for
 :PROPERTIES:
 :CUSTOM_ID: what-i-do-in-emacs
@@ -133,13 +134,13 @@ This is my rifle. There are many like it, but this one is mine.
 --Major General William H. Rupertus, "The Rifleman's Creed," 1942
 #+end_quote
 
-I use Emacs differently than you probably do, and my setup will reflect that to some extent.
-
-In order to understand why I've configured things to way I did, it might help to understand some things I do in Emacs.
+In order to understand why I've configured things the way I did, it might help to understand some things I do in Emacs.
 
 ** Org-mode
 
-I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a whole section of my Emacs config dedicated to the ins and outs of my [[file:./config/init-org-mode.el][org-mode configuration.]]
+I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
+
+I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]]
 
 It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
 
@@ -169,128 +170,9 @@ My Emacs settings for software dev should be taken with several grains of salt -
 
 Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my swiss army knife for text transformations. There are large chunks of my config that deal with sharpening various blades of said swiss army knife.
 
-* Structure 
-:PROPERTIES:
-:CUSTOM_ID: structure
-:END:
-
-Okay, so how does my config actually work?
-
-My .emacs.d directory structure looks a little something like this:
-
-- =.emacs.d/=
-  - =init.el= -- Loaded automatically by Emacs on startup. Fires up org-mode and loads =emacs-init.org.=
-  - =emacs-init.org= -- The document you're reading right now. Contains documentation with embedded elisp configuration.
-  - =emacs-init.el= -- Elisp file generated by emacs-init.org.
-  - =init-customizations.el= -- Contains overall customizations [will be folded into emacs-init.org].
-  - =init-custom-functions.el= -- Custom functions [will be folded into emacs-init.org].
-  - =init-packages.el= -- Load packages with el-get [will be folded into emacs-init.org].
-  - =init-org.org= -- Documentation & elisp for org-mode setup.
-  - =secrets.el.gpg= -- Encrypted file containing passwords and sensitive info.
-  - =secrets.el= -- Wrapper for secrets.el.gpg.
-  - =snippets/= -- Yasnippet template directory.
-  - =config/= -- Configs for each package live here for now [will be folded into emacs-init.org].
-    - =init-*.org=
-    - =init-*.el=
-  - =el-get/= -- El-get will install packages here.
-
-** =init.el=
-
-The elisp in this file only has one purpose: set things up to load the rest of my configuration via org-babel.
-
-The important part is the last s-expression: 
-
-#+begin_src emacs-lisp :tangle no
-(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
-#+end_src 
-
-This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
-
-Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. This is easy enough on the face of it -- Emacs comes with org-mode built in. 
-
-However, I'm running the latest version of org-mode (installed & maintained w/ el-get) and my config depends on some of its more recent features. This means I've got to do a bit of finagling before calling =org-babel-load-file=:
-`
-#+begin_src emacs-lisp :tangle no
-;; Load Org-mode from source when the ORG_HOME environment variable is set
-(when (getenv "ORG_HOME")
-  (let ((org-lisp-dir (expand-file-name "lisp" (getenv "ORG_HOME"))))
-    (when (file-directory-p org-lisp-dir)
-      (add-to-list 'load-path org-lisp-dir)
-      (require 'org))))
-#+end_src
-
-We're telling Emacs to load org-mode from the =ORG_HOME= environment variable, if set. On my machine, =ORG_HOME= points to =~/.emacs.d/el-get/org-mode=, which is the el-get-installed version of org-mode.
-
-One additional issue with this: on OS X, Emacs.app starts up without any knowledge of my user's environment variables.
-
-There are nasty-looking ways to make this global for all applications, but I don't really want to mess around with =launchd.conf= right now. Instead, I'm taking the approach of manually importing the environment variables I need. I do this right at the top of my =init.el= file:
-
-#+begin_src emacs-lisp :tangle no
-(let ((jcs:org-home (shell-command-to-string ". ~/.bashrc; echo -n $ORG_HOME")))
-  (setenv "ORG_HOME" jcs:org-home))
-#+end_src
-
-Kinda silly, but it works. Emacs now knows where to look for my org-mode installation, and this is controlled via an environment variable.
-
-Special thanks to Eric Schulte's [[https://github.com/eschulte/emacs24-starter-kit][literate fork of Emacs Starter Kit]] for demonstrating how to bootstrap org and load a file with org-babel.
-
-*** TODO Right, but how does this work if el-get hasn't yet been run?
-I'm deliberately ignoring the chicken-and-the-egg problem here:
-
-- My setup uses org-mode to load its config.
-- My setup also uses el-get to fetch and install external packages.
-- Using el-get, I can take a bare clone of my repo and (theoretically) just launch Emacs... and el-get will find, install, and configure all external packages.
-- One of these external packages is org-mode.
-
-It's possible that my =ORG_HOME= variable could be set in my =.bashrc=, but I am doing a fresh checkout of my config. 
-
-In this case, the first run will have an empty =~/.emacs.d/el-get/= directory, and we won't be able to load org-mode in order to load my config.
-
-Two questions I have to answer to solve this problem:
-
-1. Can I detect whether =ORG_HOME= is a valid directory and fall back if it doesn't exist? /Yes, this should be straightforward./
-2. How does my config work if I use the built-in version of org-mode to do =org-babel-load-file=? What breaks? How far along will it progress? /No idea, and I'm a little scared to find out./
-
-And another larger question:
-
-- If I use el-get to install packages, but I rely on org-mode in order to load my configs that install packages... Would it make sense to keep org-mode separate from other el-get packages (ie. directly included in my config repo)? /Probably.../
-
-** =emacs-init.org=
-
-This is the meat of my emacs config. It's also the document you're reading right now.
-
-When this document is tangled and loaded by org-babel, all the elisp code snippets contained within it are re-arranged and loaded. 
-
-That re-arranging bit is important. Expressions in my config file need to be in a particular order for Emacs to understand them. But I also want to be able to document them in =emacs-init.org= in a totally different order -- one that makes sense to a human reader.
-
-I can define that Emacs-friendly code order here, using "noweb" syntax, which looks something like:
-
-#+begin_src emacs-lisp :tangle yes :noweb tangle
-<<Prerequisites and setup -- load basic support libraries, set some useful variables>>
-<<Sync external packages with el-get, load them, and configure them>>
-<<Load some editor customizations, UI tweaks, and custom keybindings>>
-<<Load a bunch of custom functions>>
-<<Post-flight: load Emacs desktop and start server>>
-#+end_src
-
-I try to treat the resulting =emacs-init.el= file almost like /compiled code/. It's the machine-readable file that I never really look at. 
-
-Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
-
-*** TODO possible bug with noweb and comments
-If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. Would be best if they linked to the custom_id perperty of the subtree they're in.
-
-** =el-get/= and =config/=
-
-I used to find and install third-party elisp packages manually. This got nasty pretty quickly.
-
-Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[https://github.com/dimitri/el-get][el-get]].
-
-El-get is a little like homebrew for Emacs. It lets you install and manage packages from multiple sources (MELPA, github, Emacswiki, wherever), set dependencies, generate autoloads, etc. 
-
-Packages loaded with el-get look for their configs in appropriately-named files in the =config/= directory. For example, markdown-mode looks for its settings in =config/init-markdown-mode.el=.
-
-As I consolidate settings a little more in a literate configuration, I may pull these configs back into the el-get setup when possible.
+* Keybindings
+* System and editor settings
+* Interface tweaks
 
 * Implementation  
   :PROPERTIES:
@@ -478,8 +360,137 @@ Now that everything's good to go, start the emacs server so we can connect to it
 #+begin_src emacs-lisp
 (server-start)
 #+end_src
+* Additional implementation details
+
+This section contains some less-interesting details that I won't be modifying all that often, but were still important to document. These include:
+
+- How init.el loads this config
+- The final structure of 
+
+** Structure of my .emacs.d/ 
+:PROPERTIES:
+:CUSTOM_ID: structure
+:END:
+
+My .emacs.d directory looks a little something like this:
+
+- =.emacs.d/=
+  - =init.el=
+    - Loaded automatically by Emacs on startup. Fires up org-mode and loads =emacs-init.org.=
+  - =emacs-init.org=
+    - The document you're reading right now. Contains documentation with embedded elisp configuration.
+  - =init-org.org=
+    - [[file::init-org.org][Documentation & elisp for my org-mode setup.]] I've separated this into its own config file because I want to be able to export and publish it separately.
+  - =secrets.el=
+    - Loads secrets.el.pgp -- an encrypted file containing passwords and sensitive info.
+  - =config/=
+    - Configs for each package live here for now [they will be folded into emacs-init.org].
+    - =init-*.org=
+    - =init-*.el=
+  - =el-get/= 
+    - I use el-get to install and update external packages. Each package gets installed in its own directory inside the =el-get/= directory.
+*** =init.el=
+
+The elisp in this file only has one purpose: set things up to load the rest of my configuration via org-babel.
+
+The important part is that last s-expression:
+
+#+begin_src emacs-lisp :tangle no
+(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
+#+end_src 
+
+This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
+
+Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. This is easy enough on the face of it -- Emacs comes with org-mode built in. 
+
+However, I'm running the latest version of org-mode (installed & maintained w/ el-get) and my config depends on some of its more recent features. This means I've got to do a bit of finagling before calling =org-babel-load-file=:
+
+#+begin_src emacs-lisp :tangle no
+  ;; Load Org-mode from source when the ORG_HOME environment variable is set
+  (when (getenv "ORG_HOME")
+    (let ((org-lisp-dir (expand-file-name "lisp" (getenv "ORG_HOME"))))
+      (when (file-directory-p org-lisp-dir)
+        (add-to-list 'load-path org-lisp-dir)
+        (require 'org)
+         ;; For some reason, org-id isn't loading correctly just from require
+         (load-file (expand-file-name "lisp/org-id.el" (getenv "ORG_HOME")))))
+#+end_src
+
+We're telling Emacs to load org-mode from the =ORG_HOME= environment variable, if set. On my machine, =ORG_HOME= points to =~/.emacs.d/el-get/org-mode=, which is the el-get-installed version of org-mode.
+
+One oddity I discovered only recently -- it may have something to do with the way I'm using org-babel's tangle feature -- I need to load org-id.el manually on startup because it doesn't seem to load it on its own. I'll need to fix this at some point.
+
+One additional issue with this: on OS X, Emacs.app starts up without any knowledge of my user's environment variables.
+
+There are nasty-looking ways to make this global for all applications, but I don't really want to mess around with =launchd.conf= right now. Instead, I'm taking the approach of manually importing the environment variables I need. I do this right at the top of my =init.el= file:
+
+#+begin_src emacs-lisp :tangle no
+(let ((jcs:org-home (shell-command-to-string ". ~/.bashrc; echo -n $ORG_HOME")))
+  (setenv "ORG_HOME" jcs:org-home))
+#+end_src
+
+Kinda silly, but it works. Emacs now knows where to look for my org-mode installation, and this is controlled via an environment variable.
+
+Special thanks to Eric Schulte's [[https://github.com/eschulte/emacs24-starter-kit][literate fork of Emacs Starter Kit]] for demonstrating how to bootstrap org and load a file with org-babel.
+
+**** TODO Right, but how does this work if el-get hasn't yet been run?
+I'm deliberately ignoring the chicken-and-the-egg problem here:
+
+- My setup uses org-mode to load its config.
+- My setup also uses el-get to fetch and install external packages.
+- Using el-get, I can take a bare clone of my repo and (theoretically) just launch Emacs... and el-get will find, install, and configure all external packages.
+- One of these external packages is org-mode.
+
+It's possible that my =ORG_HOME= variable could be set in my =.bashrc=, but I am doing a fresh checkout of my config. 
+
+In this case, the first run will have an empty =~/.emacs.d/el-get/= directory, and we won't be able to load org-mode in order to load my config.
+
+Two questions I have to answer to solve this problem:
+
+1. Can I detect whether =ORG_HOME= is a valid directory and fall back if it doesn't exist? /Yes, this should be straightforward./
+2. How does my config work if I use the built-in version of org-mode to do =org-babel-load-file=? What breaks? How far along will it progress? /No idea, and I'm a little scared to find out./
+
+And another larger question:
+
+- If I use el-get to install packages, but I rely on org-mode in order to load my configs that install packages... Would it make sense to keep org-mode separate from other el-get packages (ie. directly included in my config repo)? /Probably.../
+
+**** TODO I also need to sort out the issue with loading org-id.el. That's just weird.
 
 
+*** =emacs-init.org=
 
+This is the meat of my emacs config. It's also the document you're reading right now.
 
+When this document is tangled and loaded by org-babel, all the elisp code snippets contained within it are re-arranged and loaded. 
 
+That re-arranging bit is important. Expressions in my config file need to be in a particular order for Emacs to understand them. But I also want to be able to document them in =emacs-init.org= in a totally different order -- one that makes sense to a human reader.
+
+I can define that Emacs-friendly code order here, using "noweb" syntax, which looks something like:
+
+#+begin_src emacs-lisp :tangle yes :noweb tangle
+<<Prerequisites and setup -- load basic support libraries, set some useful variables>>
+<<Sync external packages with el-get, load them, and configure them>>
+<<Load some editor customizations, UI tweaks, and custom keybindings>>
+<<Load a bunch of custom functions>>
+<<Post-flight: load Emacs desktop and start server>>
+#+end_src
+
+I try to treat the resulting =emacs-init.el= file almost like /compiled code/. It's the machine-readable file that I never really look at. 
+
+Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
+
+**** TODO possible bug with noweb and comments
+If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. Would be best if they linked to the custom_id perperty of the subtree they're in.
+
+*** =el-get/= and =config/=
+
+I used to find and install third-party elisp packages manually. This got nasty pretty quickly.
+
+Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[https://github.com/dimitri/el-get][el-get]].
+
+El-get is a little like homebrew for Emacs. It lets you install and manage packages from multiple sources (MELPA, github, Emacswiki, wherever), set dependencies, generate autoloads, etc. 
+
+Packages loaded with el-get look for their configs in appropriately-named files in the =config/= directory. For example, markdown-mode looks for its settings in =config/init-markdown-mode.el=.
+
+As I consolidate settings a little more in a literate configuration, I may pull these configs back into the el-get setup when possible.
+* 
