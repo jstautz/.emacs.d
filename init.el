@@ -4,9 +4,8 @@
 ;;
 ;; This is the first file Emacs loads.
 ;;
-;; The only thing done in this file is to load org-mode via the ORG_HOME
-;; environment variable, if set, then use org-babel to load org-mode files
-;; containing the rest of my setup.
+;; The only thing done in this file is to load org-mode, then use org-babel
+;; to load org-mode files containing the rest of my setup.
 ;;
 ;; Ideas and elisp stolen from Eric Schulte's literate fork of
 ;; emacs-starter-kit: https://github.com/eschulte/emacs24-starter-kit
@@ -36,8 +35,24 @@
     ,(unless (and (getenv "ORG_HOME")
                   (file-directory-p (expand-file-name "lisp"
                                                       (getenv "ORG_HOME"))))
-       '(require 'org))
+       '(require 'org)
+       ;; For some reason, org-id isn't loading correctly just from require
+       (load-file (expand-file-name "lisp/org-id.el" (getenv "ORG_HOME"))))
     ;; load up the rest of my emacs init
     (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))))
+
+
+;; TODO I want to experiment with trimming this all way way down. Similar to
+;; http://dl.dropboxusercontent.com/u/3968124/sacha-emacs.html#sec-1-1
+;; 
+;; (setq org-mode-dir "~/.emacs.d/el-get/org-mode/")
+
+;; (if (file-directory-p (concat org-mode-dir "lisp"))
+;;     (progn
+;;       (add-to-list 'load-path (concat org-mode-dir "lisp"))
+;;       (add-to-list 'load-path (concat org-mode-dir "contrib/lisp")))
+;;   (
+;;
+
 
 ;;; init.el ends here
