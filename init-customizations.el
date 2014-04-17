@@ -176,11 +176,13 @@
 
 ;; Rebind M-s to save-buffer -- I never center lines
 (global-set-key (kbd "M-s") 'save-buffer)
-(add-hook 'text-mode-hook
- (lambda ()
- (define-key text-mode-map (kbd "M-s") 'save-buffer)
- )
-)
+
+;; Don't think I need this, if I set it globally?
+;; (add-hook 'text-mode-hook
+;;  (lambda ()
+;;  (define-key text-mode-map (kbd "M-s") 'save-buffer)
+;;  )
+;; )
 
 ;; Rebind M-o to other-window. C-x o is too clunky.
 (global-set-key (kbd "M-o") 'other-window)
@@ -206,9 +208,10 @@
 (global-set-key "\M-p" 'scroll-down-line)
 
 ;; Return should preserve indentation (will override in modes where I don't like this)
-(define-key global-map (kbd "RET") 'newline-and-indent)
+(global-set-key (kbd "RET") 'newline-and-indent)
 
 ;; wdired toggle -- for rewriting filenames. hit 'r' in dired mode
+;; any reason why this has to be eval'ed after load?
 (eval-after-load 'dired
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
