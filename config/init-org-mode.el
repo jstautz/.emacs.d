@@ -634,6 +634,16 @@ Skips capture tasks."
        .done { color: green; }
     </style>")
 
+;; Some publishing settings stolen from Bernt Hansen
+
+;; Inline images in HTML instead of producting links to the image
+(setq org-html-inline-images t)
+;; Do not use sub or superscripts - I currently don't need this functionality in my documents
+(setq org-export-with-sub-superscripts nil)
+; Use org.css from the norang website for export document stylesheets
+(setq org-html-head "<link rel=\"stylesheet\" href=\"org.css\" type=\"text/css\" />")
+(setq org-html-head-include-default-style nil)
+
 ;;-----------------------------------------------------------------------------
 ;; Notifications -- use Growl to send org & calendar notifications
 ;;-----------------------------------------------------------------------------
