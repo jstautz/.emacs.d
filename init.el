@@ -13,46 +13,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; Ugly hack to get access to ORG_HOME env variable
-(let ((jcs:org-home (shell-command-to-string ". ~/.bashrc; echo -n $ORG_HOME")))
-  (setenv "ORG_HOME" jcs:org-home))
+;; Assume current directory is the dot-emacs directory.
+(setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
 
-;; Load Org-mode from source when the ORG_HOME environment variable is set
-(when (getenv "ORG_HOME")
-  (let ((org-lisp-dir (expand-file-name "lisp" (getenv "ORG_HOME"))))
-    (when (file-directory-p org-lisp-dir)
-      (add-to-list 'load-path org-lisp-dir)
-      (require 'org))))
+;; Assume that org-mode is installed via el-get
+;; TODO: check if this is valid?
+;; TODO: this is kind of a chicken and egg problem...
+(setq org-mode-dir (concat dotemacs-dir "el-get/org-mode/"))
 
-;; Load the rest of my init from the `after-init-hook' so all packages
-;; are loaded
-(add-hook 'after-init-hook
- `(lambda ()
-    ;; remember this directory
-    (setq dotemacs-dir
-          ,(file-name-directory (or load-file-name (buffer-file-name))))
-    ;; only load org-mode later if we didn't load it just now
-    ,(unless (and (getenv "ORG_HOME")
-                  (file-directory-p (expand-file-name "lisp"
-                                                      (getenv "ORG_HOME"))))
-       '(require 'org)
-       ;; For some reason, org-id isn't loading correctly just from require
-       (load-file (expand-file-name "lisp/org-id.el" (getenv "ORG_HOME"))))
-    ;; load up the rest of my emacs init
-    (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))))
+;; Load the necessary bits of org-mode and org-babel
+(if (file-directory-p (concat org-mode-dir "lisp"))
+    (progn
+      (add-to-list 'load-path (concat org-mode-dir "lisp"))
+      (add-to-list 'load-path (concat org-mode-dir "contrib/lisp"))
+      (require 'org)
+      (require 'ob-tangle)
+      (require 'org-id))
+  (message "Could not load org-mode! Expecting it in the el-get/org-mode directory."))
 
-
-;; TODO I want to experiment with trimming this all way way down. Similar to
-;; http://dl.dropboxusercontent.com/u/3968124/sacha-emacs.html#sec-1-1
-;; 
-;; (setq org-mode-dir "~/.emacs.d/el-get/org-mode/")
-
-;; (if (file-directory-p (concat org-mode-dir "lisp"))
-;;     (progn
-;;       (add-to-list 'load-path (concat org-mode-dir "lisp"))
-;;       (add-to-list 'load-path (concat org-mode-dir "contrib/lisp")))
-;;   (
-;;
-
+;; Load the rest of my config from org-mode file
+(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
 
 ;;; init.el ends here

@@ -156,7 +156,7 @@ The details of how I use Emacs for fiction writing are [[file:./emacs-init.org][
 
 ** Programming
 
-Unlike most Emacs users, I don't do a ton of development in Emacs. I only dabble, and only occasionally when I want to hack around and pretend like I know how to program. 
+Unlike most Emacs users, I don't do a ton of software development in Emacs. I'm not a professional software engineer -- I only dabble, and I only pretend like I know what I'm doing. I work with a ton of talented engineers every day
 
 A couple of languages I use:
 
@@ -389,7 +389,7 @@ My .emacs.d directory looks a little something like this:
     - =init-*.el=
   - =el-get/= 
     - I use el-get to install and update external packages. Each package gets installed in its own directory inside the =el-get/= directory.
-*** =init.el=
+** =init.el=
 
 The elisp in this file only has one purpose: set things up to load the rest of my configuration via org-babel.
 
@@ -403,37 +403,23 @@ This line will export ("tangle") the code blocks from the =emacs-init.org= file 
 
 Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. This is easy enough on the face of it -- Emacs comes with org-mode built in. 
 
-However, I'm running the latest version of org-mode (installed & maintained w/ el-get) and my config depends on some of its more recent features. This means I've got to do a bit of finagling before calling =org-babel-load-file=:
+However, I'm running the latest version of org-mode (installed & maintained w/ el-get) and my config depends on some of its more recent features. This means I've got to load org-mode from the el-get directory:
 
 #+begin_src emacs-lisp :tangle no
-  ;; Load Org-mode from source when the ORG_HOME environment variable is set
-  (when (getenv "ORG_HOME")
-    (let ((org-lisp-dir (expand-file-name "lisp" (getenv "ORG_HOME"))))
-      (when (file-directory-p org-lisp-dir)
-        (add-to-list 'load-path org-lisp-dir)
-        (require 'org)
-         ;; For some reason, org-id isn't loading correctly just from require
-         (load-file (expand-file-name "lisp/org-id.el" (getenv "ORG_HOME")))))
+(setq org-mode-dir (concat dotemacs-dir "el-get/org-mode/"))
+
+(if (file-directory-p (concat org-mode-dir "lisp"))
+    (progn
+      (add-to-list 'load-path (concat org-mode-dir "lisp"))
+      (add-to-list 'load-path (concat org-mode-dir "contrib/lisp"))
+      (require 'org)
+      (require 'ob-tangle)
+      (require 'org-id))
+  (message "Could not load org-mode! Expecting it in the el-get/org-mode directory."))
 #+end_src
 
-We're telling Emacs to load org-mode from the =ORG_HOME= environment variable, if set. On my machine, =ORG_HOME= points to =~/.emacs.d/el-get/org-mode=, which is the el-get-installed version of org-mode.
 
-One oddity I discovered only recently -- it may have something to do with the way I'm using org-babel's tangle feature -- I need to load org-id.el manually on startup because it doesn't seem to load it on its own. I'll need to fix this at some point.
-
-One additional issue with this: on OS X, Emacs.app starts up without any knowledge of my user's environment variables.
-
-There are nasty-looking ways to make this global for all applications, but I don't really want to mess around with =launchd.conf= right now. Instead, I'm taking the approach of manually importing the environment variables I need. I do this right at the top of my =init.el= file:
-
-#+begin_src emacs-lisp :tangle no
-(let ((jcs:org-home (shell-command-to-string ". ~/.bashrc; echo -n $ORG_HOME")))
-  (setenv "ORG_HOME" jcs:org-home))
-#+end_src
-
-Kinda silly, but it works. Emacs now knows where to look for my org-mode installation, and this is controlled via an environment variable.
-
-Special thanks to Eric Schulte's [[https://github.com/eschulte/emacs24-starter-kit][literate fork of Emacs Starter Kit]] for demonstrating how to bootstrap org and load a file with org-babel.
-
-**** TODO Right, but how does this work if el-get hasn't yet been run?
+*** Right, but how does this work if el-get hasn't yet been run?
 I'm deliberately ignoring the chicken-and-the-egg problem here:
 
 - My setup uses org-mode to load its config.
@@ -441,23 +427,15 @@ I'm deliberately ignoring the chicken-and-the-egg problem here:
 - Using el-get, I can take a bare clone of my repo and (theoretically) just launch Emacs... and el-get will find, install, and configure all external packages.
 - One of these external packages is org-mode.
 
-It's possible that my =ORG_HOME= variable could be set in my =.bashrc=, but I am doing a fresh checkout of my config. 
+If I'm doing a fresh install, the el-get directory won't exist and we won't be able to load org-mode.
 
-In this case, the first run will have an empty =~/.emacs.d/el-get/= directory, and we won't be able to load org-mode in order to load my config.
+I've tried using Emacs 24.3.50's built-in version of org-mode, but it doesn't work with my config. This might change with Emacs 24.4 -- I'll need to check that out soon.
 
-Two questions I have to answer to solve this problem:
-
-1. Can I detect whether =ORG_HOME= is a valid directory and fall back if it doesn't exist? /Yes, this should be straightforward./
-2. How does my config work if I use the built-in version of org-mode to do =org-babel-load-file=? What breaks? How far along will it progress? /No idea, and I'm a little scared to find out./
-
-And another larger question:
+Big question, though:
 
 - If I use el-get to install packages, but I rely on org-mode in order to load my configs that install packages... Would it make sense to keep org-mode separate from other el-get packages (ie. directly included in my config repo)? /Probably.../
 
-**** TODO I also need to sort out the issue with loading org-id.el. That's just weird.
-
-
-*** =emacs-init.org=
+** =emacs-init.org=
 
 This is the meat of my emacs config. It's also the document you're reading right now.
 
@@ -479,10 +457,10 @@ I try to treat the resulting =emacs-init.el= file almost like /compiled code/. I
 
 Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
 
-**** TODO possible bug with noweb and comments
+*** TODO possible bug with noweb and comments
 If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. Would be best if they linked to the custom_id perperty of the subtree they're in.
 
-*** =el-get/= and =config/=
+** =el-get/= and =config/=
 
 I used to find and install third-party elisp packages manually. This got nasty pretty quickly.
 
