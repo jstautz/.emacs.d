@@ -206,7 +206,9 @@ I can define that Emacs-friendly code order here, using "noweb" syntax[fn:2], wh
 #+begin_src emacs-lisp :tangle yes :noweb tangle
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
 <<Sync external packages with el-get, load them, and configure them>>
-<<Load some editor customizations, UI tweaks, and custom keybindings>>
+<<Tweak some UI settings>>
+<<Load some editor customizations>>
+<<Set custom keybindings>>
 <<Load a bunch of custom functions>>
 <<Post-flight: load Emacs desktop and start server>>
 #+end_src
@@ -253,6 +255,398 @@ A few rounds of killing/re-opening emacs usually gets through all packages.
 This is something I should dig into further and fix.
 
 -------------------------------------
+
+* Interface tweaks
+:PROPERTIES:
+:noweb-ref: Tweak some UI settings
+:END:
+
+I know, I know. Emacs doesn't have much of an interface to begin with. 
+
+Even so, there are a couple of changes I like to make in order to make things a little cleaner.
+
+** Remove distracting UI elements
+
+Emacs comes with a fat ugly toolbar turned on by default. It's seriously gross looking. 
+
+Turning it off is one of the first things I do.
+
+#+name: UI-toolbar
+#+begin_src emacs-lisp 
+(tool-bar-mode -1)
+#+end_src
+
+I don't really use the side fringe at all, so I set to a colour that blends into the buffer background. I happen to use Emacs with dark text on a white background, so I set the fringe to white. 
+
+#+name: UI-fringe
+#+begin_src emacs-lisp 
+(custom-set-faces '(fringe ((t (:background"white")))))
+#+end_src
+
+Scroll bars are also pretty useless in this age of scroll wheels and trackpads, so I turn that off as well.
+
+The only *good* part about a scroll bar? It gives you a quick indication of how far down in the current file you are, and how large the file is.
+
+I make up for this by [[file://emacs-init.org][displaying a position indicator in my modeline]] -- I'll explain that setup a bit further down.
+
+#+name: UI-fringe
+#+begin_src emacs-lisp 
+(scroll-bar-mode -1)
+
+#+end_src
+
+** Hide welcome messages
+
+We're all professionals, here. We know what we're doing. 
+
+So let's ditch the splash screen, the startup message, and the default text on the scratch buffer:
+
+#+name: UI-splash
+#+begin_src emacs-lisp 
+(setq inhibit-splash-screen 1)               
+(setq initial-scratch-message "")
+(setq inhibit-startup-message t)
+
+#+end_src 
+
+** Kill some annoyances
+
+Seriously, screw the audible alert bell.
+
+Let's set the ring-bell function to an empty function instead of the deafult (which is named, appropriately, =ding=).
+
+Let's also turn on the visible-bell option so that the screen blinks/alerts me.
+
+#+name: UI-bells
+#+begin_src emacs-lisp 
+(setq ring-bell-function (lambda ()))
+(setq visible-bell 1)                        
+
+#+end_src
+
+Another obnoxious default to change: the requirement that you actually type the letters "y" "e" and "s" at a yes/no prompt. Whose dumb idea was that? 
+
+This s-exp lets you just type "y" or "n" like in any other sane application:
+
+#+name: UI-yorn
+#+begin_src emacs-lisp 
+(fset 'yes-or-no-p 'y-or-n-p)
+
+#+end_src
+
+
+** Highlight cursor location
+
+I realize a lot of people hate blinking cursors, but I like them because:
+
+- It lets me quickly find my cursor on a large screen
+- The persistent blinking indicates Emacs is waiting for my input -- it's pushing me to write, to get shit done. 
+
+#+name: UI-cursor
+#+begin_src emacs-lisp 
+(setq blink-cursor-mode t)
+#+end_src
+
+Another helpful inidicator: I like having my current line highlighted. =grey93= is nice and subtle against a white background.
+
+#+name: UI-highlight-line
+#+begin_src emacs-lisp 
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "grey93")
+
+#+end_src
+
+** Cursor scroll settings
+
+Let's make buffer scrolling / paging a bit more sane.
+
+By default, Emacs will recenter on the cursor when you scroll above / below the current viewable area. This leads to some disorienting jumping around.
+
+Setting =scroll-conservatively= to a value > 100 means automatic scrolling will never center on the cursor.
+
+#+name: UI-scroll-conserv
+#+begin_src emacs-lisp 
+(setq scroll-conservatively 1000)
+#+end_src
+
+The =scroll-margin= variable controls how close to the bottom/top edge of the frame I can get before the viewable area begins to scroll. I like to get right to the edge before scrolling.
+
+#+name: UI-scroll-margin
+#+begin_src emacs-lisp 
+(setq scroll-margin 0)
+#+end_src
+
+I don't want to jump around at all when scrolling up or down.
+
+And when I *do* page up or down, I want my cursor to be in the same position relative to the top and bottom of the frame.
+
+This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't have to hunt for my cursor. I should still be looking at it.
+
+#+name: UI-scroll-agg
+#+begin_src emacs-lisp 
+(setq scroll-up-aggressively nil
+      scroll-down-aggressively nil
+      scroll-preserve-screen-position t)
+
+#+end_src
+
+** Mac-specific settings
+
+#+name: UI-mac-settings
+#+begin_src emacs-lisp 
+;; Make mouse/keyboard/EOL/clipboard work sanely on OS X
+(setq mac-emulate-three-button-mouse t)
+(setq ns-alternate-modifier (quote meta))
+(setq ns-command-modifier (quote meta))
+(setq eol-mnemonic-mac "(Mac)")
+(setq x-select-enable-clipboard t)
+
+;; If I drag n' drop a file onto Emacs, visit the file (instead of append to buffer)
+(define-key global-map [ns-drag-file] 'ns-find-file) 
+#+end_src
+
+** Show both line and column numbers
+
+A basic feature of any decent text editor: show me what line number I'm on.
+
+The column number display isn't as useful but does come in handy.
+
+#+name: UI-linum
+#+begin_src emacs-lisp 
+(line-number-mode 1)                         
+(column-number-mode 1)
+
+#+end_src
+** Confirm before quitting Emacs
+
+I want to make sure I don't accidentally kill Emacs by doing two things:
+
+1) Unset =C-x C-c= so I don't hit it accidentally, and
+2) Prompt me to confirm that I actually want to quit.
+
+If I want to quit Emacs (gasp!) I now need to do it *very* deliberately via =M-x save-buffers-kill-emacs= and then confirm.
+
+Good thing I rarely quit Emacs.
+
+#+name: UI-quit-emacs
+#+begin_src emacs-lisp
+(global-unset-key "\C-x\C-c")
+(setq confirm-kill-emacs 'y-or-n-p)
+
+#+end_src
+
+** Connecting to Emacs server shouldn't pop up frames
+
+Speaking of rarely quitting Emacs... My preferred way of working is in a single fullscreen frame in Emacs.app that's open all the time, running as a server. 
+
+If I'm working in the terminal and I need to edit a file in my current directory, I can just do:
+
+#+begin_example 
+$> emacsclient filename.txt
+#+end_example
+
+This will open filename.txt within my already-running Emacs.app instance. Sweet.
+
+One thing I had to tweak for this: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
+
+#+name: UI-pop-up-frames
+#+begin_src emacs-lisp 
+(setq ns-pop-up-frames nil)
+
+#+end_src
+
+** Force redisplay
+
+If the =redisplay-dont-pause= variable is not set, then any keyboard/mouse event will stop a screen redraw to handle the input. Which I suppose made sense on older machines or slower networks.
+
+On modern machines, it makes sense to turn this on in order to make the display feel faster.
+
+Thanks to [[http://www.masteringemacs.org/articles/2011/10/02/improving-performance-emacs-display-engine/][Mickey Peterson for this one]].
+
+#+name: UI-redisplay
+#+begin_src emacs-lisp 
+(setq redisplay-dont-pause t)
+
+#+end_src
+
+I believe this is now on by default in Emacs 24, so I may no longer need to set this explicitly.
+
+* Keybindings
+:PROPERTIES:
+:noweb-ref: Set custom keybindings
+:END:
+
+#+name: keybindings
+#+begin_src emacs-lisp 
+;; Up yours, read-only toggle!
+(global-unset-key "\C-x\C-q")
+
+;; Rebind M-s to save-buffer -- I never center lines
+(global-set-key (kbd "M-s") 'save-buffer)
+
+;; Don't think I need this, if I set it globally?
+;; (add-hook 'text-mode-hook
+;;  (lambda ()
+;;  (define-key text-mode-map (kbd "M-s") 'save-buffer)
+;;  )
+;; )
+
+;; Rebind M-o to other-window. C-x o is too clunky.
+(global-set-key (kbd "M-o") 'other-window)
+
+;; Bind C-esc to 'top-level for exiting from debugger, etc.
+(global-set-key (kbd "<C-escape>") 'top-level)  
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(add-hook 'org-mode-hook
+          (lambda()
+            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+
+;; I like Undo here.
+(global-set-key (kbd "C-z") 'undo)     
+
+;; I also like iBuffer here
+(global-set-key "\C-x\C-b" 'ibuffer)
+
+;; I hit F2 accidentally way too often
+(global-unset-key (kbd "<f2>"))     
+
+;; Scroll buffer
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
+
+;; Return should preserve indentation (will override in modes where I don't like this)
+(global-set-key (kbd "RET") 'newline-and-indent)
+
+;; wdired toggle -- for rewriting filenames. hit 'r' in dired mode
+;; any reason why this has to be eval'ed after load?
+(eval-after-load 'dired
+  '(define-key dired-mode-map "r"
+     'wdired-change-to-wdired-mode))
+
+
+;; If I scroll with my mouse wheel on the fringe/margin, handle this:
+(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+
+#+end_src
+
+
+
+* Editor customizations
+:PROPERTIES:
+:noweb-ref: Load some editor customizations
+:END:
+
+#+name: editor-settings
+#+begin_src emacs-lisp 
+;;-----------------------------------------------------------------------------
+;; System / Editing Prefs
+;;-----------------------------------------------------------------------------
+
+;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
+(setq gc-cons-threshold 20000000)
+
+;; Put backups & autosaves in their place (not in current dir)
+(defvar backup-dir (concat home-dir ".emacs.backup/"))
+(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
+(setq backup-directory-alist `((".*" . ,backup-dir)))
+(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+
+;; Make backups of files, even when they're in version control
+(setq vc-make-backup-files t)
+
+;; When deleting files, move them to Trash
+(setq delete-by-moving-to-trash t)
+(setq trash-directory (concat home-dir ".Trash/"))
+
+;; Refresh any buffer when file on disk changes
+(setq global-auto-revert-mode 1)
+
+;; ...Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+
+;; ...Also rebuild Tags files, and be quiet about it
+(setq tags-revert-without-query t)
+
+;; M-x locate uses OS X's Spotlight
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+
+;; Tabs insert 4 spaces, sentences have one space (as God intended).
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
+(setq sentence-end-double-space nil)
+
+;; selection options + rectangle selection w/ CUA
+(transient-mark-mode t)
+(delete-selection-mode t)
+(setq cua-enable-cua-keys nil)               
+(cua-mode t)
+
+;; auto-fill options 
+(setq fill-column 120)
+(setq default-fill-column 120)
+
+;; Testing wrap-to-fill options instead of auto-fill
+;; note: I think wrap-to-fill is only included in nxhtml-mode,
+;;       so we need packages installed before this works.
+;; 
+;;(auto-fill-mode 1)
+;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(wrap-to-fill-column-mode 1)
+(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+
+;; Desktop saving options
+(desktop-save-mode 1)
+(setq desktop-globals-to-save
+	  (append '((extended-command-history . 30)
+				(file-name-history        . 100)
+				(grep-history             . 30)
+				(compile-history          . 30)
+				(minibuffer-history       . 50)
+				(query-replace-history    . 60)
+				(read-expression-history  . 60)
+				(regexp-history           . 60)
+				(regexp-search-ring       . 20)
+				(search-ring              . 20)
+				(shell-command-history    . 50)
+				tags-file-name
+				register-alist)))
+
+;; Quick ways to restore desktop/windows
+(winner-mode 1)
+
+;; Bookmark options
+(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
+
+;; spellcheck options
+(setq ispell-program-name "aspell")
+
+;; Tramp defaults
+(setq tramp-default-method "ssh")
+
+;; Make sure diff works with .org files and others
+(setq diff-switches "-a -c")
+
+;; Let me upcase/downcase regions
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+;; ignore case when completing, including filenames
+(setq completion-ignore-case t           
+  read-file-name-completion-ignore-case t)
+
+;; Let me narrow to region -- I use this a bunch
+(put 'narrow-to-region 'disabled nil)
+
+
+
+#+end_src
+
 
 * What I use Emacs for
 :PROPERTIES:
@@ -309,11 +703,6 @@ Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs 
 
 [[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
-* Interface tweaks
-
-
-** 
-* Keybindings
 * System and editor settings
 * Implementation  
   :PROPERTIES:
@@ -385,17 +774,6 @@ And set some directory vars
 (require 'init-packages)
 #+end_src
 
-** Customizations
-:PROPERTIES:
-:noweb-ref: Load some editor customizations, UI tweaks, and custom keybindings
-:CUSTOM_ID: customizations
-:END:
-
-#+name: init-packages
-#+begin_src emacs-lisp
-(require 'init-customizations)
-#+end_src
-
 ** Custom functions and tweaks
 :PROPERTIES:
 :noweb-ref: Load a bunch of custom functions
@@ -416,6 +794,8 @@ This section contains some less-interesting details that I won't be modifying al
 :CUSTOM_ID: setup
 :END:  
 
+This section contains the first bits of elisp in my config that get loaded. 
+
 *** First, let's load common lisp libraries
 
 This is generally a good idea.
@@ -423,17 +803,19 @@ This is generally a good idea.
 #+name: setup-require-cl :comments both
 #+begin_src emacs-lisp
 (require 'cl)
+
 #+end_src
 
 *** Then set our path appropriately.
 
-I use a somewhat gross hack to grab the $PATH environment variable from my ~/.bashrc and use this. This way my path is consistent between Emacs and my shell elsewhere.
+This is kind of a gross hack to grab the $PATH environment variable from my ~/.bashrc and use this. This way my path is consistent between Emacs and my shell elsewhere.
 
 #+name: setup-path :comments both
 #+begin_src emacs-lisp
 (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
+
 #+end_src
  
 *** Set a few variables for directories
@@ -457,11 +839,12 @@ Emacs has a neat customize feature, accessible via =M-x customize=, which lets y
 
 I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle with settings in customize to try things out.
 
-When I do so, I'd like customize to save things at the bottom of my init-customizations.el file. If I like the changes, I'll pull them out of the customize section of this file and place them in the appropriate places in my config.
+When I do so, I'd like customize to save things at the bottom of my emacs-init.el file. If I like the changes, I'll pull them out of the customize section of this file and place them in the appropriate places in my config.
 
 #+name: setup-custom-file
 #+begin_src emacs-lisp
-(setq custom-file (concat dotemacs-dir "init-customizations.el"))
+(setq custom-file (concat dotemacs-dir "emacs-init.el"))
+
 #+end_src
 
 *** Add .emacs.d to load-path
@@ -484,6 +867,7 @@ I do this before I begin loading packages so that package configs can access var
 (defun jcs:decrypt-secrets ()
   (interactive)
   (require 'secrets))
+
 #+end_src
 
 
@@ -501,9 +885,8 @@ I'm not sure why this is required now when it wasn't before -- something slightl
 (desktop-read)
 #+end_src
 
-
-*** start server
-Now that everything's good to go, start the emacs server so we can connect to it using =emacsclient= from the command line
+*** Start server
+Now that everything's good to go, start the emacs server so we can connect to it using =emacsclient= from the command line.
 
 #+name: server-start
 #+begin_src emacs-lisp
