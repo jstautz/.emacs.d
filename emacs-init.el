@@ -74,8 +74,8 @@
 (global-unset-key "\C-x\C-c")
 (setq confirm-kill-emacs 'y-or-n-p)
 
-;; Keep emacs server from opening new frame each time
 (setq ns-pop-up-frames nil)
+
 (setq redisplay-dont-pause t)
 
 ;;-----------------------------------------------------------------------------
@@ -226,6 +226,13 @@
 (eval-after-load 'dired
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
+
+
+;; If I scroll with my mouse wheel on the fringe/margin, handle this:
+(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
 
 (require 'init-custom-functions)
 (desktop-read)
