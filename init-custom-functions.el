@@ -143,6 +143,25 @@
 ;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
 ;;-----------------------------------------------------------------------------
 
+;; Instead of giving me two identical buffers when I split the window, give me the previous buffer.
+;; From http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
+(defun vsplit-last-buffer ()
+  (interactive)
+  (split-window-vertically)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+(defun hsplit-last-buffer ()
+  (interactive)
+   (split-window-horizontally)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+
+(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+
+
 ;; Switch (zoom) between split window config and a single window
 (defun toggle-windows-split()
   "Switch back and forth between one window and whatever split of
