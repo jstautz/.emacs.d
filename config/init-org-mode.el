@@ -454,6 +454,18 @@ returned is wrapped in #s"
 ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
 (setq org-clock-out-remove-zero-time-clocks t)
 
+;; I want my clock to display in the frame title.
+;; This is a quick hack to see if productivity apps recognize this.
+(add-hook 'org-clock-in-hook 'jcs:clock-in-frame)
+(add-hook 'org-clock-out-hook 'jcs:clock-out-frame)
+
+(defun jcs:clock-in-frame ()
+      (setq frame-title-format '("" "[" org-clock-current-task "]")))
+
+  (defun jcs:clock-out-frame ()
+    (setq frame-title-format '("" "%b")))
+
+
 ;; Set the default task while at work -- This is the "General organization" task in work.org
 (defvar jcs:work-org-task-id "DB00839E-39A9-4023-8494-25EA0BDCF16D")
 
