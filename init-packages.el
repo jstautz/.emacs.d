@@ -66,10 +66,24 @@
                :description "Search the kill ring in the minibuffer."
                :type elpa)
 
+        ;; (:name kv
+        ;;        :description "Key/Value collection type functions: for alists, hashtables and plists."
+        ;;        :type git
+        ;;        :url "https://github.com/nicferrier/emacs-kv.git"
+        ;;        :features kv)
+        
+        ;; (:name esxml
+        ;;        :description "Library for working with XML"
+        ;;        :type git
+        ;;        :url "https://github.com/tali713/esxml.git"
+        ;;        :depends kv
+        ;;        :features esxml
+        ;;        )
+        
         (:name fountain-mode
                :description "Major mode for editing screenplays in Fountain markup format"
-               :type github
-               :pkgname "rnkn/fountain-mode"
+               :type git
+               :url "https://github.com/rnkn/fountain-mode.git"
                :features fountain-mode)
         
         (:name gmail-message-mode
@@ -91,6 +105,14 @@
                :type github
                :pkgname "Bruce-Connor/html-to-markdown"
                :features html-to-markdown)
+
+        ;; (:name org-trello
+        ;;        :description "Minor mode that enables two-way sync between Org and Trello"
+        ;;        :type git
+        ;;        :url "https://github.com/org-trello/org-trello.git"
+        ;;        :features org-trello
+        ;;        :depends (dash request elnode s esxml db)
+        ;;        )
         
         (:name popwin
                :description "Popup Window Manager for Emacs"
