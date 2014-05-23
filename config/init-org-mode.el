@@ -175,45 +175,52 @@ returned is wrapped in #s"
 						   (org-agenda-skip-function 'jcs:skip-projects)
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
-			   (tags-todo "-REFILE/!NEXT|STARTED"
-			    		  ((org-agenda-overriding-header "Next Tasks")
+							'(todo-state-down priority-down effort-up category-keep))))
+			   (tags-todo "-REFILE/!STARTED"
+			    		  ((org-agenda-overriding-header "Tasks in Progress")
 			    		   (org-agenda-skip-function 'jcs:skip-projects)
 			    		   (org-agenda-todo-ignore-scheduled 'future)
 			    		   (org-tags-match-list-sublevels t)
 			    		   (org-agenda-sorting-strategy
-			    			'(todo-state-down effort-up category-keep))))
+			    			'(priority-down effort-up category-keep))))
+			   (tags-todo "-REFILE/!NEXT"
+			    		  ((org-agenda-overriding-header "Tasks for Today")
+			    		   (org-agenda-skip-function 'jcs:skip-projects)
+			    		   (org-agenda-todo-ignore-scheduled 'future)
+			    		   (org-tags-match-list-sublevels t)
+			    		   (org-agenda-sorting-strategy
+			    			'(priority-down effort-up category-keep))))
 			   (tags-todo "@work-REFILE"
 						  ((org-agenda-overriding-header "Work Tasks")
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
 			   (tags-todo "@home-REFILE"
 						  ((org-agenda-overriding-header "Home Tasks")
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
 			   (tags-todo "@desk-REFILE"
 						  ((org-agenda-overriding-header "Writing/Focused Tasks")
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
 			   (tags-todo "@errands-REFILE"
 						  ((org-agenda-overriding-header "Errands")
 						   (org-tags-match-list-sublevels t)
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
 			   ))
 			 ("d" "@desk"
               ((tags-todo "@desk-REFILE" 
 						  ((org-agenda-overriding-header "All Desk/Writing Tasks")
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
               ))
              ("h" "@home + agenda"
               ((agenda "")
@@ -225,22 +232,22 @@ returned is wrapped in #s"
 						  ((org-agenda-overriding-header (jcs:wip-text "@home" "STARTED" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down priority-down effort-up category-keep))))
                (tags-todo "@home-REFILE/!NEXT"
                           ((org-agenda-overriding-header (jcs:wip-text "@home" "NEXT" 3))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@home-REFILE/!WAITING"
                           ((org-agenda-overriding-header (jcs:wip-text "@home" "WAITING" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@home-REFILE/!TODO"
                           ((org-agenda-overriding-header (jcs:wip-text "@home" "TODO" 20))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags (concat "@home-REFILE+TODO=\"DONE\"+CLOSED>=\""
                              (format-time-string "[%Y-%m-%d]"
                                                  (time-subtract (current-time) (days-to-time 1)))
@@ -274,22 +281,22 @@ returned is wrapped in #s"
 						  ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!NEXT"
                           ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!WAITING"
                           ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!TODO"
                           ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 20))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags (concat "@work-REFILE+TODO=\"DONE\"+CLOSED>=\""
                              (format-time-string "[%Y-%m-%d]"
                                                  (time-subtract (current-time) (days-to-time 1)))
@@ -321,22 +328,22 @@ returned is wrapped in #s"
 						  ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!NEXT"
                           ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!WAITING"
                           ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 1))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE-noexport/!TODO"
                           ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 15))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
-							'(todo-state-down effort-up category-keep))))
+							'(todo-state-down priority-down effort-up category-keep))))
                (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
                              (format-time-string "[%Y-%m-%d]"
                                                  (time-subtract (current-time) (days-to-time 1)))
