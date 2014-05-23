@@ -64,9 +64,11 @@ Let us change our traditional attitude to the construction of programs: Instead 
 -- Donald E. Knuth, Literate Programming, 1984
 #+end_quote
 
-The document you're reading now is an [[http://org-mode.org][org-mode]] text file that contains both code and documentation. 
+The document you're reading now is an [[http://org-mode.org][org-mode]] text file[fn:1] that contains both code and documentation. 
 
 On startup, emacs pulls out ("tangles") the code snippets in this file and uses them to configure the editor.
+
+[fn:1] Okay, technically you're reading HTML that's exported from the org-mode text file. The point is that the *source file* that I edit when I update my Emacs config *is the documentation.* The elisp is compiled (tangled) from the documentation org-mode files. Org-mode files can be exported in a number of nifty formats, including HTML.
 
 ** Why use literate programming for my Emacs config?
 :PROPERTIES:
@@ -82,7 +84,7 @@ Using a literate programming approach has a number of advantages that appeal to 
 1. *Better organization of my .emacs lisp files*
    - My elisp code snippets are embedded within the fold-able goodness of org-mode's outline structure.
    - I'm able to add headers and subsections to better organize my code -- way better than using giant banner-style comment blocks or squirreling things away in separate files all over the place.
-   - My configuration is easier to read and understand. It also looks good on github!
+   - My configuration is easier to read and understand.
 2. *I'm better able to follow my own thought processes.*
    - Code is organized according to how I think, not how the interpreter thinks -- I can explain code snippets in an order that makes sense to me, and org-babel later compiles these into the correct order.
    - Explanations take priority, code is secondary.
@@ -90,7 +92,7 @@ Using a literate programming approach has a number of advantages that appeal to 
 3. *Sharing my setup is easier*
    - Org-mode's publishing features mean that it's pretty simple to export my documentation and publish it.
    - I have one file that generates nice-looking documentation and the code itself.
-   - Better, more detailed explanations of my code mean it's also easier for others to understand it and benefit from it.
+   - Even better: more detailed explanations of my code mean it's easier for others to understand it and benefit from it.
      
 ** License
 :PROPERTIES:
@@ -147,7 +149,7 @@ My .emacs.d directory looks a little something like this:
 
 ** =init.el=
 
-The elisp in this file only has one purpose: set things up to load the rest of my configuration via org-babel.
+This is the first file that Emacs loads on startup. It bootstraps the rest of my config by loading it via org-babel.
 
 The important part is that last s-expression:
 
@@ -174,9 +176,9 @@ Note that my setup requires a later version of org-mode than the one pre-install
   (message "Could not load org-mode! Expecting it in the el-get/org-mode directory."))
 #+end_src
 
-This is a little sloppier than I'd like[fn:1], but I'm leaving it in place until I have time to sort out a better option.
+This is a little sloppier than I'd like[fn:2], but I'm leaving it in place until I have time to sort out a better option.
 
-[fn:1] I'm deliberately ignoring the chicken-and-the-egg problem here:
+[fn:2] I'm deliberately ignoring the chicken-and-the-egg problem here:
 
 - My setup uses org-mode to load its config.
 - My setup also uses el-get to fetch and install external packages.
@@ -201,7 +203,7 @@ When this document is tangled and loaded by org-babel, all the elisp code snippe
 
 That re-arranging bit is important. Expressions in my config file need to be in a particular order for Emacs to understand them. But I also want to be able to document them in =emacs-init.org= in a totally different order -- one that makes sense to a human reader.
 
-I can define that Emacs-friendly code order here, using "noweb" syntax[fn:2], which looks something like:
+I can define that Emacs-friendly code order here, using "noweb" syntax[fn:3], which looks something like:
 
 #+begin_src emacs-lisp :tangle yes :noweb tangle
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
@@ -219,7 +221,7 @@ I try to treat the resulting =emacs-init.el= file almost like /compiled code/. I
 
 Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
 
-[fn:2] Found a possible bug with noweb and comments. 
+[fn:3] Found a possible bug with noweb and comments. 
 
 If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. It would be best if they linked to the custom_id perperty of the subtree they're in. Might be something I can hack on and fix later.
 
@@ -239,14 +241,14 @@ El-get takes some getting used to, but it's super powerful. Think of it like [[h
 
 It lets you install and manage packages from multiple sources (MELPA, github, Emacswiki, wherever), set dependencies, generate autoloads, etc.
 
-I don't keep *any* of my installed packages under version control at the moment. If I install Emacs config from scratch, el-get will bootstrap itself and start downloading/loading all the packages I need.[fn:3]
+I don't keep *any* of my installed packages under version control at the moment. If I install Emacs config from scratch, el-get will bootstrap itself and start downloading/loading all the packages I need.[fn:4]
 
 Packages loaded with el-get look for their configs in appropriately-named files in the =config/= directory. For example, markdown-mode looks for its settings in =config/init-markdown-mode.el=.
 
 As I consolidate settings a little more in a literate configuration, I may pull these configs back into the el-get setup when possible.
 
 
-[fn:3] In theory. In practice this doesn't always work out. 
+[fn:4] In theory. In practice this doesn't always work out. 
 
 Usually on first startup, el-get is downloaded and loaded, but it fails to progress any further than that. Killing emacs and re-opening it then starts the process of grabbing packages. This also sometimes fails partway. 
 
