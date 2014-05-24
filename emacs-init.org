@@ -70,6 +70,8 @@ On startup, emacs pulls out ("tangles") the code snippets in this file and uses 
 
 [fn:1] Okay, technically you're reading HTML that's exported from the org-mode text file. The point is that the *source file* that I edit when I update my Emacs config *is the documentation.* The elisp is compiled (tangled) from the documentation org-mode files. Org-mode files can be exported in a number of nifty formats, including HTML.
 
+-------------------------------------
+
 ** Why use literate programming for my Emacs config?
 :PROPERTIES:
 :CUSTOM_ID: why-literate
@@ -122,6 +124,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 This document (including HTML format or raw org-mode format) is licensed under the GNU Free Documentation License version 1.3 or later (http://www.gnu.org/copyleft/fdl.html).
 
 The code examples and CSS stylesheets are licensed under the GNU General Public License v3 or later (http://www.gnu.org/licenses/gpl.html).
+
 * Structure of my .emacs.d/ 
 :PROPERTIES:
 :CUSTOM_ID: structure
@@ -162,7 +165,22 @@ My init.el currently looks like this:
       (require 'ob-tangle)
       (require 'org-id))
   (message "Could not load org-mode! Expecting it in the el-get/org-mode directory."))
+
+;; Load the rest of my config from org-mode file
+(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
 #+end_src
+
+The important part is that last s-expression:
+
+#+begin_src emacs-lisp :tangle no
+(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
+#+end_src 
+
+This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
+
+Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. 
+
+Note that my setup requires a later version of org-mode than the one pre-installed with Emacs 24.3. My config is pointed at the latest version (installed & maintained with el-get).
 
 This is a little sloppier than I'd like[fn:2], but I'm leaving it in place until I have time to sort out a better option.
 
@@ -185,7 +203,7 @@ Big question, though:
 
 ** =emacs-init.org=
 
-This file is the meat of my emacs config. It's also the document you're reading right now.
+The emacs-init.org file is the meat of my emacs config. It's also the document you're reading right now.
 
 When this document is tangled and loaded by org-babel, all the elisp code snippets contained within it are re-arranged and loaded. 
 
@@ -205,13 +223,13 @@ I can define that Emacs-friendly code order here, using "noweb" syntax[fn:3], wh
 
 When I tangle this file, the noweb headers above will be expanded to the matching sections of elisp. 
 
-I try to treat the resulting =emacs-init.el= file almost like /compiled code/. It's the machine-readable file that I never really look at. 
+I try to treat the resulting =emacs-init.el= file like /compiled code/. It's the machine-readable file that I never really look at. 
 
-Any edits or changes, even if they're experimental, should be made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
+Any edits or changes, even if they're experimental, are made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
 
 [fn:3] Found a possible bug with noweb and comments. 
 
-If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. It would be best if they linked to the custom_id perperty of the subtree they're in. Might be something I can hack on and fix later.
+If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. It would be best if they linked to the custom_id property of the subtree they're in. Might be something I can hack on and fix later.
 
 -------------------------------------
 
@@ -275,7 +293,7 @@ I don't really use the side fringe at all, so I set to a colour that blends into
 
 Scroll bars are also pretty useless in this age of scroll wheels and trackpads, so I turn that off as well.
 
-The only *good* part about a scroll bar? It gives you a quick indication of how far down in the current file you are, and how large the file is.
+The only *good* part about a scroll bar? Its size and position give you a quick visual indication of how far down in the current file you are, and how large the file is.
 
 I make up for this by [[file://emacs-init.org][displaying a position indicator in my modeline]] -- I'll explain that setup a bit further down.
 
@@ -359,7 +377,7 @@ Setting =scroll-conservatively= to a value > 100 means automatic scrolling will 
 (setq scroll-conservatively 1000)
 #+end_src
 
-The =scroll-margin= variable controls how close to the bottom/top edge of the frame I can get before the viewable area begins to scroll. I like to get right to the edge before scrolling.
+The =scroll-margin= variable controls how close to the bottom/top edge of the frame I can get before the viewable area begins to scroll. I like to get right up to the bottom edge before scrolling.
 
 #+name: UI-scroll-margin
 #+begin_src emacs-lisp 
@@ -409,7 +427,9 @@ The column number display isn't as useful but does come in handy.
 #+end_src
 ** Confirm before quitting Emacs
 
-I want to make sure I don't accidentally kill Emacs by doing two things:
+I want to make sure I don't accidentally kill Emacs. Ever. 
+
+I do this by changing two things:
 
 1) Unset =C-x C-c= so I don't hit it accidentally, and
 2) Prompt me to confirm that I actually want to quit.
@@ -435,7 +455,7 @@ If I'm working in the terminal and I need to edit a file in my current directory
 $> emacsclient filename.txt
 #+end_example
 
-This will open filename.txt within my already-running Emacs.app instance. Sweet.
+This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:5]
 
 One thing I had to tweak for this: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
 
@@ -445,11 +465,15 @@ One thing I had to tweak for this: I want to make sure connecting via emacsclien
 
 #+end_src
 
+[fn:5] I actually aliased emacsclient to =em= in bash to make this even simpler. =$>em filename.txt= drops me into my existing already-running Emacs session and visits the file.
+
+-------------------------------------
+
 ** Force redisplay
 
 If the =redisplay-dont-pause= variable is not set, then any keyboard/mouse event will stop a screen redraw to handle the input. Which I suppose made sense on older machines or slower networks.
 
-On modern machines, it makes sense to turn this on in order to make the display feel faster.
+On modern machines, turning this on should make the display feel faster.
 
 Thanks to [[http://www.masteringemacs.org/articles/2011/10/02/improving-performance-emacs-display-engine/][Mickey Peterson for this one]].
 
