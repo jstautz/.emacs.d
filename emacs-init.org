@@ -400,24 +400,48 @@ This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't ha
 
 ** Mac-specific settings
 
-#+name: UI-mac-settings
+I use Emacs on OS X and get my builds from http://emacsformacosx.com/. There are a couple of things I need to configure to make Emacs.app play nicely on a Mac.
+
+First, I want to treat Command *and* Option keys as Meta in Emacs. I know, this is weird. I may eventually change one of these to Super or Hyper. But for now, I like having large target areas for hitting Meta, since I use it so often.
+
+#+name: UI-mac-settings-meta
 #+begin_src emacs-lisp 
-;; Make mouse/keyboard/EOL/clipboard work sanely on OS X
-(setq mac-emulate-three-button-mouse t)
 (setq ns-alternate-modifier (quote meta))
 (setq ns-command-modifier (quote meta))
-(setq eol-mnemonic-mac "(Mac)")
-(setq x-select-enable-clipboard t)
-
-;; If I drag n' drop a file onto Emacs, visit the file (instead of append to buffer)
-(define-key global-map [ns-drag-file] 'ns-find-file) 
 #+end_src
+
+And my end of line characters? Make 'em plain old LFs, please:
+
+#+name: UI-mac-settings-eol
+#+begin_src emacs-lisp 
+(setq eol-mnemonic-mac "(Mac)")
+#+end_src
+
+Copy and paste should use the OS clipboard
+
+#+name: UI-mac-settings-clipboard
+#+begin_src emacs-lisp 
+(setq x-select-enable-clipboard t)
+#+end_src
+
+Adjust the way my mouse works:
+- Emulate a three-button mouse for copy/paste/select
+- When I drag and drop a file onto Emacs, visit that file rather than just appending it to the currently open buffer (which is a horrible default)
+
+#+name: UI-mac-settings-clipboard
+#+begin_src emacs-lisp 
+(setq mac-emulate-three-button-mouse t)
+
+(define-key global-map [ns-drag-file] 'ns-find-file) 
+
+#+end_src
+
 
 ** Show both line and column numbers
 
 A basic feature of any decent text editor: show me what line number I'm on.
 
-The column number display isn't as useful but does come in handy.
+The column number display isn't as immediately useful, but it does come in handy.
 
 #+name: UI-linum
 #+begin_src emacs-lisp 
@@ -485,68 +509,110 @@ Thanks to [[http://www.masteringemacs.org/articles/2011/10/02/improving-performa
 
 I believe this is now on by default in Emacs 24, so I may no longer need to set this explicitly.
 
-* Keybindings
+* Global Keybindings
 :PROPERTIES:
 :noweb-ref: Set custom keybindings
 :END:
 
-#+name: keybindings
+This wouldn't be a proper Emacs config if it didn't have a boatload of custom keybindings.
+
+** Unset some default keybindings
+
+First let's unset a couple of keybindings:
+- Read-only-toggle is bound by default to =C-x C-q=. It's a useless command that I toggle by accident way too often.
+- I also hit =F2= accidentally way too often.
+
+#+name: keybindings-unsets
 #+begin_src emacs-lisp 
-;; Up yours, read-only toggle!
-(global-unset-key "\C-x\C-q")
+  (global-unset-key "\C-x\C-q")
+  (global-unset-key (kbd "<f2>"))     
+#+end_src
 
-;; Rebind M-s to save-buffer -- I never center lines
+** Basic commands
+
+Now let's set a couple of bindings based on my muscle memory:
+
+- Rebind M-s to save-buffer -- I never center lines
+
+#+name: keybindings-save
+#+begin_src emacs-lisp 
 (global-set-key (kbd "M-s") 'save-buffer)
+#+end_src 
 
-;; Don't think I need this, if I set it globally?
-;; (add-hook 'text-mode-hook
-;;  (lambda ()
-;;  (define-key text-mode-map (kbd "M-s") 'save-buffer)
-;;  )
-;; )
+- =C-z= is bound to iconify-frame by default, which I never use. Set it to undo instead.
 
-;; Rebind M-o to other-window. C-x o is too clunky.
-(global-set-key (kbd "M-o") 'other-window)
+#+name: keybindings-save
+#+begin_src emacs-lisp 
+(global-set-key (kbd "C-z") 'undo)     
+#+end_src
 
-;; Bind C-esc to 'top-level for exiting from debugger, etc.
+- Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide). Let's bind margin scroll events appropriately:
+
+#+name: keybindings-scroll
+#+begin_src emacs-lisp 
+(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+#+end_src
+
+** Editing
+
+I like it when my return key preserves indentation:
+
+#+name: keybindings-return
+#+begin_src emacs-lisp
+(global-set-key (kbd "RET") 'newline-and-indent)
+#+end_src
+
+I hate having to repeatedly hit escape to bounce out of recursive edits when I drop into the debugger.  
+
+#+name: keybindings-escape
+#+begin_src emacs-lisp
 (global-set-key (kbd "<C-escape>") 'top-level)  
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (add-hook 'org-mode-hook
           (lambda()
             (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+#+end_src
+ 
+** Window and buffer navigation
+ 
+I'm experimenting with using =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
 
-;; I like Undo here.
-(global-set-key (kbd "C-z") 'undo)     
+#+name: keybindings-other-window
+#+begin_src emacs-lisp 
+(global-set-key (kbd "M-o") 'other-window)
+#+end_src
 
-;; I also like iBuffer here
-(global-set-key "\C-x\C-b" 'ibuffer)
+Use =M-n= and =M-p= to scroll the window view up or down... without moving the point.
 
-;; I hit F2 accidentally way too often
-(global-unset-key (kbd "<f2>"))     
-
-;; Scroll buffer
+#+name: keybindings-scroll-view
+#+begin_src emacs-lisp 
 (global-set-key "\M-n" 'scroll-up-line)
 (global-set-key "\M-p" 'scroll-down-line)
+#+end_src
 
-;; Return should preserve indentation (will override in modes where I don't like this)
-(global-set-key (kbd "RET") 'newline-and-indent)
+** Buffer and directory lists
 
-;; wdired toggle -- for rewriting filenames. hit 'r' in dired mode
+I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=. 
+
+#+name: keybindings-ibuffer
+#+begin_src emacs-lisp
+(global-set-key "\C-x\C-b" 'ibuffer)
+#+end_src
+
+Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome -- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
+
+I like having wdired bound to the 'r' key inside dired.
+
+#+name: keybindings-wdired
+#+begin_src emacs-lisp
 ;; any reason why this has to be eval'ed after load?
 (eval-after-load 'dired
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
-
-
-;; If I scroll with my mouse wheel on the fringe/margin, handle this:
-(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
-(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
-(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
-(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
-
 #+end_src
-
-
 
 * Editor customizations
 :PROPERTIES:
@@ -718,24 +784,14 @@ Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs 
 [[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
 * System and editor settings
-* Implementation  
-  :PROPERTIES:
-  :CUSTOM_ID: implementation
-  :END:
-
-** Keybindings
-:PROPERTIES:
-:noweb-ref: Keybindings
-:CUSTOM_ID: keybindings
-:END:
-** Sync and load packages
+* Sync and load packages
 :PROPERTIES:
 :noweb-ref: Sync external packages with el-get, load them, and configure them
 :CUSTOM_ID: load-packages
 :END:
 Here's the good stuff!
 
-*** Set package sources
+** Set package sources
 I want to add a few other sources (notably marmalade and melpa) to my package source list
   
 #+name: packages-set-sources
@@ -749,7 +805,7 @@ I want to add a few other sources (notably marmalade and melpa) to my package so
 (package-initialize)
 #+end_src
 
-*** Add ELPA and el-get package directories to load path  
+** Add ELPA and el-get package directories to load path  
 
 #+name: packages-add-to-load-path
 #+begin_src emacs-lisp
@@ -758,7 +814,7 @@ I want to add a few other sources (notably marmalade and melpa) to my package so
 #+end_src
 
  
-*** Bootstrap el-get
+** Bootstrap el-get
 
 #+name: packages-el-get-bootstrap
 #+begin_src emacs-lisp
@@ -1336,7 +1392,7 @@ Kinda necessary.
 
 Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
 
-I do this before I begin loading packages so that package configs can access variables stored in the secrets file.
+I do this *before* I begin loading packages so that package configs can access variables stored in the secrets file.
 
 #+name: setup-decrypt-secrets-function
 #+begin_src emacs-lisp
@@ -1352,9 +1408,12 @@ I do this before I begin loading packages so that package configs can access var
 :noweb-ref: Post-flight: load Emacs desktop and start server
 :CUSTOM_ID: final-steps
 :END:
+
+These are the final bits of code that get run in my config.
+
 *** Restore my desktop
 
-I'm not sure why this is required now when it wasn't before -- something slightly different after changing my config.
+(I'm not sure why this is required now when it wasn't before -- something slightly different after changing my config.)
 
 #+name: desktop-read
 #+begin_src emacs-lisp
@@ -1362,6 +1421,7 @@ I'm not sure why this is required now when it wasn't before -- something slightl
 #+end_src
 
 *** Start server
+
 Now that everything's good to go, start the emacs server so we can connect to it using =emacsclient= from the command line.
 
 #+name: server-start
