@@ -841,11 +841,11 @@ Emacs has a neat customize feature, accessible via =M-x customize=, which lets y
 
 I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle with settings in customize to try things out.
 
-When I do so, I'd like customize to save things at the bottom of my emacs-init.el file. If I like the changes, I'll pull them out of the customize section of this file and place them in the appropriate places in my config.
+When I do so, I'd like customize to save things in a separate =emcas-custom= file. I treat this file as temporary storage. If I like the changes, I'll pull them out of this file and place them in the appropriate places in my config.
 
 #+name: setup-custom-file
 #+begin_src emacs-lisp
-(setq custom-file (concat dotemacs-dir "emacs-init.el"))
+(setq custom-file (concat dotemacs-dir "emacs-custom.el"))
 
 #+end_src
 
