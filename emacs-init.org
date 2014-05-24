@@ -132,40 +132,28 @@ First, some basics about how all this works.
 My .emacs.d directory looks a little something like this:
 
 - =.emacs.d/=
-  - =init.el=
-    - Loaded automatically by Emacs on startup. Fires up org-mode and loads =emacs-init.org.=
-  - =emacs-init.org=
-    - The document you're reading right now. Contains documentation with embedded elisp configuration.
-  - =init-org.org=
-    - [[file::init-org.org][Documentation & elisp for my org-mode setup.]] I've separated this into its own config file because I want to be able to export and publish it separately.
-  - =secrets.el=
-    - Loads secrets.el.pgp -- an encrypted file containing passwords and sensitive info.
-  - =config/=
-    - Configs for each package live here for now [they will be folded into emacs-init.org].
+  - =init.el= -- Loaded automatically by Emacs on startup. Fires up org-mode and loads =emacs-init.org.=
+  - =emacs-init.org= -- The document you're reading right now. Contains documentation with embedded elisp configuration.
+  - =init-org.org= -- [[file::init-org.org][Documentation & elisp for my org-mode setup.]] I've separated this into its own config file because I want to be able to export and publish it separately.
+  - =secrets.el= -- Loads secrets.el.pgp -- an encrypted file containing passwords and sensitive info.
+  - =config/= -- Configs for each package live here for now [they will be folded into emacs-init.org].
     - =init-*.org=
     - =init-*.el=
-  - =el-get/= 
-    - I use el-get to install and update external packages. Each package gets installed in its own directory inside the =el-get/= directory.
+  - =el-get/= -- I use el-get to install and update external packages. Each package gets installed in its own directory inside the =el-get/= directory.
 
 ** =init.el=
 
 This is the first file that Emacs loads on startup. It bootstraps the rest of my config by loading it via org-babel.
 
-The important part is that last s-expression:
+My init.el currently looks like this:
 
 #+begin_src emacs-lisp :tangle no
-(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
-#+end_src 
+(setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
 
-This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
-
-Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. 
-
-Note that my setup requires a later version of org-mode than the one pre-installed with Emacs 24.3. My config is pointed at the latest version (installed & maintained with el-get).
-
-#+begin_src emacs-lisp :tangle no
+;; Assume that org-mode is installed via el-get
 (setq org-mode-dir (concat dotemacs-dir "el-get/org-mode/"))
 
+;; Load the necessary bits of org-mode and org-babel
 (if (file-directory-p (concat org-mode-dir "lisp"))
     (progn
       (add-to-list 'load-path (concat org-mode-dir "lisp"))
