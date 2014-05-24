@@ -23,13 +23,6 @@
                :prepare (progn
                   (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")))
         
-        (:name commander
-               :type github
-               :description "Emacs command line parser"
-               :pkgname "rejeep/commander.el"
-               :depends (f s dash ansi)
-               :features commander)
-
         (:name easy-kill
                :description "Kill/Copy/Mark things easily"
                :type git
@@ -65,54 +58,12 @@
         (:name kill-ring-search
                :description "Search the kill ring in the minibuffer."
                :type elpa)
-
-        ;; (:name kv
-        ;;        :description "Key/Value collection type functions: for alists, hashtables and plists."
-        ;;        :type git
-        ;;        :url "https://github.com/nicferrier/emacs-kv.git"
-        ;;        :features kv)
-        
-        ;; (:name esxml
-        ;;        :description "Library for working with XML"
-        ;;        :type git
-        ;;        :url "https://github.com/tali713/esxml.git"
-        ;;        :depends kv
-        ;;        :features esxml
-        ;;        )
         
         (:name fountain-mode
                :description "Major mode for editing screenplays in Fountain markup format"
                :type git
                :url "https://github.com/rnkn/fountain-mode.git"
                :features fountain-mode)
-        
-        (:name gmail-message-mode
-               :description "Edit Gmail messages with markdown syntax. For use with Chrome 'Edit with Emacs' extension."
-               :type github
-               :pkgname "Bruce-Connor/gmail-mode"
-               :depends (ham-mode)
-               :features gmail-message-mode)
-
-        (:name ham-mode
-               :description "Seamlessly edit an html file using markdown."
-               :type github
-               :pkgname "Bruce-Connor/ham-mode"
-               :depends (html-to-markdown markdown-mode)
-               :features ham-mode)
-
-        (:name html-to-markdown
-               :description "Convert HTML to markdown"
-               :type github
-               :pkgname "Bruce-Connor/html-to-markdown"
-               :features html-to-markdown)
-
-        ;; (:name org-trello
-        ;;        :description "Minor mode that enables two-way sync between Org and Trello"
-        ;;        :type git
-        ;;        :url "https://github.com/org-trello/org-trello.git"
-        ;;        :features org-trello
-        ;;        :depends (dash request elnode s esxml db)
-        ;;        )
         
         (:name popwin
                :description "Popup Window Manager for Emacs"
@@ -169,7 +120,6 @@
          auto-complete
          dash
          diminish
-         edit-server
          expand-region
          f
          jedi
