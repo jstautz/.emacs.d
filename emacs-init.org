@@ -36,19 +36,6 @@ My current setup borrows liberally from Emacs users far smarter than I am, inclu
 
 Props and praises are scattered throughout my config in places where I can remember who I stole something from.
 
-** Disclaimers and Warnings
-:PROPERTIES:
-:CUSTOM_ID: disclaimer
-:END:
-
-You /don't/ want to try and use my configs straight out of the box. 
-
-- This is a perpetual work in progress. 
-- No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
-- Requires Emacs 24.3. Only tested on Mac OS X.
-- First load will require an internet connection to download packages (this will take a while).
-- I'm not responsible if any of this blows up on you.
-
 ** What the hell is literate programming?
 :PROPERTIES:
 :CUSTOM_ID: what_is_literate
@@ -96,6 +83,18 @@ Using a literate programming approach has a number of advantages that appeal to 
    - I have one file that generates nice-looking documentation and the code itself.
    - Even better: more detailed explanations of my code mean it's easier for others to understand it and benefit from it.
      
+** Disclaimers and Warnings
+:PROPERTIES:
+:CUSTOM_ID: disclaimer
+:END:
+
+You /don't/ want to try and use my configs straight out of the box. 
+
+- This is a perpetual work in progress. 
+- No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
+- Requires Emacs 24.3. Only tested on Mac OS X.
+- I'm not responsible if any of this blows up on you.
+
 ** License
 :PROPERTIES:
 :CUSTOM_ID: license
@@ -125,24 +124,55 @@ This document (including HTML format or raw org-mode format) is licensed under t
 
 The code examples and CSS stylesheets are licensed under the GNU General Public License v3 or later (http://www.gnu.org/licenses/gpl.html).
 
-* Structure of my .emacs.d/ 
+
+* Installation
+:PROPERTIES:
+:CUSTOM_ID: installation
+:END:
+
+#+begin_quote
+Accio Emacs packages!
+
+-- Harry Potter
+#+end_quote
+
+** Clone this repo into your .emacs.d/ 
+
+You probably want to back up your current config first.
+
+#+begin_example
+git clone https://github.com/jstautz/.emacs.d ~/.emacs.d
+#+end_example
+
+** Run the install script
+
+Special thanks to [[http://www.swaroopch.com/2013/10/17/emacs-configuration-tutorial/][Swaroop C H]] for this script.
+
+#+begin_example
+cd ~/.emacs.d/
+./install.sh
+#+end_example
+
+This will:
+- Install [[http://cask.github.io/][Cask]] if you don't already have it installed
+- Add the ~/.cask directory to your $PATH
+  - note: assumes you're using bash. If you're using another shell, edit install.sh before running
+- Runs =cask install= to install packages listed in my Cask file, along with any dependencies
+
+=cask install= will hit various Emacs package repositories (ELPA, MELPA, Marmalade, and Org) and download packages for you. Magic!
+
+** Fire up Emacs
+
+Packages installed via Cask should be in your load path, and you should be ready to rock. 
+
+If you're *not* ready to rock at this point... sorry. Don't say I didn't [[Disclaimers and Warnings][warn you]].
+
+* Structure 
 :PROPERTIES:
 :CUSTOM_ID: structure
 :END:
 
-First, some basics about how all this works.
-
-My .emacs.d directory looks a little something like this:
-
-- =.emacs.d/=
-  - =init.el= -- Loaded automatically by Emacs on startup. Fires up org-mode and loads =emacs-init.org.=
-  - =emacs-init.org= -- The document you're reading right now. Contains documentation with embedded elisp configuration.
-  - =init-org.org= -- [[file::init-org.org][Documentation & elisp for my org-mode setup.]] I've separated this into its own config file because I want to be able to export and publish it separately.
-  - =secrets.el= -- Loads secrets.el.pgp -- an encrypted file containing passwords and sensitive info.
-  - =config/= -- Configs for each package live here for now [they will be folded into emacs-init.org].
-    - =init-*.org=
-    - =init-*.el=
-  - =el-get/= -- I use el-get to install and update external packages. Each package gets installed in its own directory inside the =el-get/= directory.
+A couple of details about how all this works:
 
 ** =init.el=
 
@@ -151,55 +181,20 @@ This is the first file that Emacs loads on startup. It bootstraps the rest of my
 My init.el currently looks like this:
 
 #+begin_src emacs-lisp :tangle no
+;; Assume current directory is the dot-emacs directory and add to load-path
 (setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
-
-;; Assume that org-mode is installed via el-get
-(setq org-mode-dir (concat dotemacs-dir "el-get/org-mode/"))
-
-;; Load the necessary bits of org-mode and org-babel
-(if (file-directory-p (concat org-mode-dir "lisp"))
-    (progn
-      (add-to-list 'load-path (concat org-mode-dir "lisp"))
-      (add-to-list 'load-path (concat org-mode-dir "contrib/lisp"))
-      (require 'org)
-      (require 'ob-tangle)
-      (require 'org-id))
-  (message "Could not load org-mode! Expecting it in the el-get/org-mode directory."))
 
 ;; Load the rest of my config from org-mode file
 (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
 #+end_src
 
-The important part is that last s-expression:
+That's it. Dead simple, right? 
 
-#+begin_src emacs-lisp :tangle no
-(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
-#+end_src 
+The important part is that last s-expression. This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
 
-This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
+That tiny =init.el= file is the only native elisp file in my whole config. Every other bit of configuration is loaded from org-mode files.
 
-Before we do that, however, we need to make sure org-mode and its org-babel libraries are fully loaded. 
-
-Note that my setup requires a later version of org-mode than the one pre-installed with Emacs 24.3. My config is pointed at the latest version (installed & maintained with el-get).
-
-This is a little sloppier than I'd like[fn:2], but I'm leaving it in place until I have time to sort out a better option.
-
-[fn:2] I'm deliberately ignoring the chicken-and-the-egg problem here:
-
-- My setup uses org-mode to load its config.
-- My setup also uses el-get to fetch and install external packages.
-- Using el-get, I can take a bare clone of my repo and (theoretically) just launch Emacs... and el-get will find, install, and configure all external packages.
-- One of these external packages is org-mode.
-
-If I'm doing a fresh install, the el-get directory won't exist and we won't be able to load org-mode.
-
-I've tried using Emacs 24.3.50's built-in version of org-mode, but it doesn't work with my config. This might change with Emacs 24.4 -- I'll need to check that out soon.
-
-Big question, though:
-
-- If I use el-get to install packages, but I rely on org-mode in order to load my configs that install packages... Would it make sense to keep org-mode separate from other el-get packages (ie. directly included in my config repo)? /Probably.../
-
--------------------------------------
+[[http://orgmode.org/worg/org-contrib/babel/][Org-babel is Merlin-level wizardry.]] Eric Schulte, Dan Davison, and everyone who's worked on it all deserve medals. 
 
 ** =emacs-init.org=
 
@@ -209,17 +204,19 @@ When this document is tangled and loaded by org-babel, all the elisp code snippe
 
 That re-arranging bit is important. Expressions in my config file need to be in a particular order for Emacs to understand them. But I also want to be able to document them in =emacs-init.org= in a totally different order -- one that makes sense to a human reader.
 
-I can define that Emacs-friendly code order here, using "noweb" syntax[fn:3], which looks something like:
+I can define that Emacs-friendly code order here, using "noweb" syntax[fn:2], which looks something like:
 
 #+begin_src emacs-lisp :tangle yes :noweb tangle
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
-<<Sync external packages with el-get, load them, and configure them>>
+<<Load and configure packages>>
 <<Tweak some UI settings>>
 <<Load some editor customizations>>
 <<Set custom keybindings>>
-<<Load a bunch of custom functions>>
+
 <<Post-flight: load Emacs desktop and start server>>
 #+end_src
+
+(removed <<Load a bunch of custom functions>> from this temporarily.)
 
 When I tangle this file, the noweb headers above will be expanded to the matching sections of elisp. 
 
@@ -227,13 +224,16 @@ I try to treat the resulting =emacs-init.el= file like /compiled code/. It's the
 
 Any edits or changes, even if they're experimental, are made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
 
-[fn:3] Found a possible bug with noweb and comments. 
+[fn:2] Found a possible bug with noweb and comments. 
 
 If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. It would be best if they linked to the custom_id property of the subtree they're in. Might be something I can hack on and fix later.
 
 -------------------------------------
 
-** =el-get/= and =config/= directories
+** Loading packages 
+:PROPERTIES:
+:noweb-ref: Load and configure packages
+:END:
 
 Back in the dark ages, I would find third-party elisp packages on the interwebs and install them manually. This got nasty pretty quickly.
 
@@ -241,28 +241,56 @@ Back in the dark ages, I would find third-party elisp packages on the interwebs 
     - I could never rememember where I grabbed packages from
     - Updating packages was a chore
 
-Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[https://github.com/dimitri/el-get][el-get]].
+Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[http://cask.github.io/][Cask]], [[https://github.com/rdallasgray/pallet][Pallet]], and [[https://github.com/jwiegley/use-package][use-package]].
 
-El-get takes some getting used to, but it's super powerful. Think of it like [[http://http://brew.sh/][homebrew]] for Emacs. 
+*** Cask
 
-It lets you install and manage packages from multiple sources (MELPA, github, Emacswiki, wherever), set dependencies, generate autoloads, etc.
+I don't keep *any* of my packages under version control at the moment. If I install Emacs config from scratch, my installation script + Cask will download and load all the packages I need.
 
-I don't keep *any* of my installed packages under version control at the moment. If I install Emacs config from scratch, el-get will bootstrap itself and start downloading/loading all the packages I need.[fn:4]
+#+name: package-cask
+#+begin_src emacs-lisp 
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+#+end_src
 
-Packages loaded with el-get look for their configs in appropriately-named files in the =config/= directory. For example, markdown-mode looks for its settings in =config/init-markdown-mode.el=.
+*** use-package
+ 
+John Wiegley's use-package lets me nicely isolate loading packages and their configurations. It handles a lot of things for me out of the box, including:
 
-As I consolidate settings a little more in a literate configuration, I may pull these configs back into the el-get setup when possible.
+- Handling missing packages without choking
+- Initializing packages
+- Set keybindings
+- Deferring configuration elisp until after a package actually gets used
+- And more!
+
+#+name: package-use-package
+#+begin_src emacs-lisp 
+(require 'use-package)
+#+end_src
+
+*** Pallet
+
+If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything in sync. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
+
+#+name: package-use-package
+#+begin_src emacs-lisp 
+(use-package pallet)
+#+end_src
+
+*** Other packages
+
+Instead of an alphabetized and ugly bulk-dump of every package I use, I've spread the declarations and configs for my packages throughout this file in places where they make logical sense.
+
+When I talk about UI tweaks, for example, I can talk about how I load and configure the smart-mode-line package. 
+
+I still want Emacs to *load* all these packages in bulk, however, so I'll list them with noweb links here:
+
+#+begin_src emacs-lisp :tangle yes :noweb tangle
+<<UI-related packages>>
+#+end_src
 
 
-[fn:4] In theory. In practice this doesn't always work out. 
 
-Usually on first startup, el-get is downloaded and loaded, but it fails to progress any further than that. Killing emacs and re-opening it then starts the process of grabbing packages. This also sometimes fails partway. 
-
-A few rounds of killing/re-opening emacs usually gets through all packages.
-
-This is something I should dig into further and fix.
-
--------------------------------------
 
 * Interface tweaks
 :PROPERTIES:
@@ -479,7 +507,7 @@ If I'm working in the terminal and I need to edit a file in my current directory
 $> emacsclient filename.txt
 #+end_example
 
-This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:5]
+This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:3]
 
 One thing I had to tweak for this: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
 
@@ -489,7 +517,7 @@ One thing I had to tweak for this: I want to make sure connecting via emacsclien
 
 #+end_src
 
-[fn:5] I actually aliased emacsclient to =em= in bash to make this even simpler. =$>em filename.txt= drops me into my existing already-running Emacs session and visits the file.
+[fn:3] I actually aliased emacsclient to =em= in bash to make this even simpler. =$>em filename.txt= drops me into my existing already-running Emacs session and visits the file.
 
 -------------------------------------
 
@@ -621,110 +649,110 @@ I like having wdired bound to the 'r' key inside dired.
 
 #+name: editor-settings
 #+begin_src emacs-lisp 
-;;-----------------------------------------------------------------------------
-;; System / Editing Prefs
-;;-----------------------------------------------------------------------------
-
-;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
-(setq gc-cons-threshold 20000000)
-
-;; Put backups & autosaves in their place (not in current dir)
-(defvar backup-dir (concat home-dir ".emacs.backup/"))
-(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
-(setq backup-directory-alist `((".*" . ,backup-dir)))
-(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
-
-;; Make backups of files, even when they're in version control
-(setq vc-make-backup-files t)
-
-;; When deleting files, move them to Trash
-(setq delete-by-moving-to-trash t)
-(setq trash-directory (concat home-dir ".Trash/"))
-
-;; Refresh any buffer when file on disk changes
-(setq global-auto-revert-mode 1)
-
-;; ...Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-
-;; ...Also rebuild Tags files, and be quiet about it
-(setq tags-revert-without-query t)
-
-;; M-x locate uses OS X's Spotlight
-(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
-
-
-;; Tabs insert 4 spaces, sentences have one space (as God intended).
-(setq-default tab-width 4)
-(setq-default indent-tabs-mode nil)
-(setq sentence-end-double-space nil)
-
-;; selection options + rectangle selection w/ CUA
-(transient-mark-mode t)
-(delete-selection-mode t)
-(setq cua-enable-cua-keys nil)               
-(cua-mode t)
-
-;; auto-fill options 
-(setq fill-column 120)
-(setq default-fill-column 120)
-
-;; Testing wrap-to-fill options instead of auto-fill
-;; note: I think wrap-to-fill is only included in nxhtml-mode,
-;;       so we need packages installed before this works.
-;; 
-;;(auto-fill-mode 1)
-;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-(wrap-to-fill-column-mode 1)
-(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
-;; Desktop saving options
-(desktop-save-mode 1)
-(setq desktop-globals-to-save
-	  (append '((extended-command-history . 30)
-				(file-name-history        . 100)
-				(grep-history             . 30)
-				(compile-history          . 30)
-				(minibuffer-history       . 50)
-				(query-replace-history    . 60)
-				(read-expression-history  . 60)
-				(regexp-history           . 60)
-				(regexp-search-ring       . 20)
-				(search-ring              . 20)
-				(shell-command-history    . 50)
-				tags-file-name
-				register-alist)))
-
-;; Quick ways to restore desktop/windows
-(winner-mode 1)
-
-;; Bookmark options
-(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
-
-;; spellcheck options
-(setq ispell-program-name "aspell")
-
-;; Tramp defaults
-(setq tramp-default-method "ssh")
-
-;; Make sure diff works with .org files and others
-(setq diff-switches "-a -c")
-
-;; Let me upcase/downcase regions
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-
-;; ignore case when completing, including filenames
-(setq completion-ignore-case t           
-  read-file-name-completion-ignore-case t)
-
-;; Let me narrow to region -- I use this a bunch
-(put 'narrow-to-region 'disabled nil)
-
-
-
+  ;;-----------------------------------------------------------------------------
+  ;; System / Editing Prefs
+  ;;-----------------------------------------------------------------------------
+  
+  ;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
+  (setq gc-cons-threshold 20000000)
+  
+  ;; Put backups & autosaves in their place (not in current dir)
+  (defvar backup-dir (concat home-dir ".emacs.backup/"))
+  (defvar autosave-dir (concat home-dir ".emacs.autosave/"))
+  (setq backup-directory-alist `((".*" . ,backup-dir)))
+  (setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+  
+  ;; Make backups of files, even when they're in version control
+  (setq vc-make-backup-files t)
+  
+  ;; When deleting files, move them to Trash
+  (setq delete-by-moving-to-trash t)
+  (setq trash-directory (concat home-dir ".Trash/"))
+  
+  ;; Refresh any buffer when file on disk changes
+  (setq global-auto-revert-mode 1)
+  
+  ;; ...Also auto refresh dired, but be quiet about it
+  (setq global-auto-revert-non-file-buffers t)
+  (setq auto-revert-verbose nil)
+  
+  ;; ...Also rebuild Tags files, and be quiet about it
+  (setq tags-revert-without-query t)
+  
+  ;; M-x locate uses OS X's Spotlight
+  (setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+  
+  
+  ;; Tabs insert 4 spaces, sentences have one space (as God intended).
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq sentence-end-double-space nil)
+  
+  ;; selection options + rectangle selection w/ CUA
+  (transient-mark-mode t)
+  (delete-selection-mode t)
+  (setq cua-enable-cua-keys nil)               
+  (cua-mode t)
+  
+  ;; auto-fill options 
+  (setq fill-column 120)
+  (setq default-fill-column 120)
+  
+  ;; Testing wrap-to-fill options instead of auto-fill
+  ;; note: I think wrap-to-fill is only included in nxhtml-mode,
+  ;;       so we need packages installed before this works.
+  ;; 
+  ;;(auto-fill-mode 1)
+  ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+  ;; (wrap-to-fill-column-mode 1)
+  ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+  
+  ;; Desktop saving options
+  (desktop-save-mode 1)
+  (setq desktop-globals-to-save
+        (append '((extended-command-history . 30)
+                  (file-name-history        . 100)
+                  (grep-history             . 30)
+                  (compile-history          . 30)
+                  (minibuffer-history       . 50)
+                  (query-replace-history    . 60)
+                  (read-expression-history  . 60)
+                  (regexp-history           . 60)
+                  (regexp-search-ring       . 20)
+                  (search-ring              . 20)
+                  (shell-command-history    . 50)
+                  tags-file-name
+                  register-alist)))
+  
+  ;; Quick ways to restore desktop/windows
+  (winner-mode 1)
+  
+  ;; Bookmark options
+  (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
+  
+  ;; spellcheck options
+  (setq ispell-program-name "aspell")
+  
+  ;; Tramp defaults
+  (setq tramp-default-method "ssh")
+  
+  ;; Make sure diff works with .org files and others
+  (setq diff-switches "-a -c")
+  
+  ;; Let me upcase/downcase regions
+  (put 'downcase-region 'disabled nil)
+  (put 'upcase-region 'disabled nil)
+  
+  ;; ignore case when completing, including filenames
+  (setq completion-ignore-case t           
+    read-file-name-completion-ignore-case t)
+  
+  ;; Let me narrow to region -- I use this a bunch
+  (put 'narrow-to-region 'disabled nil)
+  
+  
+  
 #+end_src
 
 
@@ -784,9 +812,9 @@ Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs 
 [[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
 * System and editor settings
-* Sync and load packages
+* Load and configure packages
 :PROPERTIES:
-:noweb-ref: Sync external packages with el-get, load them, and configure them
+:noweb-ref: Load and configure packages
 :CUSTOM_ID: load-packages
 :END:
 Here's the good stuff!
@@ -810,7 +838,7 @@ I want to add a few other sources (notably marmalade and melpa) to my package so
 #+name: packages-add-to-load-path
 #+begin_src emacs-lisp
 (add-to-list 'load-path (concat dotemacs-dir "elpa"))
-(add-to-list 'load-path (concat dotemacs-dir "el-get/el-get"))
+;; (add-to-list 'load-path (concat dotemacs-dir "el-get/el-get"))
 #+end_src
 
  
@@ -818,22 +846,22 @@ I want to add a few other sources (notably marmalade and melpa) to my package so
 
 #+name: packages-el-get-bootstrap
 #+begin_src emacs-lisp
-;; el-get, install thyself!
-(unless (require 'el-get nil t)
- (url-retrieve
-  "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-  (lambda (s)
-    (let ((el-get-master-branch) (el-get-install-skip-emacswiki-recipes))
-      (goto-char (point-max))
-      (eval-print-last-sexp)))))
+  ;; el-get, install thyself!
+  ;; (unless (require 'el-get nil t)
+  ;;  (url-retrieve
+  ;;   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+  ;;   (lambda (s)
+  ;;     (let ((el-get-master-branch) (el-get-install-skip-emacswiki-recipes))
+  ;;       (goto-char (point-max))
+  ;;       (eval-print-last-sexp)))))
 #+end_src
 
 And set some directory vars
 
 #+name: packages-set-el-get-dirs
 #+begin_src emacs-lisp
-(setq el-get-dir (concat dotemacs-dir "el-get")
-      el-get-user-package-directory (concat dotemacs-dir "config"))
+  ;; (setq el-get-dir (concat dotemacs-dir "el-get")
+  ;;       el-get-user-package-directory (concat dotemacs-dir "config"))
 #+end_src
 
 
@@ -841,7 +869,7 @@ And set some directory vars
 ** Load packages
 #+name: init-packages
 #+begin_src emacs-lisp
-(require 'init-packages)
+  ;; (require 'init-packages)
 #+end_src
 
 * Custom functions and tweaks
