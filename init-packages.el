@@ -11,10 +11,17 @@
         (:name ace-jump-mode
                :website "https://github.com/winterTTr/ace-jump-mode/wiki"
                :description "A quick cursor location minor mode for emacs"
-               :type github
-               :pkgname "winterTTr/ace-jump-mode"
+               :type git
+               :url "https://github.com/winterTTr/ace-jump-mode.git"
                :features ace-jump-mode ace-jump-mode-pop-mark)
 
+        (:name auto-complete
+               :website "https://github.com/auto-complete/auto-complete"
+               :description "The most intelligent auto-completion extension."
+               :type git
+               :url "https://github.com/auto-complete/auto-complete.git"
+               :depends (popup fuzzy))
+        
         (:name browse-kill-ring
                :description "Interactively insert items from kill ring"
                :type git
@@ -117,7 +124,6 @@
       (append
        '(
          ansi
-         auto-complete
          dash
          diminish
          expand-region
