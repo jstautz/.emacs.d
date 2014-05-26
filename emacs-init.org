@@ -850,121 +850,6 @@ And set some directory vars
 :CUSTOM_ID: custom-functions
 :END:
 
-
-Really, I think I can organize things into some better categories:
-- General UI / Editor configs
-  - remove gross UI elements
-    - Hide toolbar
-    - Hide scrollbar
-    - Hide fringe
-  - hide welcome messages
-  - remove alert bells
-  - y-or-n
-  - confirm before quit
-  - emacs server/client settings
-- General editing
-  - highlight cursor location & line
-  - cursor-scroll settings
-  - mac command & option -> meta
-  - mac EOL chars
-  - mac clipboard
-  - 3-button mouse emulation
-  - drag-n-drop files
-  - delete moves to trash
-  - mac spotlight
-  - line + column number settings
-  - CUA/rectagle
-  - transient mark
-  - delete-selection
-  - auto-fill columns
-  - wrap + wrap-to-fill
-  - desktop-save options
-  - ignore case when completing
-  - activate narrow-to-region
-  - unbind f2, read-only-toggle
-  - bind M-s for save
-  - bind C-z undo
-  - fix scroll events for fringe
-  - bind RET to ret+indent
-  - bind C-esc -> top level
-  - winner-mode on
-  - bind M-o other window
-  - custom window-splitting and moving functions
-  - switch between split window and single frame
-  - shift between windows
-  - shrink/expand windows
-  - bind M-n, M-p scroll view
-  - bind C-X C-b ibuffer
-  - dired, bind r to wdired
-  - dired: end/beginning of buffer bindings
-  - isearch with initial content
-  - ace-jump
-  - browse kill ring 
-  - kill-ring-search
-  - easy-kill
-  - also xah's kill-ring-save functions
-  - zap-to-char
-  - rename current buffer file, delete current file
-  - guide key (UI)
-  - ido (UI)
-  - ido ubiquitous
-  - ido vertical
-  - popwin (UI)
-  - smart-mode-line (UI)
-  - diminish (UI)
-  - smex (UI)
-- Org-mode / PIM related
-  - org dir settings
-  - org alist
-  - org modules
-  - ... etc
-  - Calendar + cal sync functions
-  - jcs:clock in/out functions
-- Writing-related
-  - backup files
-  - tabs 4 spaces, sentences 2 spaces
-  - spellcheck
-  - Marked.app
-  - unfill paragraph
-  - package: writer-names
-  - package: fountain-mode
-  - package: wordsmith-mode
-  - markdown-mode
-- Programming-related
-  - auto-revert
-  - tags options
-  - find-tag functions that refresh TAGS files
-  - tramp options
-  - reopen buffer as root via tramp
-  - auto-recomplile lisp being worked on
-  - diff options
-  - function: eval-and-replace
-  - package: auto-complete
-  - python: jedi, virtualenvwrapper
-  - html/javascript: js2, js2refactor, nxhtml
-  - package: restclient
-  - package: psvn
-  - package: skewer-mode
-  - package: yasnippet
-- System settings / prerequisites / post-flight
-  - pre-reqs
-    - cl libs
-    - set path
-    - directory vars
-    - customize file
-    - load path
-    - decrypt secrets file
-  - GC settings
-  - force redisplay
-  - post-flight
-    - desktop
-    - start-server
-
-I think organizing it by use cases is better.
-
-
-
-
 #+name: init-packages
 #+begin_src emacs-lisp
 
@@ -1315,6 +1200,7 @@ of windows in the frame simply by calling this command again."
 
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+
 #+end_src
 * Other Implementation details
 
