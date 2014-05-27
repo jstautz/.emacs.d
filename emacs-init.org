@@ -208,8 +208,9 @@ I can define that Emacs-friendly code order here, using "noweb" syntax[fn:2], wh
 
 #+begin_src emacs-lisp :tangle yes :noweb tangle
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
-<<Load and configure packages>>
-<<Tweak some UI settings>>
+<<Load and configure Cask & Pallet to load packages>>
+<<General Editor Settings: UI, files, navigation, editing, scrolling>>
+
 <<Load some editor customizations>>
 <<Set custom keybindings>>
 
@@ -232,7 +233,7 @@ If I set =comments noweb=, the links generated in the code don't seem to correct
 
 ** Loading packages 
 :PROPERTIES:
-:noweb-ref: Load and configure packages
+:noweb-ref: Load and configure Cask & Pallet to load packages
 :END:
 
 Back in the dark ages, I would find third-party elisp packages on the interwebs and install them manually. This got nasty pretty quickly.
@@ -276,32 +277,73 @@ If I install a new package via =M-x list-packages=, Pallet automatically updates
 #+begin_src emacs-lisp 
 (use-package pallet)
 #+end_src
-
-*** Other packages
-
-Instead of an alphabetized and ugly bulk-dump of every package I use, I've spread the declarations and configs for my packages throughout this file in places where they make logical sense.
-
-When I talk about UI tweaks, for example, I can talk about how I load and configure the smart-mode-line package. 
-
-I still want Emacs to *load* all these packages in bulk, however, so I'll list them with noweb links here:
-
-#+begin_src emacs-lisp :tangle yes :noweb tangle
-<<UI-related packages>>
-#+end_src
-
-
-
-
-* Interface tweaks
+* What I use Emacs for
 :PROPERTIES:
-:noweb-ref: Tweak some UI settings
+:CUSTOM_ID: what-i-do-in-emacs
 :END:
+
+#+begin_quote
+This is my rifle. There are many like it, but this one is mine.
+
+--Major General William H. Rupertus, "The Rifleman's Creed," 1942
+#+end_quote
+
+In order to understand why I've configured things the way I did, it might help to understand some things I do in Emacs.
+
+** Org-mode
+
+I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
+
+I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]]
+
+It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
+
+** Writing Fiction
+
+For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
+
+Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
+
+Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
+
+The details of [[file:./emacs-init.org][how I use Emacs for fiction writing are documented later in this file]]. 
+
+** Programming
+
+Unlike most Emacs users, I'm not a professional software engineer. 
+
+I've done a bunch of development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
+
+[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
+
+When I grow up maybe I'll be an engineer.
+
+A couple of languages I work with in Emacs:
+
+- I work with Emacs lisp quite a bit (of course)
+- I'm learning python
+- I play around with javascript (and HTML/CSS, obviously)
+
+[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
+
+** Manipulating files and text of all kinds
+
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
+
+[[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
+
+* General Editor Settings
+:PROPERTIES:
+:noweb-ref: General Editor Settings: UI, files, navigation, editing, scrolling
+:END:
+
+** Interface tweaks
 
 I know, I know. Emacs doesn't have much of an interface to begin with. 
 
 Even so, there are a couple of changes I like to make in order to make things a little cleaner.
 
-** Remove distracting UI elements
+*** Remove distracting UI elements
 
 Emacs comes with a fat ugly toolbar turned on by default. It's seriously gross looking. 
 
@@ -323,7 +365,7 @@ Scroll bars are also pretty useless in this age of scroll wheels and trackpads, 
 
 The only *good* part about a scroll bar? Its size and position give you a quick visual indication of how far down in the current file you are, and how large the file is.
 
-I make up for this by [[file://emacs-init.org][displaying a position indicator in my modeline]] -- I'll explain that setup a bit further down.
+I make up for this by [[File position][displaying a position indicator in my modeline]]-- I'll explain that setup a bit further down.
 
 #+name: UI-fringe
 #+begin_src emacs-lisp 
@@ -331,7 +373,7 @@ I make up for this by [[file://emacs-init.org][displaying a position indicator i
 
 #+end_src
 
-** Hide welcome messages
+*** Hide welcome messages
 
 We're all professionals, here. We know what we're doing. 
 
@@ -345,7 +387,7 @@ So let's ditch the splash screen, the startup message, and the default text on t
 
 #+end_src 
 
-** Kill some annoyances
+*** Kill some annoyances
 
 Seriously, screw the audible alert bell.
 
@@ -371,7 +413,230 @@ This s-exp lets you just type "y" or "n" like in any other sane application:
 #+end_src
 
 
-** Highlight cursor location
+*** Confirm before quitting Emacs
+
+I want to make sure I don't accidentally kill Emacs. Ever. 
+
+I do this by changing two things:
+
+1) Unset =C-x C-c= so I don't hit it accidentally, and
+2) Prompt me to confirm that I actually want to quit.
+
+If I want to quit Emacs (gasp!) I now need to do it *very* deliberately via =M-x save-buffers-kill-emacs= and then confirm.
+
+[[Emacsclient / Server][Good thing I rarely quit Emacs]].
+
+#+name: UI-quit-emacs
+#+begin_src emacs-lisp
+(global-unset-key "\C-x\C-c")
+(setq confirm-kill-emacs 'y-or-n-p)
+
+#+end_src
+*** Mode-line settings
+**** Show both line and column numbers in mode-line
+
+A basic feature of any decent text editor: show me what line number I'm on.
+
+The column number display isn't as immediately useful, but it does come in handy.
+
+#+name: UI-linum
+#+begin_src emacs-lisp 
+(line-number-mode 1)                         
+(column-number-mode 1)
+
+#+end_src
+
+**** Smart-mode-line setup
+I use smart-mode-line to pack a bunch of useful info into my mode line.
+
+#+name: UI-smart-mode-line
+#+begin_src emacs-lisp
+  (use-package smart-mode-line
+    :init
+    (progn
+#+end_src 
+
+When use-package initializes smart-mode-line, I want to set up the theme and width right away. I like that the theme's called "respectful."
+
+#+name: UI-sml-settings
+#+begin_src emacs-lisp
+      (setq sml/theme 'respectful
+            sml/name-width 40
+            sml/mode-width 40)
+#+end_src
+
+smart-mode-line has a useful feature that allows you to replace elements of a path with an abbreviation. So instead of seeing =/Users/jstautz/Documents/Work/filename.txt= in the modeline, I'll see =:Work:filename.txt=. 
+
+#+name: UI-sml-replacer
+#+begin_src emacs-lisp
+      (setq sml/replacer-regexp-list
+        (quote
+         (("^~/org/" ":Org:")
+          ("^~/\\.emacs\\.d/" ":ED:")
+          ("^~/[Gg]it/" ":Git:")
+          ("^~/Dropbox/Writing/01-composting/" ":Compost:")
+          ("^~/Dropbox/Writing/02-draft_in_progress/" ":Drafts:")
+          ("^~/Dropbox/Writing/03-revision_in_progress/" ":Revs:")
+          ("^~/Dropbox/Writing/04-submitted/" ":Submitted:")
+          ("^~/Dropbox/Writing/05-published/" ":Published:")
+          ("^~/Dropbox/Writing/06-cold_storage/" ":ColdStore:")
+          ("^~/Dropbox/Writing/" ":Writing:")
+          ("^~/Dropbox/finance/taxes 2013/" ":Tax2013:")
+          ("^~/Dropbox/finance/taxes 2014/" ":Tax2014:")
+          ("^~/Dropbox/" ":DB:")
+          ("^~/Documents/Writing/01-composting/" ":Compost:")
+          ("^~/Documents/Writing/02-draft_in_progress/" ":Drafts:")
+          ("^~/Documents/Writing/03-revision_in_progress/" ":Revs:")
+          ("^~/Documents/Writing/04-submitted/" ":Submitted:")
+          ("^~/Documents/Writing/05-published/" ":Published:")
+          ("^~/Documents/Writing/06-cold_storage/" ":ColdStore:")
+          ("^~/Documents/Writing/" ":Writing:")
+          ("^~/Documents/" ":Docs:")
+          ("^~/Documents/Work/" ":Work:")
+          ("^~/dev" ":dev:")
+          ("^~/Sites" ":www:")
+          ("^~/Downloads/" ":DLs:"))))
+#+end_src
+
+Fire up smart-mode-line immediately:
+
+#+name: UI-sml-setup
+#+begin_src emacs-lisp
+      (sml/setup)))
+
+#+end_src
+**** File position
+
+Remember how I [[Remove distracting UI elements][turned off the scroll bar?]] The one useful purpose scroll-bars serve is to indicate your current position in the buffer. 
+
+Luckily, smart-mode-line has us covered. It includes a built-in feature to display your current position in the buffer as a %. It will also indicate =Top= or =Bot= when you're at the top or bottom of the buffer.
+
+Note that this indicator refers to *visible* screen space within the window. So if you're working in org-mode on a large file with a lot of folding, you may be able to see the bottom of the buffer within the window, even if you're at the top of the file.
+
+**** Diminish.el
+
+Also related to keeping my mode-line clean: diminish is a package that lets you replace the default major/minor mode indicators in the mode-line with shorter abbreviations (or hide them altogether).
+
+#+name: UI-modeline-diminish
+#+begin_src emacs-lisp
+(use-package diminish)
+
+#+end_src 
+
+Even better, use-package supports diminsh options as part of the declaration when loading packages.
+
+Diminish also features [[http://www.eskimo.com/~seldon/diminish.el][some of the best code comments in the universe]].
+
+*** Force redisplay
+
+If the =redisplay-dont-pause= variable is not set, then any keyboard/mouse event will stop a screen redraw to handle the input. Which I suppose made sense on older machines or slower networks.
+
+On modern machines, turning this on should make the display feel faster.
+
+Thanks to [[http://www.masteringemacs.org/articles/2011/10/02/improving-performance-emacs-display-engine/][Mickey Peterson for this one]].
+
+#+name: UI-redisplay
+#+begin_src emacs-lisp 
+(setq redisplay-dont-pause t)
+
+#+end_src
+
+I believe this is now on by default in Emacs 24, so I may no longer need to set this explicitly.
+** Backups & Trash settings
+
+Emacs has some pretty useful features for auto-saving backups and integrating with the OS Trash / filesystem.
+
+*** Set backup directory
+
+One problem with the default auto-save in Emacs is that it peppers your working directories with duplicates of your files, e.g. =#init.el#= =init.el~=. Ugly. 
+
+Let's tell Emacs to put all these auto-saves and backups into a more useful location:
+
+#+name: backup-dir
+#+begin_src emacs-lisp
+(defvar backup-dir (concat home-dir ".emacs.backup/"))
+(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
+(setq backup-directory-alist `((".*" . ,backup-dir)))
+(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+
+#+end_src
+
+*** Backups + version control
+
+You have to explicitly tell Emacs to keep saving backups of files if they're under version control. 
+
+#+name: backup-vc
+#+begin_src emacs-lisp
+(setq vc-make-backup-files t)
+
+#+end_src
+*** ~/.Trash integration
+
+Instead of just blowing files away, I want all file-deletion events in emacs to do a =mv file.txt ~/.Trash= rather than a simple =rm file.txt=. This is just another layer of protecting myself from myself.
+
+#+name: backup-trashes
+#+begin_src emacs-lisp
+(setq delete-by-moving-to-trash t)
+(setq trash-directory (concat home-dir ".Trash/"))
+
+#+end_src
+
+** Basic Keyboard settings
+*** Unset some default keybindings
+
+First let's unset a couple of keybindings:
+- Read-only-toggle is bound by default to =C-x C-q=. It's a useless command that I toggle by accident way too often.
+- I also hit =F2= accidentally way too often.
+
+#+name: keybindings-unsets
+#+begin_src emacs-lisp 
+  (global-unset-key "\C-x\C-q")
+  (global-unset-key (kbd "<f2>"))     
+
+#+end_src
+
+*** Save and Undo
+
+Now let's set a couple of bindings based on my muscle memory:
+
+- Rebind M-s to save-buffer -- I never center lines
+
+#+name: keybindings-save
+#+begin_src emacs-lisp 
+(global-set-key (kbd "M-s") 'save-buffer)
+#+end_src 
+
+- =C-z= is bound to iconify-frame by default, which I never use. Set it to undo instead.
+
+#+name: keybindings-save
+#+begin_src emacs-lisp 
+(global-set-key (kbd "C-z") 'undo)     
+
+#+end_src
+
+*** Mac keyboard settings
+
+I use Emacs on OS X and get my builds from http://emacsformacosx.com/. There are a couple of things I need to configure to make Emacs.app play nicely on a Mac.
+
+First, I want to treat Command *and* Option keys as Meta in Emacs. I know, this is weird. I may eventually change one of these to Super or Hyper. But for now, I like having large target areas for hitting Meta, since I use it so often.
+
+#+name: UI-mac-settings-meta
+#+begin_src emacs-lisp 
+(setq ns-alternate-modifier (quote meta))
+(setq ns-command-modifier (quote meta))
+
+#+end_src
+*** Mouse settings
+
+Emulate a three-button mouse for copy/paste/select:
+
+#+name: UI-mac-settings-clipboard
+#+begin_src emacs-lisp 
+(setq mac-emulate-three-button-mouse t)
+
+#+end_src
+** Cursor and Scrolling
+*** Highlight cursor location
 
 I realize a lot of people hate blinking cursors, but I like them because:
 
@@ -392,7 +657,7 @@ Another helpful inidicator: I like having my current line highlighted. =grey93= 
 
 #+end_src
 
-** Cursor scroll settings
+*** Cursor scroll settings
 
 Let's make buffer scrolling / paging a bit more sane.
 
@@ -425,25 +690,210 @@ This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't ha
       scroll-preserve-screen-position t)
 
 #+end_src
+*** Scrolling when on fringe
 
-** Mac-specific settings
+Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide). Let's bind margin scroll events appropriately:
 
-I use Emacs on OS X and get my builds from http://emacsformacosx.com/. There are a couple of things I need to configure to make Emacs.app play nicely on a Mac.
-
-First, I want to treat Command *and* Option keys as Meta in Emacs. I know, this is weird. I may eventually change one of these to Super or Hyper. But for now, I like having large target areas for hitting Meta, since I use it so often.
-
-#+name: UI-mac-settings-meta
+#+name: keybindings-scroll
 #+begin_src emacs-lisp 
-(setq ns-alternate-modifier (quote meta))
-(setq ns-command-modifier (quote meta))
+(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
 #+end_src
 
-And my end of line characters? Make 'em plain old LFs, please:
+*** Scroll view without moving cursor
+
+Use =M-n= and =M-p= to scroll the window view up or down... without moving the point.
+
+#+name: keybindings-scroll-view
+#+begin_src emacs-lisp 
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
+#+end_src
+*** Selecting and deleting text
+
+When I select text between point and mark, I want to see this selection highlighted with transient-mark mode. I find it difficult to use Emacs effectively without having transient-mark-mode turned on.
+
+Delete-selection-mode is also important to me -- it allows overwriting selected text to work the way I expect.
+
+#+name:cursor-transient
+#+begin_src emacs-lisp
+(transient-mark-mode t)
+(delete-selection-mode t)
+#+end_src
+*** Rectangle selection
+
+CUA mode has [[https://www.youtube.com/watch?v=k-6BVjlBSVo][a really nice facility for editing rectangular regions]]. 
+
+I dislike using CUA-mode's default keybindings, but I do like the rectangle editing features. So I turn off the CUA-keys, then turn on CUA.
+
+#+name:cursor-transient
+#+begin_src emacs-lisp
+(setq cua-enable-cua-keys nil)               
+(cua-mode t)
+
+#+end_src
+
+
+*** Multiple cursors
+
+Sometimes editing a rectangular region just isn't enough power. Sometimes I need to perform the same action across several lines of varying length. Or sometimes those lines I need to edit aren't consecutive but scattered throughout the file.
+
+Multiple-cursors solves this problem nicely. [[https://www.youtube.com/watch?v=jNa3axo40qM][Check out this raw power.]]
+
+I set my keybindings for this to ones that are very close to those for expand-region, since I often use them in sequence. Expand-region is C-=, so expand-region + mark-next are just a shift key apart.
+
+#+name: cursor-mc
+#+begin_src emacs-lisp
+(use-package multiple-cursors
+:bind (("C-+" . mc/mark-next-like-this)
+       ("C--" . mc/mark-previous-like-this)
+       ("C-*" . mc/mark-all-like-this)
+#+end_src
+
+And some keybindings for activating multiple-cursors when a region is selected:
+
+#+name: cursor-mc-region
+#+begin_src emacs-lisp
+       ("C-x a l" . mc/edit-lines)
+       ("C-x a e" . mc/edit-ends-of-lines)
+       ("C-x a a" . mc/edit-beginnings-of-lines)))
+
+#+end_src
+
+*** Expand-region
+
+Another wonderful extension from Magnar Sveen. 
+
+If your point is on a word, hitting C-= expands the selection to mark the whole word. Hitting C-= again selects any punctuation around the word. Hitting C-= again selects the whole line. 
+
+This feature works nicely with various programming languages as well, allowing you to quickly expand the region to highlight a token, an s-expression, a function, etc.
+
+#+name: cursor-er
+#+begin_src emacs-lisp
+(use-package expand-region
+:bind (("C-=" . er/expand-region)))
+#+end_src
+
+
+** Auto-fill & Word Wrap
+
+By defauly, Emacs doesn't automatically wrap words onto the next line.
+
+There are two options to change this. 
+
+In the first option, setting fill-column defines the column number at which Emacs will auto-insert a linebreak.
+
+In the second option, visual-line-mode, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's visually wrapped onto multiple lines. Cursor movement and end-of-line + beginning-of-line commands work within the wrapped line.
+
+*** Auto-fill-mode
+
+I typically run Emacs.app in full screen, and a 120-character fill-column feels pretty good to me. 
+
+I know an 80-column limit would be more compatible... but it feels cramped. Especially when dealing with creative writing.
+
+#+name: auto-fill-options
+#+begin_src emacs-lisp
+  ;; auto-fill options 
+  (setq fill-column 120)
+  (setq default-fill-column 120)
+  
+#+end_src
+
+*** Use Mac EOL characters
+
+Lines should end in plain old LFs, as god intended.
 
 #+name: UI-mac-settings-eol
 #+begin_src emacs-lisp 
 (setq eol-mnemonic-mac "(Mac)")
+
 #+end_src
+
+*** Visual-line mode and wrap-to-fill-column
+
+Previously I kept auto-fill-mode turned on. The hard linebreaks didn't bother me, and when diffing files in my git repo of creative writing, I could view changes on individual lines.
+
+However... it's still kind of a pain in the ass.
+
+Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually want to work on shorter lines than that, just for usability's sake.
+
+I've since discovered wrap-to-fill-column-mode, which is packaged with nxhtml-mode. This allows me to use visual-line-mode for word.
+
+#+name: auto-fill-options
+#+begin_src emacs-lisp
+  ;; wrap-to-fill is only included in nxhtml-mode,
+  ;;  so we need packages installed before this works.
+  ;; 
+  ;;(auto-fill-mode 1)
+  ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+  ;; (wrap-to-fill-column-mode 1)
+  ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+#+end_src
+*** bzg's big fringe mode
+
+wrap-to-fill-column is packaged with nxhtml, a bloated package I've always hated and which isn't on MELPA. 
+
+So here's another discovery -- bzg's big fring mode: (not currently being activated or tangled)
+
+#+name: big-fringe-mode
+#+begin_example
+(defvar bzg-big-fringe-mode nil)
+(define-minor-mode bzg-big-fringe-mode
+  "Minor mode to use big fringe in the current buffer."
+  :init-value nil
+  :global t
+  :variable bzg-big-fringe-mode
+  :group 'editing-basics
+  (if (not bzg-big-fringe-mode)
+      (set-fringe-style nil)
+    (set-fringe-mode
+     (/ (- (frame-pixel-width)
+           (* 120 (frame-char-width)))
+        2))))
+
+;; Now activate this global minor mode
+(bzg-big-fringe-mode 1)
+
+;; To activate the fringe by default and deactivate it when windows
+;; are split vertically, uncomment this:
+(add-hook 'window-configuration-change-hook
+          (lambda ()
+            (if (delq nil
+                      (let ((fw (frame-width)))
+                        (mapcar (lambda(w) (< (window-width w) fw))
+                                (window-list))))
+                (bzg-big-fringe-mode 0)
+              (bzg-big-fringe-mode 1))))
+
+
+;; Get rid of the indicators in the fringe
+(mapcar (lambda(fb) (set-fringe-bitmap-face fb 'org-hide))
+        fringe-bitmaps)
+#+end_example
+
+
+** Desktop Settings
+
+Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, and a bunch of other
+
+** Window Navigation
+** File & Buffer Navigation & Manipulation
+*** Drag and drop file support
+
+When I drag and drop a file onto Emacs.app, visit that file rather than just appending it to the currently open buffer (which is a horrible default).
+
+#+name: Filenav-drag-n-drop
+#+begin_src emacs-lisp 
+
+(define-key global-map [ns-drag-file] 'ns-find-file) 
+
+#+end_src
+
+** Copy & Kill
+*** Use Mac clipboard for copying/killing
 
 Copy and paste should use the OS clipboard
 
@@ -452,54 +902,10 @@ Copy and paste should use the OS clipboard
 (setq x-select-enable-clipboard t)
 #+end_src
 
-Adjust the way my mouse works:
-- Emulate a three-button mouse for copy/paste/select
-- When I drag and drop a file onto Emacs, visit that file rather than just appending it to the currently open buffer (which is a horrible default)
 
-#+name: UI-mac-settings-clipboard
-#+begin_src emacs-lisp 
-(setq mac-emulate-three-button-mouse t)
+** Emacsclient / Server
 
-(define-key global-map [ns-drag-file] 'ns-find-file) 
-
-#+end_src
-
-
-** Show both line and column numbers
-
-A basic feature of any decent text editor: show me what line number I'm on.
-
-The column number display isn't as immediately useful, but it does come in handy.
-
-#+name: UI-linum
-#+begin_src emacs-lisp 
-(line-number-mode 1)                         
-(column-number-mode 1)
-
-#+end_src
-** Confirm before quitting Emacs
-
-I want to make sure I don't accidentally kill Emacs. Ever. 
-
-I do this by changing two things:
-
-1) Unset =C-x C-c= so I don't hit it accidentally, and
-2) Prompt me to confirm that I actually want to quit.
-
-If I want to quit Emacs (gasp!) I now need to do it *very* deliberately via =M-x save-buffers-kill-emacs= and then confirm.
-
-Good thing I rarely quit Emacs.
-
-#+name: UI-quit-emacs
-#+begin_src emacs-lisp
-(global-unset-key "\C-x\C-c")
-(setq confirm-kill-emacs 'y-or-n-p)
-
-#+end_src
-
-** Connecting to Emacs server shouldn't pop up frames
-
-Speaking of rarely quitting Emacs... My preferred way of working is in a single fullscreen frame in Emacs.app that's open all the time, running as a server. 
+My preferred way of working is in a single fullscreen frame in Emacs.app that's open all the time, running as a server. 
 
 If I'm working in the terminal and I need to edit a file in my current directory, I can just do:
 
@@ -508,6 +914,9 @@ $> emacsclient filename.txt
 #+end_example
 
 This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:3]
+
+*** Connecting to Emacs server shouldn't pop up frames
+
 
 One thing I had to tweak for this: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
 
@@ -521,77 +930,21 @@ One thing I had to tweak for this: I want to make sure connecting via emacsclien
 
 -------------------------------------
 
-** Force redisplay
-
-If the =redisplay-dont-pause= variable is not set, then any keyboard/mouse event will stop a screen redraw to handle the input. Which I suppose made sense on older machines or slower networks.
-
-On modern machines, turning this on should make the display feel faster.
-
-Thanks to [[http://www.masteringemacs.org/articles/2011/10/02/improving-performance-emacs-display-engine/][Mickey Peterson for this one]].
-
-#+name: UI-redisplay
-#+begin_src emacs-lisp 
-(setq redisplay-dont-pause t)
-
-#+end_src
-
-I believe this is now on by default in Emacs 24, so I may no longer need to set this explicitly.
-
-* Global Keybindings
-:PROPERTIES:
-:noweb-ref: Set custom keybindings
-:END:
-
-This wouldn't be a proper Emacs config if it didn't have a boatload of custom keybindings.
-
-** Unset some default keybindings
-
-First let's unset a couple of keybindings:
-- Read-only-toggle is bound by default to =C-x C-q=. It's a useless command that I toggle by accident way too often.
-- I also hit =F2= accidentally way too often.
-
-#+name: keybindings-unsets
-#+begin_src emacs-lisp 
-  (global-unset-key "\C-x\C-q")
-  (global-unset-key (kbd "<f2>"))     
-#+end_src
-
-** Basic commands
-
-Now let's set a couple of bindings based on my muscle memory:
-
-- Rebind M-s to save-buffer -- I never center lines
-
-#+name: keybindings-save
-#+begin_src emacs-lisp 
-(global-set-key (kbd "M-s") 'save-buffer)
-#+end_src 
-
-- =C-z= is bound to iconify-frame by default, which I never use. Set it to undo instead.
-
-#+name: keybindings-save
-#+begin_src emacs-lisp 
-(global-set-key (kbd "C-z") 'undo)     
-#+end_src
-
-- Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide). Let's bind margin scroll events appropriately:
-
-#+name: keybindings-scroll
-#+begin_src emacs-lisp 
-(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
-(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
-(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
-(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
-#+end_src
-
-** Editing
+** ido & smex
+** Help
+* Writing Fiction
+* Coding
+** Return + indent
 
 I like it when my return key preserves indentation:
 
 #+name: keybindings-return
 #+begin_src emacs-lisp
 (global-set-key (kbd "RET") 'newline-and-indent)
+
 #+end_src
+
+** Bind ESC to top-level command 
 
 I hate having to repeatedly hit escape to bounce out of recursive edits when I drop into the debugger.  
 
@@ -602,8 +955,18 @@ I hate having to repeatedly hit escape to bounce out of recursive edits when I d
 (add-hook 'org-mode-hook
           (lambda()
             (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+
 #+end_src
- 
+
+* Org-mode
+* Global Keybindings
+:PROPERTIES:
+:noweb-ref: Set custom keybindings
+:END:
+
+This wouldn't be a proper Emacs config if it didn't have a boatload of custom keybindings.
+
+
 ** Window and buffer navigation
  
 I'm experimenting with using =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
@@ -613,13 +976,6 @@ I'm experimenting with using =M-o= to move between windows. The default =C-x o= 
 (global-set-key (kbd "M-o") 'other-window)
 #+end_src
 
-Use =M-n= and =M-p= to scroll the window view up or down... without moving the point.
-
-#+name: keybindings-scroll-view
-#+begin_src emacs-lisp 
-(global-set-key "\M-n" 'scroll-up-line)
-(global-set-key "\M-p" 'scroll-down-line)
-#+end_src
 
 ** Buffer and directory lists
 
@@ -653,22 +1009,7 @@ I like having wdired bound to the 'r' key inside dired.
   ;; System / Editing Prefs
   ;;-----------------------------------------------------------------------------
   
-  ;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
-  (setq gc-cons-threshold 20000000)
-  
-  ;; Put backups & autosaves in their place (not in current dir)
-  (defvar backup-dir (concat home-dir ".emacs.backup/"))
-  (defvar autosave-dir (concat home-dir ".emacs.autosave/"))
-  (setq backup-directory-alist `((".*" . ,backup-dir)))
-  (setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
-  
-  ;; Make backups of files, even when they're in version control
-  (setq vc-make-backup-files t)
-  
-  ;; When deleting files, move them to Trash
-  (setq delete-by-moving-to-trash t)
-  (setq trash-directory (concat home-dir ".Trash/"))
-  
+    
   ;; Refresh any buffer when file on disk changes
   (setq global-auto-revert-mode 1)
   
@@ -687,12 +1028,6 @@ I like having wdired bound to the 'r' key inside dired.
   (setq-default tab-width 4)
   (setq-default indent-tabs-mode nil)
   (setq sentence-end-double-space nil)
-  
-  ;; selection options + rectangle selection w/ CUA
-  (transient-mark-mode t)
-  (delete-selection-mode t)
-  (setq cua-enable-cua-keys nil)               
-  (cua-mode t)
   
   ;; auto-fill options 
   (setq fill-column 120)
@@ -755,61 +1090,6 @@ I like having wdired bound to the 'r' key inside dired.
   
 #+end_src
 
-
-* What I use Emacs for
-:PROPERTIES:
-:CUSTOM_ID: what-i-do-in-emacs
-:END:
-
-#+begin_quote
-This is my rifle. There are many like it, but this one is mine.
-
---Major General William H. Rupertus, "The Rifleman's Creed," 1942
-#+end_quote
-
-In order to understand why I've configured things the way I did, it might help to understand some things I do in Emacs.
-
-** Org-mode
-
-I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
-
-I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]]
-
-It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
-
-** Writing Fiction
-
-For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
-
-Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
-
-Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
-
-The details of [[file:./emacs-init.org][how I use Emacs for fiction writing are documented later in this file]]. 
-
-** Programming
-
-Unlike most Emacs users, I'm not a professional software engineer. 
-
-I've done a bunch of development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
-
-[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
-
-When I grow up maybe I'll be an engineer.
-
-A couple of languages I work with in Emacs:
-
-- I work with Emacs lisp quite a bit (of course)
-- I'm learning python
-- I play around with javascript (and HTML/CSS, obviously)
-
-[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
-
-** Manipulating files and text of all kinds
-
-Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
-
-[[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
 * System and editor settings
 * Load and configure packages
@@ -880,355 +1160,357 @@ And set some directory vars
 
 #+name: init-packages
 #+begin_src emacs-lisp
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; A random smattering of custom/helper functions
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;;-----------------------------------------------------------------------------
-;; jcs:getcals -- Sync my Google Calendars to emacs diary
-;;-----------------------------------------------------------------------------
-(require 'icalendar)
-
-(defun getcal (url)
-  "Download ics file and add to diary"
-  (let ((tmpfile (url-file-local-copy url)))
-    (icalendar-import-file tmpfile "~/org/calendar.diary" t)
-    (kill-buffer (car (last (split-string tmpfile "/"))))
+  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;
+  ;; A random smattering of custom/helper functions
+  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; jcs:getcals -- Sync my Google Calendars to emacs diary
+  ;;-----------------------------------------------------------------------------
+  (require 'icalendar)
+  
+  (defun getcal (url)
+    "Download ics file and add to diary"
+    (let ((tmpfile (url-file-local-copy url)))
+      (icalendar-import-file tmpfile "~/org/calendar.diary" t)
+      (kill-buffer (car (last (split-string tmpfile "/"))))
+      )
     )
-  )
-
-;; Grab google calendars from secrets.el.gpg
-(defun jcs:getcals ()
-  (interactive)
-  (if (not (boundp 'google-calendars))
-      (jcs:decrypt-secrets))
-    (find-file "~/org/calendar.diary")
-    (flush-lines "^[& ]")
-    (dolist (url google-calendars) (getcal url))
-    (kill-buffer "calendar.diary"))
-
-
-;;-----------------------------------------------------------------------------
-;; jcs:clock functions -- Functions to clock into/out of  a particular item in
-;; projects.org (OR create a new item and clock into it)
-;;-----------------------------------------------------------------------------
- (defun jcs:clock-in-to-string (theString &optional theCategory)
-  "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
-  (interactive)
-  (save-excursion
-	(let (filepath filename mybuffer)
-	  (setq filepath "/Users/jstautz/org/projects.org"
-            filename (file-name-nondirectory filepath)
-            mybuffer (find-file filepath))
-	  (goto-char (point-min))
-	  (widen) 
-	  ;; if no category defined, try to find string in file and clock in
-	  (if (eq theCategory nil)
-		  (if (search-forward theString nil t)
-			  (org-clock-in)
-			;; if not found in buffer, insert new item at end and clock into it
-			(goto-char (point-max))
-			(insert (concat "*** " theString))
-			(goto-char (point-max))
-			(org-clock-in))
-		;; thecategory is non-nil, so this is a new item w/ category
-		(goto-char (point-max))
-		(insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
-		(goto-char (point-max))
-		(org-clock-in)))))
-
-(defun jcs:clock-out (&optional theString theCategory)
-  (org-clock-out))
-
-
-;;-----------------------------------------------------------------------------
-;; Eval and replace -- replace current sexp with its value
-;;-----------------------------------------------------------------------------
-
-(defun eval-and-replace ()
-  "Replace the preceding sexp with its value."
-  (interactive)
-  (backward-kill-sexp)
-  (prin1 (eval (read (current-kill 0)))
-         (current-buffer)))
-
-(global-set-key (kbd "C-c e") 'eval-and-replace)
-
-
-;;-----------------------------------------------------------------------------
-;; i-search with initial contents.
-;; original src: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
-;;-----------------------------------------------------------------------------
-(defvar isearch-initial-string nil)
-
-(defun isearch-set-initial-string ()
-  (remove-hook 'isearch-mode-hook 'isearch-set-initial-string)
-  (setq isearch-string isearch-initial-string)
-  (isearch-search-and-update))
-
-(defun isearch-forward-at-point (&optional regexp-p no-recursive-edit)
-  "Interactive search forward for the symbol at point."
-  (interactive "P\np")
-  (if regexp-p (isearch-forward regexp-p no-recursive-edit)
-    (let* ((end (progn (skip-syntax-forward "w_") (point)))
-           (begin (progn (skip-syntax-backward "w_") (point))))
-      (if (eq begin end)
-          (isearch-forward regexp-p no-recursive-edit)
-        (setq isearch-initial-string (buffer-substring begin end))
-        (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
-        (isearch-forward regexp-p no-recursive-edit)))))
-
-(global-set-key (kbd "C-c C-s") 'isearch-forward-at-point)
-
-
-;;-----------------------------------------------------------------------------
-;; Nice functions to change copy-kill region to copy or kill current line
-;; if no active region.
-;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
-;;-----------------------------------------------------------------------------
-(defadvice kill-ring-save (before slick-copy activate compile)
-  "When called interactively with no active region, copy the current line."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (progn
-       (message "Current line copied to kill-ring.")
-       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-
-(defadvice kill-region (before slick-copy activate compile)
-  "When called interactively with no active region, cut the current line."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (progn
-       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-
-
-;;-----------------------------------------------------------------------------
-;; Make zap-to-char act more like "zap-up-to-char"
-;; Thanks to Eric Himmelreich
-;; http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/
-;;-----------------------------------------------------------------------------
-(defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
-  "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
-  The CHAR is replaced and the point is put before CHAR."
-  (insert char)
-  (forward-char -1))
-
-
-;;-----------------------------------------------------------------------------
-;; Window-splitting and moving functions
-;; Thanks to Ignacio Paz Posse
-;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
-;;-----------------------------------------------------------------------------
-
-;; Instead of giving me two identical buffers when I split the window, give me the previous buffer.
-;; From http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
-(defun vsplit-last-buffer ()
-  (interactive)
-  (split-window-vertically)
-  (other-window 1 nil)
-  (switch-to-next-buffer)
-  )
-(defun hsplit-last-buffer ()
-  (interactive)
-   (split-window-horizontally)
-  (other-window 1 nil)
-  (switch-to-next-buffer)
-  )
-
-(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
-(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
-
-
-;; Switch (zoom) between split window config and a single window
-(defun toggle-windows-split()
-  "Switch back and forth between one window and whatever split of
-windows we might have in the frame. The idea is to maximize the
-current buffer, while being able to go back to the previous split
-of windows in the frame simply by calling this command again."
-  (interactive)
-  (if (not(window-minibuffer-p (selected-window)))
-      (progn
-        (if (< 1 (count-windows))
-            (progn
-              (window-configuration-to-register ?u)
-              (delete-other-windows))
-          (jump-to-register ?u)))))
-
-(define-key global-map (kbd "C-`") 'toggle-windows-split)
-(define-key global-map (kbd "C-~") 'toggle-windows-split)
-
-;; Window shifting. C-x-o lets us go forward a window (or several).
-;; This one lets us go back one or more windows. From Glickstein.
-(defun other-window-backward (&optional n)
-  "Select previous Nth window."
-  (interactive "P")
-  (other-window (- (prefix-numeric-value n))))
-
-(global-set-key [prior] 'other-window)
-(global-set-key [next] 'other-window-backward)
-(global-set-key [(control tab)] 'other-window)
-(global-set-key [(shift control tab)] 'other-window-backward)
-
-;; Also (stolen from someone else's dot file) this is used to shrink/expand windows without using the mouse.
-(define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
-(define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
-(define-key global-map (kbd "C-M-<up>") 'enlarge-window)
-(define-key global-map (kbd "C-M-<down>") 'shrink-window)
-
-
-;;-----------------------------------------------------------------------------
-;; Open in Marked.app -- Stolen from https://github.com/mattsears/emacs
-;;-----------------------------------------------------------------------------
-(defun markdown-preview-file ()
-  "run Marked on the current file and revert the buffer"
-  (interactive)
-  (shell-command
-   (format "open -a /Applications/Marked.app %s"
-           (shell-quote-argument (buffer-file-name)))))
-
-(global-set-key "\C-cm" 'markdown-preview-file)
-
-
-;;-----------------------------------------------------------------------------
-;; Unfill paragraph -- From https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org
-;;-----------------------------------------------------------------------------
-(defun unfill-paragraph ()
-  "Takes a multi-line paragraph and makes it into a single line of text."
-  (interactive)
-  (let ((fill-column (point-max)))
-    (fill-paragraph nil)))
-
-;;-----------------------------------------------------------------------------
-;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
-;;-----------------------------------------------------------------------------
-(defun tramp-sudo-reopen ()
-  "Re-open the current with tramp."
-  (interactive)
-  (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
-        (line (line-number-at-pos))
-        (column (current-column)))
-    (kill-buffer)
-    (find-file file-name)
-    (goto-line line)
-    (goto-char (+ (point) column))))
-
-
-;;-----------------------------------------------------------------------------
-;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
-;;-----------------------------------------------------------------------------
-(defun byte-compile-current-buffer ()
-  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
-  (interactive)
-  (when (and (eq major-mode 'emacs-lisp-mode)
-             (file-exists-p (byte-compile-dest-file buffer-file-name)))
-    (byte-compile-file buffer-file-name)))
-
-(add-hook 'after-save-hook 'byte-compile-current-buffer)
-
-
-;;-----------------------------------------------------------------------------
-;; A smarter find-tag that automagically reruns etags when it can't find a
-;; requested item and then makes a new try to locate it.
-;; by Jonas.Jarnestrom<at>ki.ericsson.se
-;; Fri Mar 15 09:52:14 2002
-;;-----------------------------------------------------------------------------
-(defadvice find-tag (around refresh-etags activate)
-  "Rerun etags and reload tags if tag not found and redo find-tag.
-   If buffer is modified, ask about save before running etags."
-  (let ((extension (file-name-extension (buffer-file-name))))
-    (condition-case err
-        ad-do-it
-      (error (and (buffer-modified-p)
-                  (not (ding))
-                  (y-or-n-p "Buffer is modified, save it? ")
-                  (save-buffer))
-             (er-refresh-etags extension)
-             ad-do-it))))
-
-(defun er-refresh-etags (&optional extension)
-  "Run etags on all peer files in current dir and reload them silently."
-  (interactive)
-  (shell-command (format "etags *.%s" (or extension "el")))
-  (let ((tags-revert-without-query t))  ; don't query, revert silently
-    (visit-tags-table default-directory nil)))
-
-;; While we're at it, modify pop-tag-mark to stay centered on cursor
-(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
-  "After popping back to where find-tag was invoked,
-   center screen on cursor"
-  (let ((current-prefix-arg '(4)))
-  (call-interactively 'recenter-top-bottom)))
-
-
-;;-----------------------------------------------------------------------------
-;; Renaming and deleting files should be easier to do. 
-;; C-x C-r renames current file
-;; C-x C-k deletes current file (since C-x k kills the buffer)
-;;-----------------------------------------------------------------------------
-
-(defun rename-current-buffer-file ()
-  "Renames current buffer and file it is visiting."
-  (interactive)
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (error "Buffer '%s' is not visiting a file!" name)
-      (let ((new-name (read-file-name "New name: " filename)))
-        (if (get-buffer new-name)
-            (error "A buffer named '%s' already exists!" new-name)
-          (rename-file filename new-name 1)
-          (rename-buffer new-name)
-          (set-visited-file-name new-name)
-          (set-buffer-modified-p nil)
-          (message "File '%s' successfully renamed to '%s'"
-                   name (file-name-nondirectory new-name)))))))
-
-(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
-
-
-(defun delete-current-buffer-file ()
-  "Removes file connected to current buffer and kills buffer."
-  (interactive)
-  (let ((filename (buffer-file-name))
-        (buffer (current-buffer))
-        (name (buffer-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (ido-kill-buffer)
-      (when (yes-or-no-p "Are you sure you want to remove this file? ")
-        (delete-file filename t)
-        (kill-buffer buffer)
-        (message "File '%s' successfully removed" filename)))))
-
-(global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
-
-
-;;-----------------------------------------------------------------------------
-;; Make beginning-of-buffer and end-of-buffer work nicely in dired
-;; Thanks to @magnars
-;;-----------------------------------------------------------------------------
-
-(defun dired-back-to-top ()
-  (interactive)
-  (beginning-of-buffer)
-  (dired-next-line 4))
-
-(define-key dired-mode-map
-  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
-
-(defun dired-jump-to-bottom ()
-  (interactive)
-  (end-of-buffer)
-  (dired-next-line -1))
-
-(define-key dired-mode-map
-  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
-
+  
+  ;; Grab google calendars from secrets.el.gpg
+  (defun jcs:getcals ()
+    (interactive)
+    (if (not (boundp 'google-calendars))
+        (jcs:decrypt-secrets))
+      (find-file "~/org/calendar.diary")
+      (flush-lines "^[& ]")
+      (dolist (url google-calendars) (getcal url))
+      (kill-buffer "calendar.diary"))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; jcs:clock functions -- Functions to clock into/out of  a particular item in
+  ;; projects.org (OR create a new item and clock into it)
+  ;;-----------------------------------------------------------------------------
+   (defun jcs:clock-in-to-string (theString &optional theCategory)
+    "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
+    (interactive)
+    (save-excursion
+      (let (filepath filename mybuffer)
+        (setq filepath "/Users/jstautz/org/projects.org"
+              filename (file-name-nondirectory filepath)
+              mybuffer (find-file filepath))
+        (goto-char (point-min))
+        (widen) 
+        ;; if no category defined, try to find string in file and clock in
+        (if (eq theCategory nil)
+            (if (search-forward theString nil t)
+                (org-clock-in)
+              ;; if not found in buffer, insert new item at end and clock into it
+              (goto-char (point-max))
+              (insert (concat "*** " theString))
+              (goto-char (point-max))
+              (org-clock-in))
+          ;; thecategory is non-nil, so this is a new item w/ category
+          (goto-char (point-max))
+          (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
+          (goto-char (point-max))
+          (org-clock-in)))))
+  
+  (defun jcs:clock-out (&optional theString theCategory)
+    (org-clock-out))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Eval and replace -- replace current sexp with its value
+  ;;-----------------------------------------------------------------------------
+  
+  (defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (prin1 (eval (read (current-kill 0)))
+           (current-buffer)))
+  
+  (global-set-key (kbd "C-c e") 'eval-and-replace)
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; i-search with initial contents.
+  ;; original src: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
+  ;;-----------------------------------------------------------------------------
+  (defvar isearch-initial-string nil)
+  
+  (defun isearch-set-initial-string ()
+    (remove-hook 'isearch-mode-hook 'isearch-set-initial-string)
+    (setq isearch-string isearch-initial-string)
+    (isearch-search-and-update))
+  
+  (defun isearch-forward-at-point (&optional regexp-p no-recursive-edit)
+    "Interactive search forward for the symbol at point."
+    (interactive "P\np")
+    (if regexp-p (isearch-forward regexp-p no-recursive-edit)
+      (let* ((end (progn (skip-syntax-forward "w_") (point)))
+             (begin (progn (skip-syntax-backward "w_") (point))))
+        (if (eq begin end)
+            (isearch-forward regexp-p no-recursive-edit)
+          (setq isearch-initial-string (buffer-substring begin end))
+          (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
+          (isearch-forward regexp-p no-recursive-edit)))))
+  
+  (global-set-key (kbd "C-c C-s") 'isearch-forward-at-point)
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Nice functions to change copy-kill region to copy or kill current line
+  ;; if no active region.
+  ;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
+  ;;-----------------------------------------------------------------------------
+  (defadvice kill-ring-save (before slick-copy activate compile)
+    "When called interactively with no active region, copy the current line."
+    (interactive
+     (if mark-active
+         (list (region-beginning) (region-end))
+       (progn
+         (message "Current line copied to kill-ring.")
+         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+  
+  (defadvice kill-region (before slick-copy activate compile)
+    "When called interactively with no active region, cut the current line."
+    (interactive
+     (if mark-active
+         (list (region-beginning) (region-end))
+       (progn
+         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Make zap-to-char act more like "zap-up-to-char"
+  ;; Thanks to Eric Himmelreich
+  ;; http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/
+  ;;-----------------------------------------------------------------------------
+  (defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
+    "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
+    The CHAR is replaced and the point is put before CHAR."
+    (insert char)
+    (forward-char -1))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Window-splitting and moving functions
+  ;; Thanks to Ignacio Paz Posse
+  ;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
+  ;;-----------------------------------------------------------------------------
+  
+  ;; Instead of giving me two identical buffers when I split the window, give me the previous buffer.
+  ;; From http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
+  (defun vsplit-last-buffer ()
+    (interactive)
+    (split-window-vertically)
+    (other-window 1 nil)
+    (switch-to-next-buffer)
+    )
+  (defun hsplit-last-buffer ()
+    (interactive)
+     (split-window-horizontally)
+    (other-window 1 nil)
+    (switch-to-next-buffer)
+    )
+  
+  (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+  (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+  
+  
+  ;; Switch (zoom) between split window config and a single window
+  (defun toggle-windows-split()
+    "Switch back and forth between one window and whatever split of
+  windows we might have in the frame. The idea is to maximize the
+  current buffer, while being able to go back to the previous split
+  of windows in the frame simply by calling this command again."
+    (interactive)
+    (if (not(window-minibuffer-p (selected-window)))
+        (progn
+          (if (< 1 (count-windows))
+              (progn
+                (window-configuration-to-register ?u)
+                (delete-other-windows))
+            (jump-to-register ?u)))))
+  
+  (define-key global-map (kbd "C-`") 'toggle-windows-split)
+  (define-key global-map (kbd "C-~") 'toggle-windows-split)
+  
+  ;; Window shifting. C-x-o lets us go forward a window (or several).
+  ;; This one lets us go back one or more windows. From Glickstein.
+  (defun other-window-backward (&optional n)
+    "Select previous Nth window."
+    (interactive "P")
+    (other-window (- (prefix-numeric-value n))))
+  
+  (global-set-key [prior] 'other-window)
+  (global-set-key [next] 'other-window-backward)
+  (global-set-key [(control tab)] 'other-window)
+  (global-set-key [(shift control tab)] 'other-window-backward)
+  
+  ;; Also (stolen from someone else's dot file) this is used to shrink/expand windows without using the mouse.
+  (define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
+  (define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
+  (define-key global-map (kbd "C-M-<up>") 'enlarge-window)
+  (define-key global-map (kbd "C-M-<down>") 'shrink-window)
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Open in Marked.app -- Stolen from https://github.com/mattsears/emacs
+  ;;-----------------------------------------------------------------------------
+  (defun markdown-preview-file ()
+    "run Marked on the current file and revert the buffer"
+    (interactive)
+    (shell-command
+     (format "open -a /Applications/Marked.app %s"
+             (shell-quote-argument (buffer-file-name)))))
+  
+  (global-set-key "\C-cm" 'markdown-preview-file)
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Unfill paragraph -- From https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org
+  ;;-----------------------------------------------------------------------------
+  (defun unfill-paragraph ()
+    "Takes a multi-line paragraph and makes it into a single line of text."
+    (interactive)
+    (let ((fill-column (point-max)))
+      (fill-paragraph nil)))
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
+  ;;-----------------------------------------------------------------------------
+  (defun tramp-sudo-reopen ()
+    "Re-open the current with tramp."
+    (interactive)
+    (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
+          (line (line-number-at-pos))
+          (column (current-column)))
+      (kill-buffer)
+      (find-file file-name)
+      (goto-line line)
+      (goto-char (+ (point) column))))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
+  ;;-----------------------------------------------------------------------------
+  (defun byte-compile-current-buffer ()
+    "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+    (interactive)
+    (when (and (eq major-mode 'emacs-lisp-mode)
+               (file-exists-p (byte-compile-dest-file buffer-file-name)))
+      (byte-compile-file buffer-file-name)))
+  
+  (add-hook 'after-save-hook 'byte-compile-current-buffer)
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; A smarter find-tag that automagically reruns etags when it can't find a
+  ;; requested item and then makes a new try to locate it.
+  ;; by Jonas.Jarnestrom<at>ki.ericsson.se
+  ;; Fri Mar 15 09:52:14 2002
+  ;;-----------------------------------------------------------------------------
+  (defadvice find-tag (around refresh-etags activate)
+    "Rerun etags and reload tags if tag not found and redo find-tag.
+     If buffer is modified, ask about save before running etags."
+    (let ((extension (file-name-extension (buffer-file-name))))
+      (condition-case err
+          ad-do-it
+        (error (and (buffer-modified-p)
+                    (not (ding))
+                    (y-or-n-p "Buffer is modified, save it? ")
+                    (save-buffer))
+               (er-refresh-etags extension)
+               ad-do-it))))
+  
+  (defun er-refresh-etags (&optional extension)
+    "Run etags on all peer files in current dir and reload them silently."
+    (interactive)
+    (shell-command (format "etags *.%s" (or extension "el")))
+    (let ((tags-revert-without-query t))  ; don't query, revert silently
+      (visit-tags-table default-directory nil)))
+  
+  ;; While we're at it, modify pop-tag-mark to stay centered on cursor
+  (defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+    "After popping back to where find-tag was invoked,
+     center screen on cursor"
+    (let ((current-prefix-arg '(4)))
+    (call-interactively 'recenter-top-bottom)))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Renaming and deleting files should be easier to do. 
+  ;; C-x C-r renames current file
+  ;; C-x C-k deletes current file (since C-x k kills the buffer)
+  ;;-----------------------------------------------------------------------------
+  
+  (defun rename-current-buffer-file ()
+    "Renames current buffer and file it is visiting."
+    (interactive)
+    (let ((name (buffer-name))
+          (filename (buffer-file-name)))
+      (if (not (and filename (file-exists-p filename)))
+          (error "Buffer '%s' is not visiting a file!" name)
+        (let ((new-name (read-file-name "New name: " filename)))
+          (if (get-buffer new-name)
+              (error "A buffer named '%s' already exists!" new-name)
+            (rename-file filename new-name 1)
+            (rename-buffer new-name)
+            (set-visited-file-name new-name)
+            (set-buffer-modified-p nil)
+            (message "File '%s' successfully renamed to '%s'"
+                     name (file-name-nondirectory new-name)))))))
+  
+  (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+  
+  
+  (defun delete-current-buffer-file ()
+    "Removes file connected to current buffer and kills buffer."
+    (interactive)
+    (let ((filename (buffer-file-name))
+          (buffer (current-buffer))
+          (name (buffer-name)))
+      (if (not (and filename (file-exists-p filename)))
+          (ido-kill-buffer)
+        (when (yes-or-no-p "Are you sure you want to remove this file? ")
+          (delete-file filename t)
+          (kill-buffer buffer)
+          (message "File '%s' successfully removed" filename)))))
+  
+  (global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; Make beginning-of-buffer and end-of-buffer work nicely in dired
+  ;; Thanks to @magnars
+  ;;-----------------------------------------------------------------------------
+  
+  (defun dired-back-to-top ()
+    (interactive)
+    (beginning-of-buffer)
+    (dired-next-line 4))
+  
+  (eval-after-load 'dired
+    (define-key dired-mode-map
+      (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
+  
+  (defun dired-jump-to-bottom ()
+    (interactive)
+    (end-of-buffer)
+    (dired-next-line -1))
+  
+  (eval-after-load 'dired
+    (define-key dired-mode-map
+      (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
+  
 #+end_src
 * Other Implementation details
 
@@ -1279,6 +1561,14 @@ I use these =*-dir= variables all over the place in my config.
       info-dir (concat emacs-dir "Resources/info/"))
 #+end_src
 
+*** Add .emacs.d to load-path
+
+...Kinda necessary.
+
+#+name: setup-load-path
+#+begin_src emacs-lisp
+(add-to-list 'load-path dotemacs-dir)
+#+end_src
 *** Tell 'customize' where to save changes
 
 Emacs has a neat customize feature, accessible via =M-x customize=, which lets you modify user-configurable variables in a simpler (read: non-elisp) interface.
@@ -1293,13 +1583,16 @@ When I do so, I'd like customize to save things in a separate =emcas-custom= fil
 
 #+end_src
 
-*** Add .emacs.d to load-path
+*** Set garbage collection threshold higher
 
-Kinda necessary.
+Props to Le Wang for this one.
 
-#+name: setup-load-path
+[[https://github.com/lewang/flx][According to his documentation in flx]], Emacs will start GC every 0.76MB allocated, which is way too often on modern machines. We want to boost that to 20MB:
+
+#+name: setup-gc-settings
 #+begin_src emacs-lisp
-(add-to-list 'load-path dotemacs-dir)
+(setq gc-cons-threshold 20000000)
+
 #+end_src
 
 *** Finally, decrypt secrets.el.gpg

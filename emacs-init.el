@@ -10,9 +10,11 @@
       emacs-dir "/Applications/Emacs.app/Contents/"
       emacs-bin (concat emacs-dir "MacOS/Emacs")
       info-dir (concat emacs-dir "Resources/info/"))
+(add-to-list 'load-path dotemacs-dir)
 (setq custom-file (concat dotemacs-dir "emacs-custom.el"))
 
-(add-to-list 'load-path dotemacs-dir)
+(setq gc-cons-threshold 20000000)
+
 (defun jcs:decrypt-secrets ()
   (interactive)
   (require 'secrets))
@@ -21,26 +23,6 @@
 (cask-initialize)
 (require 'use-package)
 (use-package pallet)
-(require 'package)
-(dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
-                   ("elpa" . "http://tromey.com/elpa/")
-                   ("marmalade" . "http://marmalade-repo.org/packages/")
-                   ("melpa" . "http://melpa.milkbox.net/packages/")))
-  (add-to-list 'package-archives source t))
-(package-initialize)
-(add-to-list 'load-path (concat dotemacs-dir "elpa"))
-;; (add-to-list 'load-path (concat dotemacs-dir "el-get/el-get"))
-;; el-get, install thyself!
-;; (unless (require 'el-get nil t)
-;;  (url-retrieve
-;;   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-;;   (lambda (s)
-;;     (let ((el-get-master-branch) (el-get-install-skip-emacswiki-recipes))
-;;       (goto-char (point-max))
-;;       (eval-print-last-sexp)))))
-;; (setq el-get-dir (concat dotemacs-dir "el-get")
-;;       el-get-user-package-directory (concat dotemacs-dir "config"))
-;; (require 'init-packages)
 (tool-bar-mode -1)
 (custom-set-faces '(fringe ((t (:background"white")))))
 (scroll-bar-mode -1)
@@ -54,6 +36,72 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(global-unset-key "\C-x\C-c")
+(setq confirm-kill-emacs 'y-or-n-p)
+
+(line-number-mode 1)                         
+(column-number-mode 1)
+
+(use-package smart-mode-line
+  :init
+  (progn
+(setq sml/theme 'respectful
+      sml/name-width 40
+      sml/mode-width 40)
+(setq sml/replacer-regexp-list
+  (quote
+   (("^~/org/" ":Org:")
+    ("^~/\\.emacs\\.d/" ":ED:")
+    ("^~/[Gg]it/" ":Git:")
+    ("^~/Dropbox/Writing/01-composting/" ":Compost:")
+    ("^~/Dropbox/Writing/02-draft_in_progress/" ":Drafts:")
+    ("^~/Dropbox/Writing/03-revision_in_progress/" ":Revs:")
+    ("^~/Dropbox/Writing/04-submitted/" ":Submitted:")
+    ("^~/Dropbox/Writing/05-published/" ":Published:")
+    ("^~/Dropbox/Writing/06-cold_storage/" ":ColdStore:")
+    ("^~/Dropbox/Writing/" ":Writing:")
+    ("^~/Dropbox/finance/taxes 2013/" ":Tax2013:")
+    ("^~/Dropbox/finance/taxes 2014/" ":Tax2014:")
+    ("^~/Dropbox/" ":DB:")
+    ("^~/Documents/Writing/01-composting/" ":Compost:")
+    ("^~/Documents/Writing/02-draft_in_progress/" ":Drafts:")
+    ("^~/Documents/Writing/03-revision_in_progress/" ":Revs:")
+    ("^~/Documents/Writing/04-submitted/" ":Submitted:")
+    ("^~/Documents/Writing/05-published/" ":Published:")
+    ("^~/Documents/Writing/06-cold_storage/" ":ColdStore:")
+    ("^~/Documents/Writing/" ":Writing:")
+    ("^~/Documents/" ":Docs:")
+    ("^~/Documents/Work/" ":Work:")
+    ("^~/dev" ":dev:")
+    ("^~/Sites" ":www:")
+    ("^~/Downloads/" ":DLs:"))))
+(sml/setup)))
+
+(use-package diminish)
+
+(setq redisplay-dont-pause t)
+
+(defvar backup-dir (concat home-dir ".emacs.backup/"))
+(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
+(setq backup-directory-alist `((".*" . ,backup-dir)))
+(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+
+(setq vc-make-backup-files t)
+
+(setq delete-by-moving-to-trash t)
+(setq trash-directory (concat home-dir ".Trash/"))
+
+(global-unset-key "\C-x\C-q")
+(global-unset-key (kbd "<f2>"))     
+
+(global-set-key (kbd "M-s") 'save-buffer)
+(global-set-key (kbd "C-z") 'undo)     
+
+(setq ns-alternate-modifier (quote meta))
+(setq ns-command-modifier (quote meta))
+
+(setq mac-emulate-three-button-mouse t)
+
 (setq blink-cursor-mode t)
 (global-hl-line-mode 1)
 (set-face-background 'hl-line "grey93")
@@ -64,44 +112,53 @@
       scroll-down-aggressively nil
       scroll-preserve-screen-position t)
 
-(setq ns-alternate-modifier (quote meta))
-(setq ns-command-modifier (quote meta))
+(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
+(transient-mark-mode t)
+(delete-selection-mode t)
+(setq cua-enable-cua-keys nil)               
+(cua-mode t)
+
+(use-package multiple-cursors
+:bind (("C-+" . mc/mark-next-like-this)
+       ("C--" . mc/mark-previous-like-this)
+       ("C-*" . mc/mark-all-like-this)
+("C-x a l" . mc/edit-lines)
+("C-x a e" . mc/edit-ends-of-lines)
+("C-x a a" . mc/edit-beginnings-of-lines)))
+
+(use-package expand-region
+:bind (("C-=" . er/expand-region)))
+;; auto-fill options 
+(setq fill-column 120)
+(setq default-fill-column 120)
+
 (setq eol-mnemonic-mac "(Mac)")
-(setq x-select-enable-clipboard t)
-(setq mac-emulate-three-button-mouse t)
+
+;; wrap-to-fill is only included in nxhtml-mode,
+;;  so we need packages installed before this works.
+;; 
+;;(auto-fill-mode 1)
+;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+;; (wrap-to-fill-column-mode 1)
+;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 (define-key global-map [ns-drag-file] 'ns-find-file) 
 
-(line-number-mode 1)                         
-(column-number-mode 1)
-
-(global-unset-key "\C-x\C-c")
-(setq confirm-kill-emacs 'y-or-n-p)
-
+(setq x-select-enable-clipboard t)
 (setq ns-pop-up-frames nil)
 
-(setq redisplay-dont-pause t)
 
 ;;-----------------------------------------------------------------------------
 ;; System / Editing Prefs
 ;;-----------------------------------------------------------------------------
 
-;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
-(setq gc-cons-threshold 20000000)
-
-;; Put backups & autosaves in their place (not in current dir)
-(defvar backup-dir (concat home-dir ".emacs.backup/"))
-(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
-(setq backup-directory-alist `((".*" . ,backup-dir)))
-(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
-
-;; Make backups of files, even when they're in version control
-(setq vc-make-backup-files t)
-
-;; When deleting files, move them to Trash
-(setq delete-by-moving-to-trash t)
-(setq trash-directory (concat home-dir ".Trash/"))
-
+  
 ;; Refresh any buffer when file on disk changes
 (setq global-auto-revert-mode 1)
 
@@ -120,12 +177,6 @@
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (setq sentence-end-double-space nil)
-
-;; selection options + rectangle selection w/ CUA
-(transient-mark-mode t)
-(delete-selection-mode t)
-(setq cua-enable-cua-keys nil)               
-(cua-mode t)
 
 ;; auto-fill options 
 (setq fill-column 120)
@@ -186,23 +237,7 @@
 
 
 
-(global-unset-key "\C-x\C-q")
-(global-unset-key (kbd "<f2>"))     
-(global-set-key (kbd "M-s") 'save-buffer)
-(global-set-key (kbd "C-z") 'undo)     
-(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
-(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
-(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
-(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
-(global-set-key (kbd "RET") 'newline-and-indent)
-(global-set-key (kbd "<C-escape>") 'top-level)  
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-(add-hook 'org-mode-hook
-          (lambda()
-            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
 (global-set-key (kbd "M-o") 'other-window)
-(global-set-key "\M-n" 'scroll-up-line)
-(global-set-key "\M-p" 'scroll-down-line)
 (global-set-key "\C-x\C-b" 'ibuffer)
 ;; any reason why this has to be eval'ed after load?
 (eval-after-load 'dired
@@ -234,6 +269,76 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(global-unset-key "\C-x\C-c")
+(setq confirm-kill-emacs 'y-or-n-p)
+
+(line-number-mode 1)                         
+(column-number-mode 1)
+
+(use-package smart-mode-line
+  :init
+  (progn
+
+(setq sml/theme 'respectful
+      sml/name-width 40
+      sml/mode-width 40)
+
+(setq sml/replacer-regexp-list
+  (quote
+   (("^~/org/" ":Org:")
+    ("^~/\\.emacs\\.d/" ":ED:")
+    ("^~/[Gg]it/" ":Git:")
+    ("^~/Dropbox/Writing/01-composting/" ":Compost:")
+    ("^~/Dropbox/Writing/02-draft_in_progress/" ":Drafts:")
+    ("^~/Dropbox/Writing/03-revision_in_progress/" ":Revs:")
+    ("^~/Dropbox/Writing/04-submitted/" ":Submitted:")
+    ("^~/Dropbox/Writing/05-published/" ":Published:")
+    ("^~/Dropbox/Writing/06-cold_storage/" ":ColdStore:")
+    ("^~/Dropbox/Writing/" ":Writing:")
+    ("^~/Dropbox/finance/taxes 2013/" ":Tax2013:")
+    ("^~/Dropbox/finance/taxes 2014/" ":Tax2014:")
+    ("^~/Dropbox/" ":DB:")
+    ("^~/Documents/Writing/01-composting/" ":Compost:")
+    ("^~/Documents/Writing/02-draft_in_progress/" ":Drafts:")
+    ("^~/Documents/Writing/03-revision_in_progress/" ":Revs:")
+    ("^~/Documents/Writing/04-submitted/" ":Submitted:")
+    ("^~/Documents/Writing/05-published/" ":Published:")
+    ("^~/Documents/Writing/06-cold_storage/" ":ColdStore:")
+    ("^~/Documents/Writing/" ":Writing:")
+    ("^~/Documents/" ":Docs:")
+    ("^~/Documents/Work/" ":Work:")
+    ("^~/dev" ":dev:")
+    ("^~/Sites" ":www:")
+    ("^~/Downloads/" ":DLs:"))))
+
+(sml/setup)))
+
+(use-package diminish)
+
+(setq redisplay-dont-pause t)
+
+(defvar backup-dir (concat home-dir ".emacs.backup/"))
+(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
+(setq backup-directory-alist `((".*" . ,backup-dir)))
+(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+
+(setq vc-make-backup-files t)
+
+(setq delete-by-moving-to-trash t)
+(setq trash-directory (concat home-dir ".Trash/"))
+
+(global-unset-key "\C-x\C-q")
+(global-unset-key (kbd "<f2>"))
+
+(global-set-key (kbd "M-s") 'save-buffer)
+
+(global-set-key (kbd "C-z") 'undo)
+
+(setq ns-alternate-modifier (quote meta))
+(setq ns-command-modifier (quote meta))
+
+(setq mac-emulate-three-button-mouse t)
+
 (setq blink-cursor-mode t)
 
 (global-hl-line-mode 1)
@@ -247,38 +352,52 @@
       scroll-down-aggressively nil
       scroll-preserve-screen-position t)
 
-(setq ns-alternate-modifier (quote meta))
-(setq ns-command-modifier (quote meta))
-
-(setq eol-mnemonic-mac "(Mac)")
-
-(setq x-select-enable-clipboard t)
-
-(setq mac-emulate-three-button-mouse t)
-
-(define-key global-map [ns-drag-file] 'ns-find-file)
-
-(line-number-mode 1)                         
-(column-number-mode 1)
-
-(global-unset-key "\C-x\C-c")
-(setq confirm-kill-emacs 'y-or-n-p)
-
-(setq ns-pop-up-frames nil)
-
-(setq redisplay-dont-pause t)
-
-(global-unset-key "\C-x\C-q")
-(global-unset-key (kbd "<f2>"))
-
-(global-set-key (kbd "M-s") 'save-buffer)
-
-(global-set-key (kbd "C-z") 'undo)
-
 (global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
 (global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
+
+(transient-mark-mode t)
+(delete-selection-mode t)
+
+(setq cua-enable-cua-keys nil)               
+(cua-mode t)
+
+(use-package multiple-cursors
+:bind (("C-+" . mc/mark-next-like-this)
+       ("C--" . mc/mark-previous-like-this)
+       ("C-*" . mc/mark-all-like-this)
+
+("C-x a l" . mc/edit-lines)
+("C-x a e" . mc/edit-ends-of-lines)
+("C-x a a" . mc/edit-beginnings-of-lines)))
+
+(use-package expand-region
+:bind (("C-=" . er/expand-region)))
+
+;; auto-fill options 
+(setq fill-column 120)
+(setq default-fill-column 120)
+
+(setq eol-mnemonic-mac "(Mac)")
+
+;; wrap-to-fill is only included in nxhtml-mode,
+;;  so we need packages installed before this works.
+;; 
+;;(auto-fill-mode 1)
+;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+;; (wrap-to-fill-column-mode 1)
+;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+
+(define-key global-map [ns-drag-file] 'ns-find-file)
+
+(setq x-select-enable-clipboard t)
+
+(setq ns-pop-up-frames nil)
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 
@@ -289,9 +408,6 @@
             (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
 
 (global-set-key (kbd "M-o") 'other-window)
-
-(global-set-key "\M-n" 'scroll-up-line)
-(global-set-key "\M-p" 'scroll-down-line)
 
 (global-set-key "\C-x\C-b" 'ibuffer)
 
@@ -304,22 +420,7 @@
 ;; System / Editing Prefs
 ;;-----------------------------------------------------------------------------
 
-;; Set gabage collection threshold higher, as per https://github.com/lewang/flx
-(setq gc-cons-threshold 20000000)
-
-;; Put backups & autosaves in their place (not in current dir)
-(defvar backup-dir (concat home-dir ".emacs.backup/"))
-(defvar autosave-dir (concat home-dir ".emacs.autosave/"))
-(setq backup-directory-alist `((".*" . ,backup-dir)))
-(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
-
-;; Make backups of files, even when they're in version control
-(setq vc-make-backup-files t)
-
-;; When deleting files, move them to Trash
-(setq delete-by-moving-to-trash t)
-(setq trash-directory (concat home-dir ".Trash/"))
-
+  
 ;; Refresh any buffer when file on disk changes
 (setq global-auto-revert-mode 1)
 
@@ -338,12 +439,6 @@
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (setq sentence-end-double-space nil)
-
-;; selection options + rectangle selection w/ CUA
-(transient-mark-mode t)
-(delete-selection-mode t)
-(setq cua-enable-cua-keys nil)               
-(cua-mode t)
 
 ;; auto-fill options 
 (setq fill-column 120)
@@ -466,26 +561,26 @@
   "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
   (interactive)
   (save-excursion
-        (let (filepath filename mybuffer)
-          (setq filepath "/Users/jstautz/org/projects.org"
+    (let (filepath filename mybuffer)
+      (setq filepath "/Users/jstautz/org/projects.org"
             filename (file-name-nondirectory filepath)
             mybuffer (find-file filepath))
-          (goto-char (point-min))
-          (widen) 
-          ;; if no category defined, try to find string in file and clock in
-          (if (eq theCategory nil)
-                  (if (search-forward theString nil t)
-                          (org-clock-in)
-                        ;; if not found in buffer, insert new item at end and clock into it
-                        (goto-char (point-max))
-                        (insert (concat "*** " theString))
-                        (goto-char (point-max))
-                        (org-clock-in))
-                ;; thecategory is non-nil, so this is a new item w/ category
-                (goto-char (point-max))
-                (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
-                (goto-char (point-max))
-                (org-clock-in)))))
+      (goto-char (point-min))
+      (widen) 
+      ;; if no category defined, try to find string in file and clock in
+      (if (eq theCategory nil)
+          (if (search-forward theString nil t)
+              (org-clock-in)
+            ;; if not found in buffer, insert new item at end and clock into it
+            (goto-char (point-max))
+            (insert (concat "*** " theString))
+            (goto-char (point-max))
+            (org-clock-in))
+        ;; thecategory is non-nil, so this is a new item w/ category
+        (goto-char (point-max))
+        (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
+        (goto-char (point-max))
+        (org-clock-in)))))
 
 (defun jcs:clock-out (&optional theString theCategory)
   (org-clock-out))
@@ -764,16 +859,18 @@ of windows in the frame simply by calling this command again."
   (beginning-of-buffer)
   (dired-next-line 4))
 
-(define-key dired-mode-map
-  (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
+(eval-after-load 'dired
+  (define-key dired-mode-map
+    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
 
 (defun dired-jump-to-bottom ()
   (interactive)
   (end-of-buffer)
   (dired-next-line -1))
 
-(define-key dired-mode-map
-  (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+(eval-after-load 'dired
+  (define-key dired-mode-map
+    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
 
 (require 'cl)
 
@@ -787,9 +884,11 @@ of windows in the frame simply by calling this command again."
       emacs-bin (concat emacs-dir "MacOS/Emacs")
       info-dir (concat emacs-dir "Resources/info/"))
 
+(add-to-list 'load-path dotemacs-dir)
+
 (setq custom-file (concat dotemacs-dir "emacs-custom.el"))
 
-(add-to-list 'load-path dotemacs-dir)
+(setq gc-cons-threshold 20000000)
 
 (defun jcs:decrypt-secrets ()
   (interactive)
