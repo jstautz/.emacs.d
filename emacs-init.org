@@ -877,10 +877,248 @@ So here's another discovery -- bzg's big fring mode: (not currently being activa
 
 ** Desktop Settings
 
-Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, and a bunch of other
+Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings). It's pretty rad.
+
+#+name: desktop-settings
+#+begin_src emacs-lisp
+  (desktop-save-mode 1)
+  (setq desktop-globals-to-save
+        (append '((extended-command-history . 30)
+                  (file-name-history        . 100)
+                  (grep-history             . 30)
+                  (compile-history          . 30)
+                  (minibuffer-history       . 50)
+                  (query-replace-history    . 60)
+                  (read-expression-history  . 60)
+                  (regexp-history           . 60)
+                  (regexp-search-ring       . 20)
+                  (search-ring              . 20)
+                  (shell-command-history    . 50)
+                  tags-file-name
+                  register-alist)))
+
+#+end_src
+
 
 ** Window Navigation
+*** Move to other window
+
+I'm experimenting with using =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
+
+#+name: keybindings-other-window
+#+begin_src emacs-lisp 
+(global-set-key (kbd "M-o") 'other-window)
+#+end_src
+
+
+*** Winner-mode
+
+I don't use this as much anymore, but winner-mode lets you flip between various window/frame configurations.
+
+#+name: window-winner-mode
+#+begin_src emacs-lisp
+  (winner-mode 1)
+
+#+end_src
+*** Previous buffer when splitting window 
+
+Whenever I split my frame into multiple windows (e.g. with =C-x 2= or =C-x 3=), Emacs will open the current buffer in both windows. This isn't always useful.
+
+Usually what I actually want is to show the previous buffer in that new window. [[http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury][I stole this nice snippet from /r/emacs user chldury]]:
+
+#+name: window-split
+#+begin_src emacs-lisp
+  (defun vsplit-last-buffer ()
+    (interactive)
+    (split-window-vertically)
+    (other-window 1 nil)
+    (switch-to-next-buffer)
+    )
+  (defun hsplit-last-buffer ()
+    (interactive)
+     (split-window-horizontally)
+    (other-window 1 nil)
+    (switch-to-next-buffer)
+    )
+  
+  (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+  (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+
+#+end_src
+
+*** Zoom between split window and single window
+
+[[http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/][This function from Ignacio Paz Posse]] has mostly replace winner-mode for me at this point. 
+
+It allows me to move from a split-window view (e.g. two buffers side by side) and "zoom" into one of those buffers, taking it full-frame... and allows me to quickly "zoom" back to the same split-window view.
+
+#+name: window-zoom
+#+begin_src emacs-lisp
+  (defun toggle-windows-split()
+    "Switch back and forth between one window and whatever split of
+  windows we might have in the frame. The idea is to maximize the
+  current buffer, while being able to go back to the previous split
+  of windows in the frame simply by calling this command again."
+    (interactive)
+    (if (not(window-minibuffer-p (selected-window)))
+        (progn
+          (if (< 1 (count-windows))
+              (progn
+                (window-configuration-to-register ?u)
+                (delete-other-windows))
+            (jump-to-register ?u)))))
+  
+  (define-key global-map (kbd "C-`") 'toggle-windows-split)
+  (define-key global-map (kbd "C-~") 'toggle-windows-split)
+
+#+end_src
+
+*** Shift between windows
+
+Some convenience functions, also stolen from Ignacio Paz Posse.
+
+First we define an "other-window-backward" function that acts just like =C-x-o= but cycles through windows in reverse:
+
+#+name: other-window-backward
+#+begin_src emacs-lisp
+  (defun other-window-backward (&optional n)
+    "Select previous Nth window."
+    (interactive "P")
+    (other-window (- (prefix-numeric-value n))))
+
+#+end_src   
+
+And now we bind these to some familiar keybindings -- =C-<tab>= and =C-S-<tab>= to cycle backward and foward through windows, and also [prior] and [next] keys.
+
+#+name: window-move-bindings
+#+begin_src emacs-lisp
+  (global-set-key [prior] 'other-window)
+  (global-set-key [next] 'other-window-backward)
+  (global-set-key [(control tab)] 'other-window)
+  (global-set-key [(shift control tab)] 'other-window-backward)
+
+#+end_src
+*** TODO note that C-<tab> doesn't work in org-mode because of binding conflict
+*** Shrink/expand windows
+
+Sometimes I want to adjust the size of a window in my split-frame configuration. For example, I may not want my split at 50%, I may want 75% of my frame filled with a view into my source code and 25% showing a REPL. 
+
+I can use the mouse to drag the window boundaries, sure... but it's sometimes faster to do it with my hands on the keyboard:
+ 
+#+name: window-shifting
+#+begin_src emacs-lisp
+  (define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
+  (define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
+  (define-key global-map (kbd "C-M-<up>") 'enlarge-window)
+  (define-key global-map (kbd "C-M-<down>") 'shrink-window)
+
+#+end_src  
+
 ** File & Buffer Navigation & Manipulation
+*** Buffer lists
+
+I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=. 
+
+#+name: ibuffer
+#+begin_src emacs-lisp
+(global-set-key "\C-x\C-b" 'ibuffer)
+
+#+end_src
+*** Edit filenames in dired
+Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome -- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
+
+I like having wdired bound to the 'r' key inside dired.
+
+(note that I'm eval-ing this only after loading dired, otherwise Emacs chokes on an undefined dired-mode-map var)
+
+#+name: wdired
+#+begin_src emacs-lisp
+(eval-after-load 'dired
+  '(define-key dired-mode-map "r"
+     'wdired-change-to-wdired-mode))
+
+#+end_src
+*** Make =C-<= and =C->= work nicely in dired-mode
+
+Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the cursor to the beginning/end of the filenames in dired buffers. Handy!
+
+#+name: dired-c-a
+#+begin_src emacs-lisp
+  (defun dired-back-to-top ()
+    (interactive)
+    (beginning-of-buffer)
+    (dired-next-line 4))
+  
+  (eval-after-load 'dired
+    (define-key dired-mode-map
+      (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
+  
+  (defun dired-jump-to-bottom ()
+    (interactive)
+    (end-of-buffer)
+    (dired-next-line -1))
+  
+  (eval-after-load 'dired
+    (define-key dired-mode-map
+      (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
+
+#+end_src
+
+*** Auto-revert dired
+
+This code is supposed to auto-revert (refresh) dired buffers when things change, but I don't think it works the way I want it to work:
+
+#+name: auto-revert-dired
+#+begin_src emacs-lisp
+  (setq global-auto-revert-non-file-buffers t)
+  (setq auto-revert-verbose nil)
+
+#+end_src
+*** Rename and delete files
+
+Renaming and deleting files should be easier to do while you're viewing them.
+
+Since =C-x k= kills a buffer, it makes sense to bind =C-x C-k= to deleting the current file (with confirmation, of course).
+
+And =C-x C-w= is bound to write-file... but a more useful feature would be to simple rename the current buffer and file. This is bound to =C-x C-r=.
+
+#+name: rename-and-delete-files
+#+begin_src emacs-lisp  
+  (defun rename-current-buffer-file ()
+    "Renames current buffer and file it is visiting."
+    (interactive)
+    (let ((name (buffer-name))
+          (filename (buffer-file-name)))
+      (if (not (and filename (file-exists-p filename)))
+          (error "Buffer '%s' is not visiting a file!" name)
+        (let ((new-name (read-file-name "New name: " filename)))
+          (if (get-buffer new-name)
+              (error "A buffer named '%s' already exists!" new-name)
+            (rename-file filename new-name 1)
+            (rename-buffer new-name)
+            (set-visited-file-name new-name)
+            (set-buffer-modified-p nil)
+            (message "File '%s' successfully renamed to '%s'"
+                     name (file-name-nondirectory new-name)))))))
+  
+  (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+  
+  
+  (defun delete-current-buffer-file ()
+    "Removes file connected to current buffer and kills buffer."
+    (interactive)
+    (let ((filename (buffer-file-name))
+          (buffer (current-buffer))
+          (name (buffer-name)))
+      (if (not (and filename (file-exists-p filename)))
+          (ido-kill-buffer)
+        (when (yes-or-no-p "Are you sure you want to remove this file? ")
+          (delete-file filename t)
+          (kill-buffer buffer)
+          (message "File '%s' successfully removed" filename)))))
+  
+  (global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
+  #+end_src
 *** Drag and drop file support
 
 When I drag and drop a file onto Emacs.app, visit that file rather than just appending it to the currently open buffer (which is a horrible default).
@@ -891,7 +1129,71 @@ When I drag and drop a file onto Emacs.app, visit that file rather than just app
 (define-key global-map [ns-drag-file] 'ns-find-file) 
 
 #+end_src
+*** Make M-x locate use OS X's Spotlight
 
+Leverage OS X's mdfind util for crazy-fast file locating. Try it with =M-x locate=.
+
+#+name: locate-spotlight
+#+begin_src emacs-lisp
+  (setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+#+end_src
+*** Re-open file as root
+
+[[http://t.co/KiAWcJoo][Thanks to @christopherdone for this one]].
+
+#+name: open-as-root
+#+begin_src emacs-lisp
+  (defun tramp-sudo-reopen ()
+    "Re-open the current with tramp."
+    (interactive)
+    (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
+          (line (line-number-at-pos))
+          (column (current-column)))
+      (kill-buffer)
+      (find-file file-name)
+      (goto-line line)
+      (goto-char (+ (point) column))))
+
+#+end_src
+*** isearch using token at point
+
+#+name: isearch-token
+#+begin_src emacs-lisp
+  ;;-----------------------------------------------------------------------------
+  ;; Nice functions to change copy-kill region to copy or kill current line
+  ;; if no active region.
+  ;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
+  ;;-----------------------------------------------------------------------------
+  (defadvice kill-ring-save (before slick-copy activate compile)
+    "When called interactively with no active region, copy the current line."
+    (interactive
+     (if mark-active
+         (list (region-beginning) (region-end))
+       (progn
+         (message "Current line copied to kill-ring.")
+         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+  
+  (defadvice kill-region (before slick-copy activate compile)
+    "When called interactively with no active region, cut the current line."
+    (interactive
+     (if mark-active
+         (list (region-beginning) (region-end))
+       (progn
+         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+   #+end_src
+*** TODO finish documenting this
+*** ace-jump mode
+
+Handy for very fast navigation around a file.
+
+#+name: ace-jump
+#+begin_src emacs-lisp
+  (use-package ace-jump-mode
+               :bind ("C-." . ace-jump-mode))
+#+end_src
+*** TODO document ace-jump-mode usage more
 ** Copy & Kill
 *** Use Mac clipboard for copying/killing
 
@@ -964,40 +1266,6 @@ I hate having to repeatedly hit escape to bounce out of recursive edits when I d
 :noweb-ref: Set custom keybindings
 :END:
 
-This wouldn't be a proper Emacs config if it didn't have a boatload of custom keybindings.
-
-
-** Window and buffer navigation
- 
-I'm experimenting with using =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
-
-#+name: keybindings-other-window
-#+begin_src emacs-lisp 
-(global-set-key (kbd "M-o") 'other-window)
-#+end_src
-
-
-** Buffer and directory lists
-
-I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=. 
-
-#+name: keybindings-ibuffer
-#+begin_src emacs-lisp
-(global-set-key "\C-x\C-b" 'ibuffer)
-#+end_src
-
-Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome -- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
-
-I like having wdired bound to the 'r' key inside dired.
-
-#+name: keybindings-wdired
-#+begin_src emacs-lisp
-;; any reason why this has to be eval'ed after load?
-(eval-after-load 'dired
-  '(define-key dired-mode-map "r"
-     'wdired-change-to-wdired-mode))
-#+end_src
-
 * Editor customizations
 :PROPERTIES:
 :noweb-ref: Load some editor customizations
@@ -1013,9 +1281,6 @@ I like having wdired bound to the 'r' key inside dired.
   ;; Refresh any buffer when file on disk changes
   (setq global-auto-revert-mode 1)
   
-  ;; ...Also auto refresh dired, but be quiet about it
-  (setq global-auto-revert-non-file-buffers t)
-  (setq auto-revert-verbose nil)
   
   ;; ...Also rebuild Tags files, and be quiet about it
   (setq tags-revert-without-query t)
@@ -1029,40 +1294,8 @@ I like having wdired bound to the 'r' key inside dired.
   (setq-default indent-tabs-mode nil)
   (setq sentence-end-double-space nil)
   
-  ;; auto-fill options 
-  (setq fill-column 120)
-  (setq default-fill-column 120)
   
-  ;; Testing wrap-to-fill options instead of auto-fill
-  ;; note: I think wrap-to-fill is only included in nxhtml-mode,
-  ;;       so we need packages installed before this works.
-  ;; 
-  ;;(auto-fill-mode 1)
-  ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-  ;; (wrap-to-fill-column-mode 1)
-  ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
-  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-  
-  ;; Desktop saving options
-  (desktop-save-mode 1)
-  (setq desktop-globals-to-save
-        (append '((extended-command-history . 30)
-                  (file-name-history        . 100)
-                  (grep-history             . 30)
-                  (compile-history          . 30)
-                  (minibuffer-history       . 50)
-                  (query-replace-history    . 60)
-                  (read-expression-history  . 60)
-                  (regexp-history           . 60)
-                  (regexp-search-ring       . 20)
-                  (search-ring              . 20)
-                  (shell-command-history    . 50)
-                  tags-file-name
-                  register-alist)))
-  
-  ;; Quick ways to restore desktop/windows
-  (winner-mode 1)
-  
+   
   ;; Bookmark options
   (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
   
@@ -1239,54 +1472,6 @@ And set some directory vars
   (global-set-key (kbd "C-c e") 'eval-and-replace)
   
   
-  ;;-----------------------------------------------------------------------------
-  ;; i-search with initial contents.
-  ;; original src: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
-  ;;-----------------------------------------------------------------------------
-  (defvar isearch-initial-string nil)
-  
-  (defun isearch-set-initial-string ()
-    (remove-hook 'isearch-mode-hook 'isearch-set-initial-string)
-    (setq isearch-string isearch-initial-string)
-    (isearch-search-and-update))
-  
-  (defun isearch-forward-at-point (&optional regexp-p no-recursive-edit)
-    "Interactive search forward for the symbol at point."
-    (interactive "P\np")
-    (if regexp-p (isearch-forward regexp-p no-recursive-edit)
-      (let* ((end (progn (skip-syntax-forward "w_") (point)))
-             (begin (progn (skip-syntax-backward "w_") (point))))
-        (if (eq begin end)
-            (isearch-forward regexp-p no-recursive-edit)
-          (setq isearch-initial-string (buffer-substring begin end))
-          (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
-          (isearch-forward regexp-p no-recursive-edit)))))
-  
-  (global-set-key (kbd "C-c C-s") 'isearch-forward-at-point)
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Nice functions to change copy-kill region to copy or kill current line
-  ;; if no active region.
-  ;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
-  ;;-----------------------------------------------------------------------------
-  (defadvice kill-ring-save (before slick-copy activate compile)
-    "When called interactively with no active region, copy the current line."
-    (interactive
-     (if mark-active
-         (list (region-beginning) (region-end))
-       (progn
-         (message "Current line copied to kill-ring.")
-         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-  
-  (defadvice kill-region (before slick-copy activate compile)
-    "When called interactively with no active region, cut the current line."
-    (interactive
-     (if mark-active
-         (list (region-beginning) (region-end))
-       (progn
-         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-  
   
   ;;-----------------------------------------------------------------------------
   ;; Make zap-to-char act more like "zap-up-to-char"
@@ -1299,67 +1484,6 @@ And set some directory vars
     (insert char)
     (forward-char -1))
   
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Window-splitting and moving functions
-  ;; Thanks to Ignacio Paz Posse
-  ;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
-  ;;-----------------------------------------------------------------------------
-  
-  ;; Instead of giving me two identical buffers when I split the window, give me the previous buffer.
-  ;; From http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
-  (defun vsplit-last-buffer ()
-    (interactive)
-    (split-window-vertically)
-    (other-window 1 nil)
-    (switch-to-next-buffer)
-    )
-  (defun hsplit-last-buffer ()
-    (interactive)
-     (split-window-horizontally)
-    (other-window 1 nil)
-    (switch-to-next-buffer)
-    )
-  
-  (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
-  (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
-  
-  
-  ;; Switch (zoom) between split window config and a single window
-  (defun toggle-windows-split()
-    "Switch back and forth between one window and whatever split of
-  windows we might have in the frame. The idea is to maximize the
-  current buffer, while being able to go back to the previous split
-  of windows in the frame simply by calling this command again."
-    (interactive)
-    (if (not(window-minibuffer-p (selected-window)))
-        (progn
-          (if (< 1 (count-windows))
-              (progn
-                (window-configuration-to-register ?u)
-                (delete-other-windows))
-            (jump-to-register ?u)))))
-  
-  (define-key global-map (kbd "C-`") 'toggle-windows-split)
-  (define-key global-map (kbd "C-~") 'toggle-windows-split)
-  
-  ;; Window shifting. C-x-o lets us go forward a window (or several).
-  ;; This one lets us go back one or more windows. From Glickstein.
-  (defun other-window-backward (&optional n)
-    "Select previous Nth window."
-    (interactive "P")
-    (other-window (- (prefix-numeric-value n))))
-  
-  (global-set-key [prior] 'other-window)
-  (global-set-key [next] 'other-window-backward)
-  (global-set-key [(control tab)] 'other-window)
-  (global-set-key [(shift control tab)] 'other-window-backward)
-  
-  ;; Also (stolen from someone else's dot file) this is used to shrink/expand windows without using the mouse.
-  (define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
-  (define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
-  (define-key global-map (kbd "C-M-<up>") 'enlarge-window)
-  (define-key global-map (kbd "C-M-<down>") 'shrink-window)
   
   
   ;;-----------------------------------------------------------------------------
@@ -1384,19 +1508,6 @@ And set some directory vars
     (let ((fill-column (point-max)))
       (fill-paragraph nil)))
   
-  ;;-----------------------------------------------------------------------------
-  ;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
-  ;;-----------------------------------------------------------------------------
-  (defun tramp-sudo-reopen ()
-    "Re-open the current with tramp."
-    (interactive)
-    (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
-          (line (line-number-at-pos))
-          (column (current-column)))
-      (kill-buffer)
-      (find-file file-name)
-      (goto-line line)
-      (goto-char (+ (point) column))))
   
   
   ;;-----------------------------------------------------------------------------
@@ -1445,71 +1556,6 @@ And set some directory vars
     (let ((current-prefix-arg '(4)))
     (call-interactively 'recenter-top-bottom)))
   
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Renaming and deleting files should be easier to do. 
-  ;; C-x C-r renames current file
-  ;; C-x C-k deletes current file (since C-x k kills the buffer)
-  ;;-----------------------------------------------------------------------------
-  
-  (defun rename-current-buffer-file ()
-    "Renames current buffer and file it is visiting."
-    (interactive)
-    (let ((name (buffer-name))
-          (filename (buffer-file-name)))
-      (if (not (and filename (file-exists-p filename)))
-          (error "Buffer '%s' is not visiting a file!" name)
-        (let ((new-name (read-file-name "New name: " filename)))
-          (if (get-buffer new-name)
-              (error "A buffer named '%s' already exists!" new-name)
-            (rename-file filename new-name 1)
-            (rename-buffer new-name)
-            (set-visited-file-name new-name)
-            (set-buffer-modified-p nil)
-            (message "File '%s' successfully renamed to '%s'"
-                     name (file-name-nondirectory new-name)))))))
-  
-  (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
-  
-  
-  (defun delete-current-buffer-file ()
-    "Removes file connected to current buffer and kills buffer."
-    (interactive)
-    (let ((filename (buffer-file-name))
-          (buffer (current-buffer))
-          (name (buffer-name)))
-      (if (not (and filename (file-exists-p filename)))
-          (ido-kill-buffer)
-        (when (yes-or-no-p "Are you sure you want to remove this file? ")
-          (delete-file filename t)
-          (kill-buffer buffer)
-          (message "File '%s' successfully removed" filename)))))
-  
-  (global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Make beginning-of-buffer and end-of-buffer work nicely in dired
-  ;; Thanks to @magnars
-  ;;-----------------------------------------------------------------------------
-  
-  (defun dired-back-to-top ()
-    (interactive)
-    (beginning-of-buffer)
-    (dired-next-line 4))
-  
-  (eval-after-load 'dired
-    (define-key dired-mode-map
-      (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
-  
-  (defun dired-jump-to-bottom ()
-    (interactive)
-    (end-of-buffer)
-    (dired-next-line -1))
-  
-  (eval-after-load 'dired
-    (define-key dired-mode-map
-      (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
   
 #+end_src
 * Other Implementation details
