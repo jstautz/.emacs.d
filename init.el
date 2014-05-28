@@ -15,13 +15,18 @@
 ;; Assume current directory is the dot-emacs directory and add to load-path
 (setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
 
-(add-to-list 'load-path dotemacs-dir)
+;; (add-to-list 'load-path dotemacs-dir)
 
-;; Package Manager
+;; Load cask and activate it.
 ;; https://github.com/cask/cask
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
-(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
-
+;; If emacs-init.el is *newer* than emacs-init.org, then load the *.el file directly.
+;; Otherwise, tangle the *.org file and load.
+(if (> (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.el"))
+       (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
+      (load-file (expand-file-name "emacs-init.el" dotemacs-dir))
+    (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)))
+  
 ;;; init.el ends here

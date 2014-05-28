@@ -147,52 +147,6 @@
 ;; (wrap-to-fill-column-mode 1)
 ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
-(define-key global-map [ns-drag-file] 'ns-find-file) 
-
-(setq x-select-enable-clipboard t)
-(setq ns-pop-up-frames nil)
-
-
-;;-----------------------------------------------------------------------------
-;; System / Editing Prefs
-;;-----------------------------------------------------------------------------
-
-  
-;; Refresh any buffer when file on disk changes
-(setq global-auto-revert-mode 1)
-
-;; ...Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-
-;; ...Also rebuild Tags files, and be quiet about it
-(setq tags-revert-without-query t)
-
-;; M-x locate uses OS X's Spotlight
-(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
-
-
-;; Tabs insert 4 spaces, sentences have one space (as God intended).
-(setq-default tab-width 4)
-(setq-default indent-tabs-mode nil)
-(setq sentence-end-double-space nil)
-
-;; auto-fill options 
-(setq fill-column 120)
-(setq default-fill-column 120)
-
-;; Testing wrap-to-fill options instead of auto-fill
-;; note: I think wrap-to-fill is only included in nxhtml-mode,
-;;       so we need packages installed before this works.
-;; 
-;;(auto-fill-mode 1)
-;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-;; (wrap-to-fill-column-mode 1)
-;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
-;; Desktop saving options
 (desktop-save-mode 1)
 (setq desktop-globals-to-save
       (append '((extended-command-history . 30)
@@ -209,9 +163,185 @@
                 tags-file-name
                 register-alist)))
 
-;; Quick ways to restore desktop/windows
+(global-set-key (kbd "M-o") 'other-window)
 (winner-mode 1)
 
+(defun vsplit-last-buffer ()
+  (interactive)
+  (split-window-vertically)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+(defun hsplit-last-buffer ()
+  (interactive)
+   (split-window-horizontally)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+
+(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+
+(defun toggle-windows-split()
+  "Switch back and forth between one window and whatever split of
+windows we might have in the frame. The idea is to maximize the
+current buffer, while being able to go back to the previous split
+of windows in the frame simply by calling this command again."
+  (interactive)
+  (if (not(window-minibuffer-p (selected-window)))
+      (progn
+        (if (< 1 (count-windows))
+            (progn
+              (window-configuration-to-register ?u)
+              (delete-other-windows))
+          (jump-to-register ?u)))))
+
+(define-key global-map (kbd "C-`") 'toggle-windows-split)
+(define-key global-map (kbd "C-~") 'toggle-windows-split)
+
+(defun other-window-backward (&optional n)
+  "Select previous Nth window."
+  (interactive "P")
+  (other-window (- (prefix-numeric-value n))))
+
+(global-set-key [prior] 'other-window)
+(global-set-key [next] 'other-window-backward)
+(global-set-key [(control tab)] 'other-window)
+(global-set-key [(shift control tab)] 'other-window-backward)
+
+(define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
+(define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
+(define-key global-map (kbd "C-M-<up>") 'enlarge-window)
+(define-key global-map (kbd "C-M-<down>") 'shrink-window)
+
+(global-set-key "\C-x\C-b" 'ibuffer)
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map "r"
+     'wdired-change-to-wdired-mode))
+
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (dired-next-line 4))
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map
+    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
+
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (dired-next-line -1))
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map
+    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
+
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+
+(defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
+
+(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+
+
+(defun delete-current-buffer-file ()
+  "Removes file connected to current buffer and kills buffer."
+  (interactive)
+  (let ((filename (buffer-file-name))
+        (buffer (current-buffer))
+        (name (buffer-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (ido-kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename t)
+        (kill-buffer buffer)
+        (message "File '%s' successfully removed" filename)))))
+
+(global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
+
+(define-key global-map [ns-drag-file] 'ns-find-file) 
+
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+(defun tramp-sudo-reopen ()
+  "Re-open the current with tramp."
+  (interactive)
+  (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
+        (line (line-number-at-pos))
+        (column (current-column)))
+    (kill-buffer)
+    (find-file file-name)
+    (goto-line line)
+    (goto-char (+ (point) column))))
+
+;;-----------------------------------------------------------------------------
+;; Nice functions to change copy-kill region to copy or kill current line
+;; if no active region.
+;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
+;;-----------------------------------------------------------------------------
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (message "Current line copied to kill-ring.")
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defadvice kill-region (before slick-copy activate compile)
+  "When called interactively with no active region, cut the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(use-package ace-jump-mode
+             :bind ("C-." . ace-jump-mode))
+(setq x-select-enable-clipboard t)
+(setq ns-pop-up-frames nil)
+
+
+;;-----------------------------------------------------------------------------
+;; System / Editing Prefs
+;;-----------------------------------------------------------------------------
+
+  
+;; Refresh any buffer when file on disk changes
+(setq global-auto-revert-mode 1)
+
+
+;; ...Also rebuild Tags files, and be quiet about it
+(setq tags-revert-without-query t)
+
+;; M-x locate uses OS X's Spotlight
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+
+;; Tabs insert 4 spaces, sentences have one space (as God intended).
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
+(setq sentence-end-double-space nil)
+
+
+ 
 ;; Bookmark options
 (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
@@ -237,12 +367,7 @@
 
 
 
-(global-set-key (kbd "M-o") 'other-window)
-(global-set-key "\C-x\C-b" 'ibuffer)
-;; any reason why this has to be eval'ed after load?
-(eval-after-load 'dired
-  '(define-key dired-mode-map "r"
-     'wdired-change-to-wdired-mode))
+
 
 (desktop-read)
 (server-start)
@@ -393,68 +518,6 @@
 ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
-(define-key global-map [ns-drag-file] 'ns-find-file)
-
-(setq x-select-enable-clipboard t)
-
-(setq ns-pop-up-frames nil)
-
-(global-set-key (kbd "RET") 'newline-and-indent)
-
-(global-set-key (kbd "<C-escape>") 'top-level)  
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-(add-hook 'org-mode-hook
-          (lambda()
-            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
-
-(global-set-key (kbd "M-o") 'other-window)
-
-(global-set-key "\C-x\C-b" 'ibuffer)
-
-;; any reason why this has to be eval'ed after load?
-(eval-after-load 'dired
-  '(define-key dired-mode-map "r"
-     'wdired-change-to-wdired-mode))
-
-;;-----------------------------------------------------------------------------
-;; System / Editing Prefs
-;;-----------------------------------------------------------------------------
-
-  
-;; Refresh any buffer when file on disk changes
-(setq global-auto-revert-mode 1)
-
-;; ...Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-
-;; ...Also rebuild Tags files, and be quiet about it
-(setq tags-revert-without-query t)
-
-;; M-x locate uses OS X's Spotlight
-(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
-
-
-;; Tabs insert 4 spaces, sentences have one space (as God intended).
-(setq-default tab-width 4)
-(setq-default indent-tabs-mode nil)
-(setq sentence-end-double-space nil)
-
-;; auto-fill options 
-(setq fill-column 120)
-(setq default-fill-column 120)
-
-;; Testing wrap-to-fill options instead of auto-fill
-;; note: I think wrap-to-fill is only included in nxhtml-mode,
-;;       so we need packages installed before this works.
-;; 
-;;(auto-fill-mode 1)
-;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-;; (wrap-to-fill-column-mode 1)
-;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
-;; Desktop saving options
 (desktop-save-mode 1)
 (setq desktop-globals-to-save
       (append '((extended-command-history . 30)
@@ -471,9 +534,195 @@
                 tags-file-name
                 register-alist)))
 
-;; Quick ways to restore desktop/windows
+(global-set-key (kbd "M-o") 'other-window)
+
 (winner-mode 1)
 
+(defun vsplit-last-buffer ()
+  (interactive)
+  (split-window-vertically)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+(defun hsplit-last-buffer ()
+  (interactive)
+   (split-window-horizontally)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+
+(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+
+(defun toggle-windows-split()
+  "Switch back and forth between one window and whatever split of
+windows we might have in the frame. The idea is to maximize the
+current buffer, while being able to go back to the previous split
+of windows in the frame simply by calling this command again."
+  (interactive)
+  (if (not(window-minibuffer-p (selected-window)))
+      (progn
+        (if (< 1 (count-windows))
+            (progn
+              (window-configuration-to-register ?u)
+              (delete-other-windows))
+          (jump-to-register ?u)))))
+
+(define-key global-map (kbd "C-`") 'toggle-windows-split)
+(define-key global-map (kbd "C-~") 'toggle-windows-split)
+
+(defun other-window-backward (&optional n)
+  "Select previous Nth window."
+  (interactive "P")
+  (other-window (- (prefix-numeric-value n))))
+
+(global-set-key [prior] 'other-window)
+(global-set-key [next] 'other-window-backward)
+(global-set-key [(control tab)] 'other-window)
+(global-set-key [(shift control tab)] 'other-window-backward)
+
+(define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
+(define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
+(define-key global-map (kbd "C-M-<up>") 'enlarge-window)
+(define-key global-map (kbd "C-M-<down>") 'shrink-window)
+
+(global-set-key "\C-x\C-b" 'ibuffer)
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map "r"
+     'wdired-change-to-wdired-mode))
+
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (dired-next-line 4))
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map
+    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
+
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (dired-next-line -1))
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map
+    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
+
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+
+(defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
+
+(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+
+
+(defun delete-current-buffer-file ()
+  "Removes file connected to current buffer and kills buffer."
+  (interactive)
+  (let ((filename (buffer-file-name))
+        (buffer (current-buffer))
+        (name (buffer-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (ido-kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename t)
+        (kill-buffer buffer)
+        (message "File '%s' successfully removed" filename)))))
+
+(global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
+
+(define-key global-map [ns-drag-file] 'ns-find-file)
+
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+(defun tramp-sudo-reopen ()
+  "Re-open the current with tramp."
+  (interactive)
+  (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
+        (line (line-number-at-pos))
+        (column (current-column)))
+    (kill-buffer)
+    (find-file file-name)
+    (goto-line line)
+    (goto-char (+ (point) column))))
+
+;;-----------------------------------------------------------------------------
+;; Nice functions to change copy-kill region to copy or kill current line
+;; if no active region.
+;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
+;;-----------------------------------------------------------------------------
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (message "Current line copied to kill-ring.")
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defadvice kill-region (before slick-copy activate compile)
+  "When called interactively with no active region, cut the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(use-package ace-jump-mode
+             :bind ("C-." . ace-jump-mode))
+
+(setq x-select-enable-clipboard t)
+
+(setq ns-pop-up-frames nil)
+
+(global-set-key (kbd "RET") 'newline-and-indent)
+
+(global-set-key (kbd "<C-escape>") 'top-level)  
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(add-hook 'org-mode-hook
+          (lambda()
+            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+
+;;-----------------------------------------------------------------------------
+;; System / Editing Prefs
+;;-----------------------------------------------------------------------------
+
+  
+;; Refresh any buffer when file on disk changes
+(setq global-auto-revert-mode 1)
+
+
+;; ...Also rebuild Tags files, and be quiet about it
+(setq tags-revert-without-query t)
+
+;; M-x locate uses OS X's Spotlight
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+
+;; Tabs insert 4 spaces, sentences have one space (as God intended).
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
+(setq sentence-end-double-space nil)
+
+
+ 
 ;; Bookmark options
 (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
@@ -600,54 +849,6 @@
 (global-set-key (kbd "C-c e") 'eval-and-replace)
 
 
-;;-----------------------------------------------------------------------------
-;; i-search with initial contents.
-;; original src: http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness
-;;-----------------------------------------------------------------------------
-(defvar isearch-initial-string nil)
-
-(defun isearch-set-initial-string ()
-  (remove-hook 'isearch-mode-hook 'isearch-set-initial-string)
-  (setq isearch-string isearch-initial-string)
-  (isearch-search-and-update))
-
-(defun isearch-forward-at-point (&optional regexp-p no-recursive-edit)
-  "Interactive search forward for the symbol at point."
-  (interactive "P\np")
-  (if regexp-p (isearch-forward regexp-p no-recursive-edit)
-    (let* ((end (progn (skip-syntax-forward "w_") (point)))
-           (begin (progn (skip-syntax-backward "w_") (point))))
-      (if (eq begin end)
-          (isearch-forward regexp-p no-recursive-edit)
-        (setq isearch-initial-string (buffer-substring begin end))
-        (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
-        (isearch-forward regexp-p no-recursive-edit)))))
-
-(global-set-key (kbd "C-c C-s") 'isearch-forward-at-point)
-
-
-;;-----------------------------------------------------------------------------
-;; Nice functions to change copy-kill region to copy or kill current line
-;; if no active region.
-;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
-;;-----------------------------------------------------------------------------
-(defadvice kill-ring-save (before slick-copy activate compile)
-  "When called interactively with no active region, copy the current line."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (progn
-       (message "Current line copied to kill-ring.")
-       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-
-(defadvice kill-region (before slick-copy activate compile)
-  "When called interactively with no active region, cut the current line."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (progn
-       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-
 
 ;;-----------------------------------------------------------------------------
 ;; Make zap-to-char act more like "zap-up-to-char"
@@ -660,67 +861,6 @@
   (insert char)
   (forward-char -1))
 
-
-;;-----------------------------------------------------------------------------
-;; Window-splitting and moving functions
-;; Thanks to Ignacio Paz Posse
-;; http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/
-;;-----------------------------------------------------------------------------
-
-;; Instead of giving me two identical buffers when I split the window, give me the previous buffer.
-;; From http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
-(defun vsplit-last-buffer ()
-  (interactive)
-  (split-window-vertically)
-  (other-window 1 nil)
-  (switch-to-next-buffer)
-  )
-(defun hsplit-last-buffer ()
-  (interactive)
-   (split-window-horizontally)
-  (other-window 1 nil)
-  (switch-to-next-buffer)
-  )
-
-(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
-(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
-
-
-;; Switch (zoom) between split window config and a single window
-(defun toggle-windows-split()
-  "Switch back and forth between one window and whatever split of
-windows we might have in the frame. The idea is to maximize the
-current buffer, while being able to go back to the previous split
-of windows in the frame simply by calling this command again."
-  (interactive)
-  (if (not(window-minibuffer-p (selected-window)))
-      (progn
-        (if (< 1 (count-windows))
-            (progn
-              (window-configuration-to-register ?u)
-              (delete-other-windows))
-          (jump-to-register ?u)))))
-
-(define-key global-map (kbd "C-`") 'toggle-windows-split)
-(define-key global-map (kbd "C-~") 'toggle-windows-split)
-
-;; Window shifting. C-x-o lets us go forward a window (or several).
-;; This one lets us go back one or more windows. From Glickstein.
-(defun other-window-backward (&optional n)
-  "Select previous Nth window."
-  (interactive "P")
-  (other-window (- (prefix-numeric-value n))))
-
-(global-set-key [prior] 'other-window)
-(global-set-key [next] 'other-window-backward)
-(global-set-key [(control tab)] 'other-window)
-(global-set-key [(shift control tab)] 'other-window-backward)
-
-;; Also (stolen from someone else's dot file) this is used to shrink/expand windows without using the mouse.
-(define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
-(define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
-(define-key global-map (kbd "C-M-<up>") 'enlarge-window)
-(define-key global-map (kbd "C-M-<down>") 'shrink-window)
 
 
 ;;-----------------------------------------------------------------------------
@@ -745,19 +885,6 @@ of windows in the frame simply by calling this command again."
   (let ((fill-column (point-max)))
     (fill-paragraph nil)))
 
-;;-----------------------------------------------------------------------------
-;; Re-open buffer as root -- Thank to @christopherdone: http://t.co/KiAWcJoo
-;;-----------------------------------------------------------------------------
-(defun tramp-sudo-reopen ()
-  "Re-open the current with tramp."
-  (interactive)
-  (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
-        (line (line-number-at-pos))
-        (column (current-column)))
-    (kill-buffer)
-    (find-file file-name)
-    (goto-line line)
-    (goto-char (+ (point) column))))
 
 
 ;;-----------------------------------------------------------------------------
@@ -805,72 +932,6 @@ of windows in the frame simply by calling this command again."
    center screen on cursor"
   (let ((current-prefix-arg '(4)))
   (call-interactively 'recenter-top-bottom)))
-
-
-;;-----------------------------------------------------------------------------
-;; Renaming and deleting files should be easier to do. 
-;; C-x C-r renames current file
-;; C-x C-k deletes current file (since C-x k kills the buffer)
-;;-----------------------------------------------------------------------------
-
-(defun rename-current-buffer-file ()
-  "Renames current buffer and file it is visiting."
-  (interactive)
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (error "Buffer '%s' is not visiting a file!" name)
-      (let ((new-name (read-file-name "New name: " filename)))
-        (if (get-buffer new-name)
-            (error "A buffer named '%s' already exists!" new-name)
-          (rename-file filename new-name 1)
-          (rename-buffer new-name)
-          (set-visited-file-name new-name)
-          (set-buffer-modified-p nil)
-          (message "File '%s' successfully renamed to '%s'"
-                   name (file-name-nondirectory new-name)))))))
-
-(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
-
-
-(defun delete-current-buffer-file ()
-  "Removes file connected to current buffer and kills buffer."
-  (interactive)
-  (let ((filename (buffer-file-name))
-        (buffer (current-buffer))
-        (name (buffer-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (ido-kill-buffer)
-      (when (yes-or-no-p "Are you sure you want to remove this file? ")
-        (delete-file filename t)
-        (kill-buffer buffer)
-        (message "File '%s' successfully removed" filename)))))
-
-(global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
-
-
-;;-----------------------------------------------------------------------------
-;; Make beginning-of-buffer and end-of-buffer work nicely in dired
-;; Thanks to @magnars
-;;-----------------------------------------------------------------------------
-
-(defun dired-back-to-top ()
-  (interactive)
-  (beginning-of-buffer)
-  (dired-next-line 4))
-
-(eval-after-load 'dired
-  (define-key dired-mode-map
-    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
-
-(defun dired-jump-to-bottom ()
-  (interactive)
-  (end-of-buffer)
-  (dired-next-line -1))
-
-(eval-after-load 'dired
-  (define-key dired-mode-map
-    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
 
 (require 'cl)
 

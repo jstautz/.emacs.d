@@ -184,17 +184,33 @@ My init.el currently looks like this:
 ;; Assume current directory is the dot-emacs directory and add to load-path
 (setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
 
-;; Load the rest of my config from org-mode file
-(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir))
+;; Load cask and activate it.
+;; https://github.com/cask/cask
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+
+;; If emacs-init.el is *newer* than emacs-init.org, then load the *.el file directly.
+;; Otherwise, tangle the *.org file and load my config.
+(if (> (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.el"))
+       (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
+      (load-file (expand-file-name "emacs-init.el" dotemacs-dir))
+    (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)))
+
 #+end_src
 
-That's it. Dead simple, right? 
+That's it.
 
-The important part is that last s-expression. This line will export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
+The important part is that last s-expression: 
 
-That tiny =init.el= file is the only native elisp file in my whole config. Every other bit of configuration is loaded from org-mode files.
+#+begin_src emacs-lisp :tangle no
+(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)
+#+end_src
+
+This line calls org-babel to export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
 
 [[http://orgmode.org/worg/org-contrib/babel/][Org-babel is Merlin-level wizardry.]] Eric Schulte, Dan Davison, and everyone who's worked on it all deserve medals. 
+
+The =if= statement wrapping this =org-babel-load-file= expression will improve load time if my config hasn't changed. If my "tangled" =emacs-init.el= file is newer than the most recent changes to =emacs-init.org=, then I load the .el file directly.
 
 ** =emacs-init.org=
 
@@ -1050,7 +1066,7 @@ Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the
     (dired-next-line 4))
   
   (eval-after-load 'dired
-    (define-key dired-mode-map
+    '(define-key dired-mode-map
       (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
   
   (defun dired-jump-to-bottom ()
@@ -1059,7 +1075,7 @@ Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the
     (dired-next-line -1))
   
   (eval-after-load 'dired
-    (define-key dired-mode-map
+    '(define-key dired-mode-map
       (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
 
 #+end_src
