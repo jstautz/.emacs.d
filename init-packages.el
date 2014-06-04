@@ -35,7 +35,7 @@
                :type git
                :url "https://github.com/leoliu/easy-kill.git"
                :features easy-kill)
-        
+
         (:name guide-key
                :description "Guide following keys to an input key sequence automatically and dynamically in Emacs."
                :type git

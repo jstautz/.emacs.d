@@ -24,7 +24,9 @@
 (require 'use-package)
 (use-package pallet)
 (tool-bar-mode -1)
-(custom-set-faces '(fringe ((t (:background"white")))))
+(set-face-background 'fringe (face-background 'default))
+(set-face-foreground 'fringe (face-background 'default))
+
 (scroll-bar-mode -1)
 
 (setq inhibit-splash-screen 1)               
@@ -116,6 +118,9 @@
 (global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-up>") 'mwheel-scroll)
+
 (global-set-key "\M-n" 'scroll-up-line)
 (global-set-key "\M-p" 'scroll-down-line)
 (transient-mark-mode t)
@@ -316,7 +321,104 @@ of windows in the frame simply by calling this command again."
 (use-package ace-jump-mode
              :bind ("C-." . ace-jump-mode))
 (setq x-select-enable-clipboard t)
+
+(use-package browse-kill-ring
+             :defer t
+             :init
+             (progn
+               (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")
+               (browse-kill-ring-default-keybindings)))
+
+(use-package kill-ring-search
+             :bind ("\M-\C-y" . kill-ring-search))
+
+(defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
+    "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
+    The CHAR is replaced and the point is put before CHAR."
+    (insert char)
+    (forward-char -1))
+(use-package easy-kill
+             :defer t
+             :init
+             (global-set-key [remap kill-ring-save] 'easy-kill))
+
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (message "Current line copied to kill-ring.")
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defadvice kill-region (before slick-copy activate compile)
+  "When called interactively with no active region, cut the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
 (setq ns-pop-up-frames nil)
+
+(ido-mode t)
+(setq ido-enable-flex-matching t
+      ido-enable-tramp-completion nil
+      ;; since we're using ido-ubiquitous, we don't need this on
+      ido-everywhere nil
+      ido-is-tramp-root nil
+      ido-max-prospects 20
+      ;; don't save tramp work directories -- this caused stalls for me in the past
+      ido-record-ftp-work-directories nil
+      ido-show-dot-for-dired t
+      ;; be able to re-visit recently closed buffers
+      ido-use-virtual-buffers t
+      ;; No automatic searching if no matches found
+      ido-auto-merge-work-directories-length -1
+      ido-use-faces t
+      ;; for find-file-at-point
+      ido-use-filename-at-point 'guess)
+;; use recentf for visiting recent buffers
+(recentf-mode t)
+;; don't need this function disabled (it is by default)
+(put 'ido-exit-minibuffer 'disabled nil)
+
+
+;; ignore case when completing, including filenames
+  (setq completion-ignore-case t           
+    read-file-name-completion-ignore-case t)
+(use-package ido-ubiquitous
+             :init (ido-ubiquitous))
+(use-package ido-vertical-mode
+             :init
+             (progn (ido-vertical-mode 1)
+                    (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
+  
+
+(defun jcs:smex-init ()
+  (interactive)
+  (condition-case description
+      (progn
+        (smex-initialize)
+        (global-set-key (kbd "M-x") 'smex)
+        (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+        (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+        (global-set-key (kbd "C-c C-m") 'smex)
+        (global-set-key (kbd "C-x C-m") 'smex)
+        (smex))
+    (error (execute-extended-command))))
+(global-set-key (kbd "M-x") 'jcs:smex-init)
+
+(defun guide-key/jcs-hook-function-for-org-mode ()
+  (guide-key/add-local-guide-key-sequence "C-c")
+  (guide-key/add-local-guide-key-sequence "C-c C-x"))
+(add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
+
+(setq guide-key/idle-delay 1)
+
+(setq guide-key/popup-window-position 'bottom)
+
+(guide-key-mode 1)
 
 
 ;;-----------------------------------------------------------------------------
@@ -358,10 +460,6 @@ of windows in the frame simply by calling this command again."
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
-;; ignore case when completing, including filenames
-(setq completion-ignore-case t           
-  read-file-name-completion-ignore-case t)
-
 ;; Let me narrow to region -- I use this a bunch
 (put 'narrow-to-region 'disabled nil)
 
@@ -381,7 +479,8 @@ of windows in the frame simply by calling this command again."
 
 (tool-bar-mode -1)
 
-(custom-set-faces '(fringe ((t (:background"white")))))
+(set-face-background 'fringe (face-background 'default))
+(set-face-foreground 'fringe (face-background 'default))
 
 (scroll-bar-mode -1)
 
@@ -481,6 +580,8 @@ of windows in the frame simply by calling this command again."
 (global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-up>") 'mwheel-scroll)
 
 (global-set-key "\M-n" 'scroll-up-line)
 (global-set-key "\M-p" 'scroll-down-line)
@@ -690,9 +791,108 @@ of windows in the frame simply by calling this command again."
 
 (setq x-select-enable-clipboard t)
 
+(use-package browse-kill-ring
+             :defer t
+             :init
+             (progn
+               (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")
+               (browse-kill-ring-default-keybindings)))
+
+(use-package kill-ring-search
+             :bind ("\M-\C-y" . kill-ring-search))
+
+(defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
+    "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
+    The CHAR is replaced and the point is put before CHAR."
+    (insert char)
+    (forward-char -1))
+
+(use-package easy-kill
+             :defer t
+             :init
+             (global-set-key [remap kill-ring-save] 'easy-kill))
+
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (message "Current line copied to kill-ring.")
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defadvice kill-region (before slick-copy activate compile)
+  "When called interactively with no active region, cut the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
 (setq ns-pop-up-frames nil)
 
+(ido-mode t)
+(setq ido-enable-flex-matching t
+      ido-enable-tramp-completion nil
+      ;; since we're using ido-ubiquitous, we don't need this on
+      ido-everywhere nil
+      ido-is-tramp-root nil
+      ido-max-prospects 20
+      ;; don't save tramp work directories -- this caused stalls for me in the past
+      ido-record-ftp-work-directories nil
+      ido-show-dot-for-dired t
+      ;; be able to re-visit recently closed buffers
+      ido-use-virtual-buffers t
+      ;; No automatic searching if no matches found
+      ido-auto-merge-work-directories-length -1
+      ido-use-faces t
+      ;; for find-file-at-point
+      ido-use-filename-at-point 'guess)
+;; use recentf for visiting recent buffers
+(recentf-mode t)
+;; don't need this function disabled (it is by default)
+(put 'ido-exit-minibuffer 'disabled nil)
+
+;; ignore case when completing, including filenames
+  (setq completion-ignore-case t           
+    read-file-name-completion-ignore-case t)
+
+(use-package ido-ubiquitous
+             :init (ido-ubiquitous))
+
+(use-package ido-vertical-mode
+             :init
+             (progn (ido-vertical-mode 1)
+                    (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
+
+(defun jcs:smex-init ()
+  (interactive)
+  (condition-case description
+      (progn
+        (smex-initialize)
+        (global-set-key (kbd "M-x") 'smex)
+        (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+        (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+        (global-set-key (kbd "C-c C-m") 'smex)
+        (global-set-key (kbd "C-x C-m") 'smex)
+        (smex))
+    (error (execute-extended-command))))
+(global-set-key (kbd "M-x") 'jcs:smex-init)
+
+(defun guide-key/jcs-hook-function-for-org-mode ()
+  (guide-key/add-local-guide-key-sequence "C-c")
+  (guide-key/add-local-guide-key-sequence "C-c C-x"))
+(add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
+
+(setq guide-key/idle-delay 1)
+
+(setq guide-key/popup-window-position 'bottom)
+
+(guide-key-mode 1)
+
 (global-set-key (kbd "RET") 'newline-and-indent)
+
+(use-package sublimity)
 
 (global-set-key (kbd "<C-escape>") 'top-level)  
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -738,10 +938,6 @@ of windows in the frame simply by calling this command again."
 ;; Let me upcase/downcase regions
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-
-;; ignore case when completing, including filenames
-(setq completion-ignore-case t           
-  read-file-name-completion-ignore-case t)
 
 ;; Let me narrow to region -- I use this a bunch
 (put 'narrow-to-region 'disabled nil)
@@ -847,19 +1043,6 @@ of windows in the frame simply by calling this command again."
          (current-buffer)))
 
 (global-set-key (kbd "C-c e") 'eval-and-replace)
-
-
-
-;;-----------------------------------------------------------------------------
-;; Make zap-to-char act more like "zap-up-to-char"
-;; Thanks to Eric Himmelreich
-;; http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/
-;;-----------------------------------------------------------------------------
-(defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
-  "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
-  The CHAR is replaced and the point is put before CHAR."
-  (insert char)
-  (forward-char -1))
 
 
 

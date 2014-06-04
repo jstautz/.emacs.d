@@ -370,11 +370,13 @@ Turning it off is one of the first things I do.
 (tool-bar-mode -1)
 #+end_src
 
-I don't really use the side fringe at all, so I set to a colour that blends into the buffer background. I happen to use Emacs with dark text on a white background, so I set the fringe to white. 
+I don't really use the side fringe at all, so I set it to blend in with my background face.
 
 #+name: UI-fringe
 #+begin_src emacs-lisp 
-(custom-set-faces '(fringe ((t (:background"white")))))
+(set-face-background 'fringe (face-background 'default))
+(set-face-foreground 'fringe (face-background 'default))
+
 #+end_src
 
 Scroll bars are also pretty useless in this age of scroll wheels and trackpads, so I turn that off as well.
@@ -543,6 +545,49 @@ Even better, use-package supports diminsh options as part of the declaration whe
 
 Diminish also features [[http://www.eskimo.com/~seldon/diminish.el][some of the best code comments in the universe]].
 
+*** bzg's big fringe mode (experimental)
+
+wrap-to-fill-column is packaged with nxhtml, a bloated package I've always hated and which isn't on MELPA. 
+
+So here's another discovery -- bzg's big fring mode: (not currently being activated or tangled)
+
+#+name: big-fringe-mode
+#+begin_example
+(defvar bzg-big-fringe-mode nil)
+(define-minor-mode bzg-big-fringe-mode
+  "Minor mode to use big fringe in the current buffer."
+  :init-value nil
+  :global t
+  :variable bzg-big-fringe-mode
+  :group 'editing-basics
+  (if (not bzg-big-fringe-mode)
+      (set-fringe-style nil)
+    (set-fringe-mode
+     (/ (- (frame-pixel-width)
+           (* 120 (frame-char-width)))
+        2))))
+
+;; Now activate this global minor mode
+(bzg-big-fringe-mode 1)
+
+;; To activate the fringe by default and deactivate it when windows
+;; are split vertically, uncomment this:
+(add-hook 'window-configuration-change-hook
+          (lambda ()
+            (if (delq nil
+                      (let ((fw (frame-width)))
+                        (mapcar (lambda(w) (< (window-width w) fw))
+                                (window-list))))
+                (bzg-big-fringe-mode 0)
+              (bzg-big-fringe-mode 1))))
+
+
+;; Get rid of the indicators in the fringe
+(mapcar (lambda(fb) (set-fringe-bitmap-face fb 'org-hide))
+        fringe-bitmaps)
+#+end_example
+
+
 *** Force redisplay
 
 If the =redisplay-dont-pause= variable is not set, then any keyboard/mouse event will stop a screen redraw to handle the input. Which I suppose made sense on older machines or slower networks.
@@ -708,7 +753,7 @@ This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't ha
 #+end_src
 *** Scrolling when on fringe
 
-Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide). Let's bind margin scroll events appropriately:
+Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide), or on the mode-line. Let's bind margin and mode-line scroll events appropriately:
 
 #+name: keybindings-scroll
 #+begin_src emacs-lisp 
@@ -716,6 +761,9 @@ Scolling via mouse wheel / trackpad works great, except if my mouse is on the fr
 (global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
 (global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-up>") 'mwheel-scroll)
+
 #+end_src
 
 *** Scroll view without moving cursor
@@ -848,49 +896,6 @@ I've since discovered wrap-to-fill-column-mode, which is packaged with nxhtml-mo
   ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
   (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 #+end_src
-*** bzg's big fringe mode
-
-wrap-to-fill-column is packaged with nxhtml, a bloated package I've always hated and which isn't on MELPA. 
-
-So here's another discovery -- bzg's big fring mode: (not currently being activated or tangled)
-
-#+name: big-fringe-mode
-#+begin_example
-(defvar bzg-big-fringe-mode nil)
-(define-minor-mode bzg-big-fringe-mode
-  "Minor mode to use big fringe in the current buffer."
-  :init-value nil
-  :global t
-  :variable bzg-big-fringe-mode
-  :group 'editing-basics
-  (if (not bzg-big-fringe-mode)
-      (set-fringe-style nil)
-    (set-fringe-mode
-     (/ (- (frame-pixel-width)
-           (* 120 (frame-char-width)))
-        2))))
-
-;; Now activate this global minor mode
-(bzg-big-fringe-mode 1)
-
-;; To activate the fringe by default and deactivate it when windows
-;; are split vertically, uncomment this:
-(add-hook 'window-configuration-change-hook
-          (lambda ()
-            (if (delq nil
-                      (let ((fw (frame-width)))
-                        (mapcar (lambda(w) (< (window-width w) fw))
-                                (window-list))))
-                (bzg-big-fringe-mode 0)
-              (bzg-big-fringe-mode 1))))
-
-
-;; Get rid of the indicators in the fringe
-(mapcar (lambda(fb) (set-fringe-bitmap-face fb 'org-hide))
-        fringe-bitmaps)
-#+end_example
-
-
 ** Desktop Settings
 
 Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings). It's pretty rad.
@@ -1213,13 +1218,94 @@ Handy for very fast navigation around a file.
 ** Copy & Kill
 *** Use Mac clipboard for copying/killing
 
-Copy and paste should use the OS clipboard
+Copy and paste should use the OS clipboard.
 
-#+name: UI-mac-settings-clipboard
+#+name: mac-settings-clipboard
 #+begin_src emacs-lisp 
 (setq x-select-enable-clipboard t)
+
 #+end_src
 
+*** Browse kill ring
+
+=C-y= yanks from the top of the kill ring, and hitting =C-y M-y, M-y, M-y= repeatedly will cycle through previous kills. But what if you want to browse through the whole kill ring and find that text you kileld a few hours ago?
+
+Hitting =M-y= activates browse-kill-ring and let you dig through your kill history, select an item, and yank it into the buffer.
+
+#+name: browse-kill-ring
+#+begin_src emacs-lisp
+  (use-package browse-kill-ring
+               :defer t
+               :init
+               (progn
+                 (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")
+                 (browse-kill-ring-default-keybindings)))
+  
+#+end_src
+
+*** Search kill ring
+
+Also useful -- search the kill-ring directly with =C-M-y=. Type a string to do an incremental-search on the whole kill ring for that string.
+
+#+name: browse-kill-ring
+#+begin_src emacs-lisp
+  (use-package kill-ring-search
+               :bind ("\M-\C-y" . kill-ring-search))
+  
+#+end_src
+
+*** Fix =zap-to-char=
+
+One thing that annoys me about the default zap-to-char is that it nukes everything up to and *including* the char you enter. Usually I found that this behaviour isn't what I want. So let's create a function called =zap-*up*-to-char=.
+
+#+name: zap-up-to-char
+#+begin_src emacs-lisp
+(defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
+    "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
+    The CHAR is replaced and the point is put before CHAR."
+    (insert char)
+    (forward-char -1))
+#+end_src
+
+Thanks to [[http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/][Eric Himmelreich]] for this one.
+
+*** Kill line + easy-kill
+
+[[https://github.com/leoliu/easy-kill/][Easy-kill]] is a package that lets me quickly copy a line, word, or series of words. 
+
+#+name: easy-kill
+#+begin_src emacs-lisp
+  (use-package easy-kill
+               :defer t
+               :init
+               (global-set-key [remap kill-ring-save] 'easy-kill))
+  
+#+end_src
+
+Related to this, I want to advise =kill-ring-save= and =kill-region= functions so they copy/kill the current line if there's no active region. [[http://xahlee.org/emacs/emacs_copy_cut_current_line.html][I stole this from Xah Lee]].
+
+I don't use this a ton, but when I remember it's there, it's nice. I usually use it for killing a line when I'm in the middle of that line.
+
+#+name: kill-ring-save-functions
+#+begin_src emacs-lisp
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (message "Current line copied to kill-ring.")
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defadvice kill-region (before slick-copy activate compile)
+  "When called interactively with no active region, cut the current line."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (progn
+       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+#+end_src
 
 ** Emacsclient / Server
 
@@ -1235,8 +1321,7 @@ This will open filename.txt within my already-running Emacs.app instance. Sweet.
 
 *** Connecting to Emacs server shouldn't pop up frames
 
-
-One thing I had to tweak for this: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
+One thing I had to tweak: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
 
 #+name: UI-pop-up-frames
 #+begin_src emacs-lisp 
@@ -1249,24 +1334,164 @@ One thing I had to tweak for this: I want to make sure connecting via emacsclien
 -------------------------------------
 
 ** ido & smex
+*** Ido settings
+
+#+name: ido-settings
+#+begin_src emacs-lisp
+(ido-mode t)
+(setq ido-enable-flex-matching t
+      ido-enable-tramp-completion nil
+      ;; since we're using ido-ubiquitous, we don't need this on
+      ido-everywhere nil
+      ido-is-tramp-root nil
+      ido-max-prospects 20
+      ;; don't save tramp work directories -- this caused stalls for me in the past
+      ido-record-ftp-work-directories nil
+      ido-show-dot-for-dired t
+      ;; be able to re-visit recently closed buffers
+      ido-use-virtual-buffers t
+      ;; No automatic searching if no matches found
+      ido-auto-merge-work-directories-length -1
+      ido-use-faces t
+      ;; for find-file-at-point
+      ido-use-filename-at-point 'guess)
+;; use recentf for visiting recent buffers
+(recentf-mode t)
+;; don't need this function disabled (it is by default)
+(put 'ido-exit-minibuffer 'disabled nil)
+
+#+end_src
+
+
+#+name: ignore-case-completion
+#+begin_src emacs-lisp
+
+;; ignore case when completing, including filenames
+  (setq completion-ignore-case t           
+    read-file-name-completion-ignore-case t)
+#+end_src
+
+*** ido-ubiquitous
+
+#+name:ido-ubiquitous
+#+begin_src emacs-lisp
+  (use-package ido-ubiquitous
+               :init (ido-ubiquitous))
+#+end_src
+
+*** ido-vertical
+
+#+name:ido-vertical
+#+begin_src emacs-lisp
+  (use-package ido-vertical-mode
+               :init
+               (progn (ido-vertical-mode 1)
+                      (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
+    
+#+end_src
+*** smex
+
+(I need to rework this a bit)
+
+#+name: smex-settings
+#+begin_src emacs-lisp 
+
+(defun jcs:smex-init ()
+  (interactive)
+  (condition-case description
+      (progn
+        (smex-initialize)
+        (global-set-key (kbd "M-x") 'smex)
+        (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+        (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+        (global-set-key (kbd "C-c C-m") 'smex)
+        (global-set-key (kbd "C-x C-m") 'smex)
+        (smex))
+    (error (execute-extended-command))))
+(global-set-key (kbd "M-x") 'jcs:smex-init)
+
+#+end_src
+
 ** Help
+*** Guide Key
+
+(need to rework this to use use-package)
+
+#+name: guide-key
+#+begin_src emacs-lisp
+(defun guide-key/jcs-hook-function-for-org-mode ()
+  (guide-key/add-local-guide-key-sequence "C-c")
+  (guide-key/add-local-guide-key-sequence "C-c C-x"))
+(add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
+
+(setq guide-key/idle-delay 1)
+
+(setq guide-key/popup-window-position 'bottom)
+
+(guide-key-mode 1)
+
+#+end_src
+*** popwin
+
+
+#+name: popwin
+#+begin_src: emacs-lisp
+
+(defun popwin-bkr:update-window-reference ()
+  (popwin:update-window-reference 'browse-kill-ring-original-window :safe t))
+
+(add-hook 'popwin:after-popup-hook 'popwin-bkr:update-window-reference)
+
+(push "*Kill Ring*" popwin:special-display-config)
+
+(popwin-mode 1)
+
+#+end_src
+
 * Writing Fiction
+** Tabs and spaces
+** Spell-check settings
+** Unfill-paragraph
+** Narrow-to-region
+** Markdown mode
+** Marked.app integration
+** fountain-mode
+** wordsmith-mode
+** writer-names
 * Coding
 ** Return + indent
 
 I like it when my return key preserves indentation:
 
-#+name: keybindings-return
+#+name: coding-return-indent
 #+begin_src emacs-lisp
 (global-set-key (kbd "RET") 'newline-and-indent)
 
 #+end_src
+** Sublime-style Minimap
 
-** Bind ESC to top-level command 
+One nice feature of Sublime Text is the [[http://i.stack.imgur.com/SkFIc.png][Minimap]]: a small scaled-down overview of the code in your buffer, so you can get a sense of your current location in relation to the rest of the file.
+
+Sublimity is a package that provides this functionality for emacs.
+
+Actually, I don't like this. It fucks with my scrolling. 
+
+#+name: coding-minimap-sublimity
+#+begin_src emacs-lisp
+;;  (use-package sublimity)
+#+end_src
+
+
+
+
+** Emacs Lisp
+*** eval and replace
+*** auto-recompile elisp
+*** Bind ESC to top-level command 
 
 I hate having to repeatedly hit escape to bounce out of recursive edits when I drop into the debugger.  
 
-#+name: keybindings-escape
+#+name: coding-escape-top-level
 #+begin_src emacs-lisp
 (global-set-key (kbd "<C-escape>") 'top-level)  
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -1276,12 +1501,15 @@ I hate having to repeatedly hit escape to bounce out of recursive edits when I d
 
 #+end_src
 
+** Python
+*** Virtualenvwrapper
+*** Jedi
+** Web development
+*** web mode
+*** css
+*** js2 mode
+*** skewer
 * Org-mode
-* Global Keybindings
-:PROPERTIES:
-:noweb-ref: Set custom keybindings
-:END:
-
 * Editor customizations
 :PROPERTIES:
 :noweb-ref: Load some editor customizations
@@ -1327,10 +1555,6 @@ I hate having to repeatedly hit escape to bounce out of recursive edits when I d
   ;; Let me upcase/downcase regions
   (put 'downcase-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
-  
-  ;; ignore case when completing, including filenames
-  (setq completion-ignore-case t           
-    read-file-name-completion-ignore-case t)
   
   ;; Let me narrow to region -- I use this a bunch
   (put 'narrow-to-region 'disabled nil)
@@ -1486,19 +1710,6 @@ And set some directory vars
            (current-buffer)))
   
   (global-set-key (kbd "C-c e") 'eval-and-replace)
-  
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Make zap-to-char act more like "zap-up-to-char"
-  ;; Thanks to Eric Himmelreich
-  ;; http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/
-  ;;-----------------------------------------------------------------------------
-  (defadvice zap-to-char (after my-zap-to-char-advice (arg char) activate)
-    "Kill up to the ARG'th occurence of CHAR, and leave CHAR.
-    The CHAR is replaced and the point is put before CHAR."
-    (insert char)
-    (forward-char -1))
   
   
   
