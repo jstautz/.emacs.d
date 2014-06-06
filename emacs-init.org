@@ -1,3 +1,4 @@
+
 #+TITLE: Jeff's Emacs config
 #+AUTHOR: Jeff Stautz
 #+EMAIL: jeff@jeffstautz.com
@@ -144,7 +145,7 @@ You probably want to back up your current config first.
 git clone https://github.com/jstautz/.emacs.d ~/.emacs.d
 #+end_example
 
-** Run the install script
+** Run the install.sh script
 
 Special thanks to [[http://www.swaroopch.com/2013/10/17/emacs-configuration-tutorial/][Swaroop C H]] for this script.
 
@@ -260,7 +261,28 @@ Back in the dark ages, I would find third-party elisp packages on the interwebs 
 
 Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[http://cask.github.io/][Cask]], [[https://github.com/rdallasgray/pallet][Pallet]], and [[https://github.com/jwiegley/use-package][use-package]].
 
+*** package.el
+
+The default package manager in Emacs 24 is super handy. Use =package-list-packages= to browse packages on all source repos, then install/uninstall/update them. Slick.
+
+Before using it, I want to add a few other sources (notably marmalade and melpa) to my package source list.
+  
+#+name: packages-set-sources
+#+begin_src emacs-lisp
+(require 'package)
+(dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
+                   ("elpa" . "http://tromey.com/elpa/")
+                   ("marmalade" . "http://marmalade-repo.org/packages/")
+                   ("melpa" . "http://melpa.milkbox.net/packages/")))
+  (add-to-list 'package-archives source t))
+(package-initialize)
+#+end_src
+ 
 *** Cask
+
+Cask is a [[http://cask.readthedocs.org/en/latest/][dependency manager and much more.]]
+
+The =Cask= file in my .emacs.d/ lists the packages that my setup depends on, as well as specifying some source repositories (the same ones I specify for package.el, above).
 
 I don't keep *any* of my packages under version control at the moment. If I install Emacs config from scratch, my installation script + Cask will download and load all the packages I need.
 
@@ -270,6 +292,21 @@ I don't keep *any* of my packages under version control at the moment. If I inst
 (cask-initialize)
 #+end_src
 
+*** Pallet
+
+So =package.el= lets me browse and install packages from within Emacs... but Cask manages packages outside emacs based on a Cask file... so how am I supposed to keep these in sync?
+
+Enter Pallet.
+
+If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything in lockstep. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
+
+Note that the reverse is true if I remove a package using the built-in package manager -- Pallet removes its line from my Cask file.
+
+#+name: package-use-package
+#+begin_src emacs-lisp 
+(require 'pallet)
+
+#+end_src
 *** use-package
  
 John Wiegley's use-package lets me nicely isolate loading packages and their configurations. It handles a lot of things for me out of the box, including:
@@ -285,14 +322,8 @@ John Wiegley's use-package lets me nicely isolate loading packages and their con
 (require 'use-package)
 #+end_src
 
-*** Pallet
+You'll see use-package and its syntax all over the place in my setup.
 
-If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything in sync. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
-
-#+name: package-use-package
-#+begin_src emacs-lisp 
-(use-package pallet)
-#+end_src
 * What I use Emacs for
 :PROPERTIES:
 :CUSTOM_ID: what-i-do-in-emacs
