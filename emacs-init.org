@@ -1464,15 +1464,135 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 
 * Writing Fiction
 ** Tabs and spaces
+
+I am firmly in the "spaces" camp on the whole "tabs v. spaces" debate. I also like my tabs to insert 4 spaces.
+
+#+name: writing-tabs
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  
+#+end_src  
+
+And don't even get me started on one space vs. two after sentences.
+
+#+name: writing-spaces
+#+begin_src emacs-lisp
+  (setq sentence-end-double-space nil)
+  
+#+end_src  
+  
+
+
 ** Spell-check settings
+
+I like aspell for ispell.
+
+#+name: coding-reload-tags
+#+begin_src emacs-lisp
+  (setq ispell-program-name "aspell")
+  
+#+end_src  
+
 ** Unfill-paragraph
+
+I sometimes want to "unfill" a paragraph -- that is, take a block of text that's had hard linebreaks inserted into it, and turn it into a single line of text. 
+
+I borrowed this snippet from [[https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org][Kyle Machulis]].
+
+#+name: writing-unfill-paragraph
+#+begin_src emacs-lisp
+  (defun unfill-paragraph ()
+    "Takes a multi-line paragraph and makes it into a single line of text."
+    (interactive)
+    (let ((fill-column (point-max)))
+      (fill-paragraph nil)))
+
+#+end_src  
+
 ** Narrow-to-region
+
+When I'm writing or working, I find it useful to be able to focus on a narrow region of text. The =narrow-to-region= command, when invoked on a selected region of text, will hide everything else in the buffer except for that text. 
+
+It's as if you're editing a file containing *only* that information -- you can't see anything else, can't scroll beyond it, etc. In addition, most editing commands will only apply to the narrowed region of the buffer. 
+
+It's pretty damn handy. It's also disbled by default, so let's turn it on.
+
+#+name: writing-narrow
+#+begin_src emacs-lisp
+  (put 'narrow-to-region 'disabled nil)
+  
+#+end_src
+** Upcase / downcase
+
+Upcase-region and downcase-region are disabled by default. Let's turn them on.  
+
+#+name: writing-upcase
+#+begin_src emacs-lisp
+  (put 'downcase-region 'disabled nil)
+  (put 'upcase-region 'disabled nil)
+  
+#+end_src  
+
 ** Markdown mode
+
+#+name: writing-markdown
+#+begin_src emacs-lisp
+    (use-package markdown-mode
+               :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")  
+
+#+end_src  
+
+
+
 ** Marked.app integration
+
+Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/emacs
+
+#+name: writing-marked-app
+#+begin_src emacs-lisp
+  (defun markdown-preview-file ()
+    "run Marked on the current file and revert the buffer"
+    (interactive)
+    (shell-command
+     (format "open -a /Applications/Marked.app %s"
+             (shell-quote-argument (buffer-file-name)))))
+  
+  (global-set-key "\C-cm" 'markdown-preview-file)
+  
+#+end_src  
+
 ** fountain-mode
+
+
+#+name: writing-tabs
+#+begin_src emacs-lisp
+(use-package fountain-mode)
+  
+#+end_src  
+
+
 ** wordsmith-mode
+
+
+#+name: writing-tabs
+#+begin_src emacs-lisp
+(use-package wordsmith-mode)
+  
+#+end_src  
+
+
+
 ** writer-names
 * Coding
+** Tramp
+
+#+name: coding-tramp
+#+begin_src emacs-lisp   
+  (setq tramp-default-method "ssh")
+
+#+end_src
+
 ** Return + indent
 
 I like it when my return key preserves indentation:
@@ -1710,94 +1830,7 @@ And set some directory vars
   
   (defun jcs:clock-out (&optional theString theCategory)
     (org-clock-out))
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Eval and replace -- replace current sexp with its value
-  ;;-----------------------------------------------------------------------------
-  
-  (defun eval-and-replace ()
-    "Replace the preceding sexp with its value."
-    (interactive)
-    (backward-kill-sexp)
-    (prin1 (eval (read (current-kill 0)))
-           (current-buffer)))
-  
-  (global-set-key (kbd "C-c e") 'eval-and-replace)
-  
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Open in Marked.app -- Stolen from https://github.com/mattsears/emacs
-  ;;-----------------------------------------------------------------------------
-  (defun markdown-preview-file ()
-    "run Marked on the current file and revert the buffer"
-    (interactive)
-    (shell-command
-     (format "open -a /Applications/Marked.app %s"
-             (shell-quote-argument (buffer-file-name)))))
-  
-  (global-set-key "\C-cm" 'markdown-preview-file)
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; Unfill paragraph -- From https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org
-  ;;-----------------------------------------------------------------------------
-  (defun unfill-paragraph ()
-    "Takes a multi-line paragraph and makes it into a single line of text."
-    (interactive)
-    (let ((fill-column (point-max)))
-      (fill-paragraph nil)))
-  
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
-  ;;-----------------------------------------------------------------------------
-  (defun byte-compile-current-buffer ()
-    "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
-    (interactive)
-    (when (and (eq major-mode 'emacs-lisp-mode)
-               (file-exists-p (byte-compile-dest-file buffer-file-name)))
-      (byte-compile-file buffer-file-name)))
-  
-  (add-hook 'after-save-hook 'byte-compile-current-buffer)
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; A smarter find-tag that automagically reruns etags when it can't find a
-  ;; requested item and then makes a new try to locate it.
-  ;; by Jonas.Jarnestrom<at>ki.ericsson.se
-  ;; Fri Mar 15 09:52:14 2002
-  ;;-----------------------------------------------------------------------------
-  (defadvice find-tag (around refresh-etags activate)
-    "Rerun etags and reload tags if tag not found and redo find-tag.
-     If buffer is modified, ask about save before running etags."
-    (let ((extension (file-name-extension (buffer-file-name))))
-      (condition-case err
-          ad-do-it
-        (error (and (buffer-modified-p)
-                    (not (ding))
-                    (y-or-n-p "Buffer is modified, save it? ")
-                    (save-buffer))
-               (er-refresh-etags extension)
-               ad-do-it))))
-  
-  (defun er-refresh-etags (&optional extension)
-    "Run etags on all peer files in current dir and reload them silently."
-    (interactive)
-    (shell-command (format "etags *.%s" (or extension "el")))
-    (let ((tags-revert-without-query t))  ; don't query, revert silently
-      (visit-tags-table default-directory nil)))
-  
-  ;; While we're at it, modify pop-tag-mark to stay centered on cursor
-  (defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
-    "After popping back to where find-tag was invoked,
-     center screen on cursor"
-    (let ((current-prefix-arg '(4)))
-    (call-interactively 'recenter-top-bottom)))
-  
-  
+    
 #+end_src
 * Other Implementation details
 
