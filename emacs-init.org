@@ -1089,7 +1089,7 @@ Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the
 
 #+end_src
 
-*** Auto-revert dired
+*** Auto-revert dired buffers
 
 This code is supposed to auto-revert (refresh) dired buffers when things change, but I don't think it works the way I want it to work:
 
@@ -1099,6 +1099,16 @@ This code is supposed to auto-revert (refresh) dired buffers when things change,
   (setq auto-revert-verbose nil)
 
 #+end_src
+
+And this is supposed to allow me to revert buffers if the file changes.
+
+#+name: auto-revert-dired
+#+begin_src emacs-lisp
+  (setq global-auto-revert-mode 1)
+
+#+end_src
+
+
 *** Rename and delete files
 
 Renaming and deleting files should be easier to do while you're viewing them.
