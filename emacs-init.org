@@ -920,18 +920,35 @@ Emacs Desktop allows you to save your current workspace (frame dimensions, windo
 
 #+end_src
 
+Define my bookmarks file.
+
+#+name: desktop-settings
+#+begin_src emacs-lisp
+  (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
+
+#+end_src
+
 
 ** Window Navigation
 *** Move to other window
 
 I'm experimenting with using =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
 
-#+name: keybindings-other-window
+#+name: window-other-window
 #+begin_src emacs-lisp 
 (global-set-key (kbd "M-o") 'other-window)
 #+end_src
 
+*** ace-jump between windows
 
+#+name: window-ace-window
+#+begin_src emacs-lisp 
+    (use-package ace-window
+                 :bind ("M-p" . ace-window))
+#+end_src
+
+
+ 
 *** Winner-mode
 
 I don't use this as much anymore, but winner-mode lets you flip between various window/frame configurations.
