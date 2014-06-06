@@ -576,49 +576,6 @@ Even better, use-package supports diminsh options as part of the declaration whe
 
 Diminish also features [[http://www.eskimo.com/~seldon/diminish.el][some of the best code comments in the universe]].
 
-*** bzg's big fringe mode (experimental)
-
-wrap-to-fill-column is packaged with nxhtml, a bloated package I've always hated and which isn't on MELPA. 
-
-So here's another discovery -- bzg's big fring mode: (not currently being activated or tangled)
-
-#+name: big-fringe-mode
-#+begin_example
-(defvar bzg-big-fringe-mode nil)
-(define-minor-mode bzg-big-fringe-mode
-  "Minor mode to use big fringe in the current buffer."
-  :init-value nil
-  :global t
-  :variable bzg-big-fringe-mode
-  :group 'editing-basics
-  (if (not bzg-big-fringe-mode)
-      (set-fringe-style nil)
-    (set-fringe-mode
-     (/ (- (frame-pixel-width)
-           (* 120 (frame-char-width)))
-        2))))
-
-;; Now activate this global minor mode
-(bzg-big-fringe-mode 1)
-
-;; To activate the fringe by default and deactivate it when windows
-;; are split vertically, uncomment this:
-(add-hook 'window-configuration-change-hook
-          (lambda ()
-            (if (delq nil
-                      (let ((fw (frame-width)))
-                        (mapcar (lambda(w) (< (window-width w) fw))
-                                (window-list))))
-                (bzg-big-fringe-mode 0)
-              (bzg-big-fringe-mode 1))))
-
-
-;; Get rid of the indicators in the fringe
-(mapcar (lambda(fb) (set-fringe-bitmap-face fb 'org-hide))
-        fringe-bitmaps)
-#+end_example
-
-
 *** Force redisplay
 
 If the =redisplay-dont-pause= variable is not set, then any keyboard/mouse event will stop a screen redraw to handle the input. Which I suppose made sense on older machines or slower networks.
@@ -914,20 +871,19 @@ However... it's still kind of a pain in the ass.
 
 Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually want to work on shorter lines than that, just for usability's sake.
 
-I've since discovered wrap-to-fill-column-mode, which is packaged with nxhtml-mode. This allows me to use visual-line-mode for word.
+I've since discovered wrap-to-fill-column-mode (packaged with nxhtml-mode). This allows me to use visual-line-mode for word.
 
 #+name: auto-fill-options
 #+begin_src emacs-lisp
-  ;; wrap-to-fill is only included in nxhtml-mode,
-  ;;  so we need packages installed before this works.
-  ;; 
   ;;(auto-fill-mode 1)
   ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-  ;; (wrap-to-fill-column-mode 1)
-  ;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+  (require 'wrap-to-fill)
+  (visual-line-mode 1)
+  (wrap-to-fill-column-mode 1)
+  (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
   (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 #+end_src
-** Desktop Settings
+** Desktop & Bookmark Settings
 
 Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings). It's pretty rad.
 
