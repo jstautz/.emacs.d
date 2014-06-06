@@ -1602,25 +1602,113 @@ I like it when my return key preserves indentation:
 (global-set-key (kbd "RET") 'newline-and-indent)
 
 #+end_src
-** Sublime-style Minimap
+** Tags
 
-One nice feature of Sublime Text is the [[http://i.stack.imgur.com/SkFIc.png][Minimap]]: a small scaled-down overview of the code in your buffer, so you can get a sense of your current location in relation to the rest of the file.
+A smarter find-tag that automagically reruns etags when it can't find a requested item and then makes a new try to locate it.
 
-Sublimity is a package that provides this functionality for emacs.
+I stole this from Jonas.Jarnestrom<at>ki.ericsson.se.
 
-Actually, I don't like this. It fucks with my scrolling. 
-
-#+name: coding-minimap-sublimity
+#+name: coding-reload-tags
 #+begin_src emacs-lisp
-;;  (use-package sublimity)
+  (defadvice find-tag (around refresh-etags activate)
+    "Rerun etags and reload tags if tag not found and redo find-tag.
+     If buffer is modified, ask about save before running etags."
+    (let ((extension (file-name-extension (buffer-file-name))))
+      (condition-case err
+          ad-do-it
+        (error (and (buffer-modified-p)
+                    (not (ding))
+                    (y-or-n-p "Buffer is modified, save it? ")
+                    (save-buffer))
+               (er-refresh-etags extension)
+               ad-do-it))))
+  
+  (defun er-refresh-etags (&optional extension)
+    "Run etags on all peer files in current dir and reload them silently."
+    (interactive)
+    (shell-command (format "etags *.%s" (or extension "el")))
+    (let ((tags-revert-without-query t))  ; don't query, revert silently
+      (visit-tags-table default-directory nil)))
+  
+#+end_src  
+
+...And if my etags file gets rebuilt at any point, don't pester me about it, just use the updated file:
+
+#+name: coding-rebuild-tags
+#+begin_src emacs-lisp
+  (setq tags-revert-without-query t)
+  
+#+end_src  
+  
+
+
+When navigating via tags and I pop back to my original location, I want to make sure the cursor is centered on the screen and easy to spot. I do this by modifying the =pop-tag-mark= function like this:
+
+#+name: coding-pop-tag
+#+begin_src emacs-lisp
+  (defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+    "After popping back to where find-tag was invoked,
+     center screen on cursor"
+    (let ((current-prefix-arg '(4)))
+    (call-interactively 'recenter-top-bottom)))
+  
+#+end_src
+** Diff
+
+Add some flags to the default diff command so it works with .org files and others.
+
+#+name: coding-diff
+#+begin_src emacs-lisp   
+  (setq diff-switches "-a -c")
+
 #+end_src
 
 
+** Magit
 
+#+name: coding-magit
+#+begin_src emacs-lisp   
+  (use-package magit)
+  
+#+end_src
 
 ** Emacs Lisp
 *** eval and replace
+
+When I'm working with elisp, it's sometimes useful to quickly evaluate an s-expression and immediately replace it with the result.
+
+#+name: coding-eval-replace
+#+begin_src emacs-lisp
+(defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (prin1 (eval (read (current-kill 0)))
+           (current-buffer)))
+  
+  (global-set-key (kbd "C-c e") 'eval-and-replace)
+
+#+end_src  
+  
 *** auto-recompile elisp
+
+If I'm working on an elisp file that has a corresponding compiled version (*.elc), I want to re-compile whenever I save the buffer. 
+
+#+name: coding-auto-recompile
+#+begin_src emacs-lisp
+
+  (defun byte-compile-current-buffer ()
+    "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+    (interactive)
+    (when (and (eq major-mode 'emacs-lisp-mode)
+               (file-exists-p (byte-compile-dest-file buffer-file-name)))
+      (byte-compile-file buffer-file-name)))
+  
+  (add-hook 'after-save-hook 'byte-compile-current-buffer)
+
+#+end_src  
+
+
 *** Bind ESC to top-level command 
 
 I hate having to repeatedly hit escape to bounce out of recursive edits when I drop into the debugger.  
@@ -1637,68 +1725,66 @@ I hate having to repeatedly hit escape to bounce out of recursive edits when I d
 
 ** Python
 *** Virtualenvwrapper
+
+I use virtualenvwrapper for working in Python.
+
+#+name: coding-virtualenv
+#+begin_src emacs-lisp
+  (use-package virtualenvwrapper)
+  
+#+end_src  
+
 *** Jedi
+
+Jedi is awesome for autocompletion and more when working with Python.
+
+#+name: coding-jedi
+#+begin_src emacs-lisp
+  (use-package jedi)
+  
+#+end_src  
+
 ** Web development
 *** web mode
-*** css
-*** js2 mode
+
+Haven't used web-mode much yet -- still trying it out.
+
+#+name: coding-webmode
+#+begin_src emacs-lisp
+  (use-package web-mode)
+  
+#+end_src  
+
 *** skewer
+
+Skewer-mode is rad. It uses simple-http to connect your HTML/CSS/js buffer to your browser, so you can live-edit your code and see the results instantly. 
+
+#+name: coding-skewer
+#+begin_src emacs-lisp
+  (use-package skewer-mode)
+  
+#+end_src  
+
+*** js2 mode
+
+Steve Yegge built this. I think it's useful.
+
+#+name: coding-js2-mode
+#+begin_src emacs-lisp
+  (use-package js2-mode)
+  
+#+end_src  
+
+There's also a "refactored" version. I have yet to decide which is best.
+
+#+name: coding-js2-refactor
+#+begin_src emacs-lisp
+  (use-package js2-refactor)
+  
+#+end_src  
+
+
 * Org-mode
-* Editor customizations
-:PROPERTIES:
-:noweb-ref: Load some editor customizations
-:END:
-
-#+name: editor-settings
-#+begin_src emacs-lisp 
-  ;;-----------------------------------------------------------------------------
-  ;; System / Editing Prefs
-  ;;-----------------------------------------------------------------------------
-  
-    
-  ;; Refresh any buffer when file on disk changes
-  (setq global-auto-revert-mode 1)
-  
-  
-  ;; ...Also rebuild Tags files, and be quiet about it
-  (setq tags-revert-without-query t)
-  
-  ;; M-x locate uses OS X's Spotlight
-  (setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
-  
-  
-  ;; Tabs insert 4 spaces, sentences have one space (as God intended).
-  (setq-default tab-width 4)
-  (setq-default indent-tabs-mode nil)
-  (setq sentence-end-double-space nil)
-  
-  
-   
-  ;; Bookmark options
-  (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
-  
-  ;; spellcheck options
-  (setq ispell-program-name "aspell")
-  
-  ;; Tramp defaults
-  (setq tramp-default-method "ssh")
-  
-  ;; Make sure diff works with .org files and others
-  (setq diff-switches "-a -c")
-  
-  ;; Let me upcase/downcase regions
-  (put 'downcase-region 'disabled nil)
-  (put 'upcase-region 'disabled nil)
-  
-  ;; Let me narrow to region -- I use this a bunch
-  (put 'narrow-to-region 'disabled nil)
-  
-  
-  
-#+end_src
-
-
-* System and editor settings
 * Load and configure packages
 :PROPERTIES:
 :noweb-ref: Load and configure packages
@@ -1707,57 +1793,7 @@ I hate having to repeatedly hit escape to bounce out of recursive edits when I d
 Here's the good stuff!
 
 ** Set package sources
-I want to add a few other sources (notably marmalade and melpa) to my package source list
-  
-#+name: packages-set-sources
-#+begin_src emacs-lisp
-(require 'package)
-(dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
-                   ("elpa" . "http://tromey.com/elpa/")
-                   ("marmalade" . "http://marmalade-repo.org/packages/")
-                   ("melpa" . "http://melpa.milkbox.net/packages/")))
-  (add-to-list 'package-archives source t))
-(package-initialize)
-#+end_src
-
-** Add ELPA and el-get package directories to load path  
-
-#+name: packages-add-to-load-path
-#+begin_src emacs-lisp
-(add-to-list 'load-path (concat dotemacs-dir "elpa"))
-;; (add-to-list 'load-path (concat dotemacs-dir "el-get/el-get"))
-#+end_src
-
  
-** Bootstrap el-get
-
-#+name: packages-el-get-bootstrap
-#+begin_src emacs-lisp
-  ;; el-get, install thyself!
-  ;; (unless (require 'el-get nil t)
-  ;;  (url-retrieve
-  ;;   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-  ;;   (lambda (s)
-  ;;     (let ((el-get-master-branch) (el-get-install-skip-emacswiki-recipes))
-  ;;       (goto-char (point-max))
-  ;;       (eval-print-last-sexp)))))
-#+end_src
-
-And set some directory vars
-
-#+name: packages-set-el-get-dirs
-#+begin_src emacs-lisp
-  ;; (setq el-get-dir (concat dotemacs-dir "el-get")
-  ;;       el-get-user-package-directory (concat dotemacs-dir "config"))
-#+end_src
-
-
- 
-** Load packages
-#+name: init-packages
-#+begin_src emacs-lisp
-  ;; (require 'init-packages)
-#+end_src
 
 * Custom functions and tweaks
 :PROPERTIES:
@@ -1767,13 +1803,6 @@ And set some directory vars
 
 #+name: init-packages
 #+begin_src emacs-lisp
-  
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;; A random smattering of custom/helper functions
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  
   
   ;;-----------------------------------------------------------------------------
   ;; jcs:getcals -- Sync my Google Calendars to emacs diary

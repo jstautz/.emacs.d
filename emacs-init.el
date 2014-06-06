@@ -19,10 +19,18 @@
   (interactive)
   (require 'secrets))
 
+(require 'package)
+(dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
+                   ("elpa" . "http://tromey.com/elpa/")
+                   ("marmalade" . "http://marmalade-repo.org/packages/")
+                   ("melpa" . "http://melpa.milkbox.net/packages/")))
+  (add-to-list 'package-archives source t))
+(package-initialize)
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+(require 'pallet)
+
 (require 'use-package)
-(use-package pallet)
 (tool-bar-mode -1)
 (set-face-background 'fringe (face-background 'default))
 (set-face-foreground 'fringe (face-background 'default))
@@ -144,13 +152,12 @@
 
 (setq eol-mnemonic-mac "(Mac)")
 
-;; wrap-to-fill is only included in nxhtml-mode,
-;;  so we need packages installed before this works.
-;; 
 ;;(auto-fill-mode 1)
 ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-;; (wrap-to-fill-column-mode 1)
-;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(require 'wrap-to-fill)
+(visual-line-mode 1)
+(wrap-to-fill-column-mode 1)
+(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 (desktop-save-mode 1)
 (setq desktop-globals-to-save
@@ -168,7 +175,11 @@
                 tags-file-name
                 register-alist)))
 
+(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
+
 (global-set-key (kbd "M-o") 'other-window)
+(use-package ace-window
+             :bind ("M-p" . ace-window))
 (winner-mode 1)
 
 (defun vsplit-last-buffer ()
@@ -245,6 +256,8 @@ of windows in the frame simply by calling this command again."
 
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
+
+(setq global-auto-revert-mode 1)
 
 (defun rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
@@ -421,61 +434,26 @@ of windows in the frame simply by calling this command again."
 (guide-key-mode 1)
 
 
-;;-----------------------------------------------------------------------------
-;; System / Editing Prefs
-;;-----------------------------------------------------------------------------
-
-  
-;; Refresh any buffer when file on disk changes
-(setq global-auto-revert-mode 1)
-
-
-;; ...Also rebuild Tags files, and be quiet about it
-(setq tags-revert-without-query t)
-
-;; M-x locate uses OS X's Spotlight
-(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
-
-
-;; Tabs insert 4 spaces, sentences have one space (as God intended).
-(setq-default tab-width 4)
-(setq-default indent-tabs-mode nil)
-(setq sentence-end-double-space nil)
-
-
- 
-;; Bookmark options
-(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
-
-;; spellcheck options
-(setq ispell-program-name "aspell")
-
-;; Tramp defaults
-(setq tramp-default-method "ssh")
-
-;; Make sure diff works with .org files and others
-(setq diff-switches "-a -c")
-
-;; Let me upcase/downcase regions
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-
-;; Let me narrow to region -- I use this a bunch
-(put 'narrow-to-region 'disabled nil)
-
-
 
 
 
 (desktop-read)
 (server-start)
 
+(require 'package)
+(dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
+                   ("elpa" . "http://tromey.com/elpa/")
+                   ("marmalade" . "http://marmalade-repo.org/packages/")
+                   ("melpa" . "http://melpa.milkbox.net/packages/")))
+  (add-to-list 'package-archives source t))
+(package-initialize)
+
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
-(require 'use-package)
+(require 'pallet)
 
-(use-package pallet)
+(require 'use-package)
 
 (tool-bar-mode -1)
 
@@ -610,13 +588,12 @@ of windows in the frame simply by calling this command again."
 
 (setq eol-mnemonic-mac "(Mac)")
 
-;; wrap-to-fill is only included in nxhtml-mode,
-;;  so we need packages installed before this works.
-;; 
 ;;(auto-fill-mode 1)
 ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-;; (wrap-to-fill-column-mode 1)
-;; (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(require 'wrap-to-fill)
+(visual-line-mode 1)
+(wrap-to-fill-column-mode 1)
+(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 (desktop-save-mode 1)
@@ -635,7 +612,12 @@ of windows in the frame simply by calling this command again."
                 tags-file-name
                 register-alist)))
 
+(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
+
 (global-set-key (kbd "M-o") 'other-window)
+
+(use-package ace-window
+             :bind ("M-p" . ace-window))
 
 (winner-mode 1)
 
@@ -713,6 +695,8 @@ of windows in the frame simply by calling this command again."
 
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
+
+(setq global-auto-revert-mode 1)
 
 (defun rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
@@ -890,9 +874,93 @@ of windows in the frame simply by calling this command again."
 
 (guide-key-mode 1)
 
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+(setq sentence-end-double-space nil)
+
+(setq ispell-program-name "aspell")
+
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+(put 'narrow-to-region 'disabled nil)
+
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+(use-package markdown-mode
+           :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")
+
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked.app %s"
+           (shell-quote-argument (buffer-file-name)))))
+
+(global-set-key "\C-cm" 'markdown-preview-file)
+
+(use-package fountain-mode)
+
+(use-package wordsmith-mode)
+
+(setq tramp-default-method "ssh")
+
 (global-set-key (kbd "RET") 'newline-and-indent)
 
-(use-package sublimity)
+(defadvice find-tag (around refresh-etags activate)
+  "Rerun etags and reload tags if tag not found and redo find-tag.
+   If buffer is modified, ask about save before running etags."
+  (let ((extension (file-name-extension (buffer-file-name))))
+    (condition-case err
+        ad-do-it
+      (error (and (buffer-modified-p)
+                  (not (ding))
+                  (y-or-n-p "Buffer is modified, save it? ")
+                  (save-buffer))
+             (er-refresh-etags extension)
+             ad-do-it))))
+
+(defun er-refresh-etags (&optional extension)
+  "Run etags on all peer files in current dir and reload them silently."
+  (interactive)
+  (shell-command (format "etags *.%s" (or extension "el")))
+  (let ((tags-revert-without-query t))  ; don't query, revert silently
+    (visit-tags-table default-directory nil)))
+
+(setq tags-revert-without-query t)
+
+(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+  "After popping back to where find-tag was invoked,
+   center screen on cursor"
+  (let ((current-prefix-arg '(4)))
+  (call-interactively 'recenter-top-bottom)))
+
+(setq diff-switches "-a -c")
+
+(use-package magit)
+
+(defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (prin1 (eval (read (current-kill 0)))
+           (current-buffer)))
+  
+  (global-set-key (kbd "C-c e") 'eval-and-replace)
+
+(defun byte-compile-current-buffer ()
+  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+  (interactive)
+  (when (and (eq major-mode 'emacs-lisp-mode)
+             (file-exists-p (byte-compile-dest-file buffer-file-name)))
+    (byte-compile-file buffer-file-name)))
+
+(add-hook 'after-save-hook 'byte-compile-current-buffer)
 
 (global-set-key (kbd "<C-escape>") 'top-level)  
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -900,79 +968,17 @@ of windows in the frame simply by calling this command again."
           (lambda()
             (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
 
-;;-----------------------------------------------------------------------------
-;; System / Editing Prefs
-;;-----------------------------------------------------------------------------
+(use-package virtualenvwrapper)
 
-  
-;; Refresh any buffer when file on disk changes
-(setq global-auto-revert-mode 1)
+(use-package jedi)
 
+(use-package web-mode)
 
-;; ...Also rebuild Tags files, and be quiet about it
-(setq tags-revert-without-query t)
+(use-package skewer-mode)
 
-;; M-x locate uses OS X's Spotlight
-(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+(use-package js2-mode)
 
-
-;; Tabs insert 4 spaces, sentences have one space (as God intended).
-(setq-default tab-width 4)
-(setq-default indent-tabs-mode nil)
-(setq sentence-end-double-space nil)
-
-
- 
-;; Bookmark options
-(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
-
-;; spellcheck options
-(setq ispell-program-name "aspell")
-
-;; Tramp defaults
-(setq tramp-default-method "ssh")
-
-;; Make sure diff works with .org files and others
-(setq diff-switches "-a -c")
-
-;; Let me upcase/downcase regions
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-
-;; Let me narrow to region -- I use this a bunch
-(put 'narrow-to-region 'disabled nil)
-
-(require 'package)
-(dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
-                   ("elpa" . "http://tromey.com/elpa/")
-                   ("marmalade" . "http://marmalade-repo.org/packages/")
-                   ("melpa" . "http://melpa.milkbox.net/packages/")))
-  (add-to-list 'package-archives source t))
-(package-initialize)
-
-(add-to-list 'load-path (concat dotemacs-dir "elpa"))
-;; (add-to-list 'load-path (concat dotemacs-dir "el-get/el-get"))
-
-;; el-get, install thyself!
-;; (unless (require 'el-get nil t)
-;;  (url-retrieve
-;;   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-;;   (lambda (s)
-;;     (let ((el-get-master-branch) (el-get-install-skip-emacswiki-recipes))
-;;       (goto-char (point-max))
-;;       (eval-print-last-sexp)))))
-
-;; (setq el-get-dir (concat dotemacs-dir "el-get")
-;;       el-get-user-package-directory (concat dotemacs-dir "config"))
-
-;; (require 'init-packages)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; A random smattering of custom/helper functions
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(use-package js2-refactor)
 
 ;;-----------------------------------------------------------------------------
 ;; jcs:getcals -- Sync my Google Calendars to emacs diary
@@ -1029,92 +1035,6 @@ of windows in the frame simply by calling this command again."
 
 (defun jcs:clock-out (&optional theString theCategory)
   (org-clock-out))
-
-
-;;-----------------------------------------------------------------------------
-;; Eval and replace -- replace current sexp with its value
-;;-----------------------------------------------------------------------------
-
-(defun eval-and-replace ()
-  "Replace the preceding sexp with its value."
-  (interactive)
-  (backward-kill-sexp)
-  (prin1 (eval (read (current-kill 0)))
-         (current-buffer)))
-
-(global-set-key (kbd "C-c e") 'eval-and-replace)
-
-
-
-;;-----------------------------------------------------------------------------
-;; Open in Marked.app -- Stolen from https://github.com/mattsears/emacs
-;;-----------------------------------------------------------------------------
-(defun markdown-preview-file ()
-  "run Marked on the current file and revert the buffer"
-  (interactive)
-  (shell-command
-   (format "open -a /Applications/Marked.app %s"
-           (shell-quote-argument (buffer-file-name)))))
-
-(global-set-key "\C-cm" 'markdown-preview-file)
-
-
-;;-----------------------------------------------------------------------------
-;; Unfill paragraph -- From https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org
-;;-----------------------------------------------------------------------------
-(defun unfill-paragraph ()
-  "Takes a multi-line paragraph and makes it into a single line of text."
-  (interactive)
-  (let ((fill-column (point-max)))
-    (fill-paragraph nil)))
-
-
-
-;;-----------------------------------------------------------------------------
-;; auto-recompile elisp -- Thanks to Adolfo Benedetti and Xah Lee
-;;-----------------------------------------------------------------------------
-(defun byte-compile-current-buffer ()
-  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
-  (interactive)
-  (when (and (eq major-mode 'emacs-lisp-mode)
-             (file-exists-p (byte-compile-dest-file buffer-file-name)))
-    (byte-compile-file buffer-file-name)))
-
-(add-hook 'after-save-hook 'byte-compile-current-buffer)
-
-
-;;-----------------------------------------------------------------------------
-;; A smarter find-tag that automagically reruns etags when it can't find a
-;; requested item and then makes a new try to locate it.
-;; by Jonas.Jarnestrom<at>ki.ericsson.se
-;; Fri Mar 15 09:52:14 2002
-;;-----------------------------------------------------------------------------
-(defadvice find-tag (around refresh-etags activate)
-  "Rerun etags and reload tags if tag not found and redo find-tag.
-   If buffer is modified, ask about save before running etags."
-  (let ((extension (file-name-extension (buffer-file-name))))
-    (condition-case err
-        ad-do-it
-      (error (and (buffer-modified-p)
-                  (not (ding))
-                  (y-or-n-p "Buffer is modified, save it? ")
-                  (save-buffer))
-             (er-refresh-etags extension)
-             ad-do-it))))
-
-(defun er-refresh-etags (&optional extension)
-  "Run etags on all peer files in current dir and reload them silently."
-  (interactive)
-  (shell-command (format "etags *.%s" (or extension "el")))
-  (let ((tags-revert-without-query t))  ; don't query, revert silently
-    (visit-tags-table default-directory nil)))
-
-;; While we're at it, modify pop-tag-mark to stay centered on cursor
-(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
-  "After popping back to where find-tag was invoked,
-   center screen on cursor"
-  (let ((current-prefix-arg '(4)))
-  (call-interactively 'recenter-top-bottom)))
 
 (require 'cl)
 
