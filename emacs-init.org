@@ -1,4 +1,3 @@
-
 #+TITLE: Jeff's Emacs config
 #+AUTHOR: Jeff Stautz
 #+EMAIL: jeff@jeffstautz.com
@@ -201,7 +200,7 @@ My init.el currently looks like this:
 
 That's it.
 
-The important part is that last s-expression: 
+Ignore the bits about Cask for now -- we'll get to that later. The important part is that last s-expression: 
 
 #+begin_src emacs-lisp :tangle no
 (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)
@@ -227,10 +226,10 @@ I can define that Emacs-friendly code order here, using "noweb" syntax[fn:2], wh
 <<Prerequisites and setup -- load basic support libraries, set some useful variables>>
 <<Load and configure Cask & Pallet to load packages>>
 <<General Editor Settings: UI, files, navigation, editing, scrolling>>
-
+<<Load settings for writing fiction>>
 <<Load some editor customizations>>
-<<Set custom keybindings>>
-
+<<Configure programming-related packages and settings>>
+<<Set up org-mode>>
 <<Post-flight: load Emacs desktop and start server>>
 #+end_src
 
@@ -286,7 +285,7 @@ The =Cask= file in my .emacs.d/ lists the packages that my setup depends on, as 
 
 I don't keep *any* of my packages under version control at the moment. If I install Emacs config from scratch, my installation script + Cask will download and load all the packages I need.
 
-#+name: package-cask
+#+name: package-cask :tangle no
 #+begin_src emacs-lisp 
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
@@ -378,6 +377,100 @@ A couple of languages I work with in Emacs:
 Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
 
 [[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
+
+* Prerequisites and setup
+:PROPERTIES:
+:noweb-ref: Prerequisites and setup -- load basic support libraries, set some useful variables
+:CUSTOM_ID: setup
+:END:  
+
+This section contains the first bits of elisp in my config that get loaded. 
+
+** First, let's load common lisp libraries
+
+This is generally a good idea.
+
+#+name: setup-require-cl :comments both
+#+begin_src emacs-lisp
+(require 'cl)
+
+#+end_src
+
+** Then set our path appropriately.
+
+This is kind of a gross hack to grab the $PATH environment variable from my ~/.bashrc and use this. This way my path is consistent between Emacs and my shell elsewhere.
+
+#+name: setup-path :comments both
+#+begin_src emacs-lisp
+(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+  (setenv "PATH" jcs:shell-path)
+  (setq exec-path (split-string jcs:shell-path ":")))
+
+#+end_src
+ 
+** Set a few variables for directories
+
+Define our home directory, dot emacs directory (where the config lives), emacs binary directory (where Emacs.app lives), and info file directory.
+
+I use these =*-dir= variables all over the place in my config.
+
+#+name: setup-dirs :comments both
+#+begin_src emacs-lisp
+(setq home-dir "/Users/jstautz/"
+      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
+      emacs-dir "/Applications/Emacs.app/Contents/"
+      emacs-bin (concat emacs-dir "MacOS/Emacs")
+      info-dir (concat emacs-dir "Resources/info/"))
+#+end_src
+
+** Add .emacs.d to load-path
+
+...Kinda necessary.
+
+#+name: setup-load-path
+#+begin_src emacs-lisp
+(add-to-list 'load-path dotemacs-dir)
+#+end_src
+** Tell 'customize' where to save changes
+
+Emacs has a neat customize feature, accessible via =M-x customize=, which lets you modify user-configurable variables in a simpler (read: non-elisp) interface.
+
+I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle with settings in customize to try things out.
+
+When I do so, I'd like customize to save things in a separate =emcas-custom= file. I treat this file as temporary storage. If I like the changes, I'll pull them out of this file and place them in the appropriate places in my config.
+
+#+name: setup-custom-file
+#+begin_src emacs-lisp
+(setq custom-file (concat dotemacs-dir "emacs-custom.el"))
+
+#+end_src
+
+** Set garbage collection threshold higher
+
+Props to Le Wang for this one.
+
+[[https://github.com/lewang/flx][According to his documentation in flx]], Emacs will start GC every 0.76MB allocated, which is way too often on modern machines. We want to boost that to 20MB:
+
+#+name: setup-gc-settings
+#+begin_src emacs-lisp
+(setq gc-cons-threshold 20000000)
+
+#+end_src
+
+** Finally, decrypt secrets.el.gpg
+
+Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
+
+I do this *before* I begin loading packages so that package configs can access variables stored in the secrets file.
+
+#+name: setup-decrypt-secrets-function
+#+begin_src emacs-lisp
+(defun jcs:decrypt-secrets ()
+  (interactive)
+  (require 'secrets))
+
+#+end_src
+
 
 * General Editor Settings
 :PROPERTIES:
@@ -1463,6 +1556,10 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 #+end_src
 
 * Writing Fiction
+:PROPERTIES:
+:noweb-ref: Load settings for writing fiction
+:END:
+
 ** Tabs and spaces
 
 I am firmly in the "spaces" camp on the whole "tabs v. spaces" debate. I also like my tabs to insert 4 spaces.
@@ -1585,6 +1682,11 @@ Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/
 
 ** writer-names
 * Coding
+:PROPERTIES:
+:noweb-ref: Configure programming-related packages and settings
+:END:
+
+
 ** Tramp
 
 #+name: coding-tramp
@@ -1785,15 +1887,9 @@ There's also a "refactored" version. I have yet to decide which is best.
 
 
 * Org-mode
-* Load and configure packages
 :PROPERTIES:
-:noweb-ref: Load and configure packages
-:CUSTOM_ID: load-packages
+:noweb-ref: Set up org-mode
 :END:
-Here's the good stuff!
-
-** Set package sources
- 
 
 * Custom functions and tweaks
 :PROPERTIES:
@@ -1861,113 +1957,13 @@ Here's the good stuff!
     (org-clock-out))
     
 #+end_src
-* Other Implementation details
-
-This section contains some less-interesting details that I won't be modifying all that often, but were still important to document. 
-
-** Prerequisites and setup
-:PROPERTIES:
-:noweb-ref: Prerequisites and setup -- load basic support libraries, set some useful variables
-:CUSTOM_ID: setup
-:END:  
-
-This section contains the first bits of elisp in my config that get loaded. 
-
-*** First, let's load common lisp libraries
-
-This is generally a good idea.
-
-#+name: setup-require-cl :comments both
-#+begin_src emacs-lisp
-(require 'cl)
-
-#+end_src
-
-*** Then set our path appropriately.
-
-This is kind of a gross hack to grab the $PATH environment variable from my ~/.bashrc and use this. This way my path is consistent between Emacs and my shell elsewhere.
-
-#+name: setup-path :comments both
-#+begin_src emacs-lisp
-(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
-  (setenv "PATH" jcs:shell-path)
-  (setq exec-path (split-string jcs:shell-path ":")))
-
-#+end_src
- 
-*** Set a few variables for directories
-
-Define our home directory, dot emacs directory (where the config lives), emacs binary directory (where Emacs.app lives), and info file directory.
-
-I use these =*-dir= variables all over the place in my config.
-
-#+name: setup-dirs :comments both
-#+begin_src emacs-lisp
-(setq home-dir "/Users/jstautz/"
-      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
-      emacs-dir "/Applications/Emacs.app/Contents/"
-      emacs-bin (concat emacs-dir "MacOS/Emacs")
-      info-dir (concat emacs-dir "Resources/info/"))
-#+end_src
-
-*** Add .emacs.d to load-path
-
-...Kinda necessary.
-
-#+name: setup-load-path
-#+begin_src emacs-lisp
-(add-to-list 'load-path dotemacs-dir)
-#+end_src
-*** Tell 'customize' where to save changes
-
-Emacs has a neat customize feature, accessible via =M-x customize=, which lets you modify user-configurable variables in a simpler (read: non-elisp) interface.
-
-I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle with settings in customize to try things out.
-
-When I do so, I'd like customize to save things in a separate =emcas-custom= file. I treat this file as temporary storage. If I like the changes, I'll pull them out of this file and place them in the appropriate places in my config.
-
-#+name: setup-custom-file
-#+begin_src emacs-lisp
-(setq custom-file (concat dotemacs-dir "emacs-custom.el"))
-
-#+end_src
-
-*** Set garbage collection threshold higher
-
-Props to Le Wang for this one.
-
-[[https://github.com/lewang/flx][According to his documentation in flx]], Emacs will start GC every 0.76MB allocated, which is way too often on modern machines. We want to boost that to 20MB:
-
-#+name: setup-gc-settings
-#+begin_src emacs-lisp
-(setq gc-cons-threshold 20000000)
-
-#+end_src
-
-*** Finally, decrypt secrets.el.gpg
-
-Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
-
-I do this *before* I begin loading packages so that package configs can access variables stored in the secrets file.
-
-#+name: setup-decrypt-secrets-function
-#+begin_src emacs-lisp
-(defun jcs:decrypt-secrets ()
-  (interactive)
-  (require 'secrets))
-
-#+end_src
-
-
-** Post-flight -- final steps
+* Post-flight -- final steps
 :PROPERTIES:
 :noweb-ref: Post-flight: load Emacs desktop and start server
 :CUSTOM_ID: final-steps
 :END:
 
-These are the final bits of code that get run in my config.
-
-*** Restore my desktop
+** Restore my desktop
 
 (I'm not sure why this is required now when it wasn't before -- something slightly different after changing my config.)
 
@@ -1976,7 +1972,7 @@ These are the final bits of code that get run in my config.
 (desktop-read)
 #+end_src
 
-*** Start server
+** Start server
 
 Now that everything's good to go, start the emacs server so we can connect to it using =emacsclient= from the command line.
 
