@@ -433,8 +433,114 @@ of windows in the frame simply by calling this command again."
 
 (guide-key-mode 1)
 
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+(setq sentence-end-double-space nil)
+
+(setq ispell-program-name "aspell")
+
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+(put 'narrow-to-region 'disabled nil)
+
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+(use-package markdown-mode
+           :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")  
+
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked.app %s"
+           (shell-quote-argument (buffer-file-name)))))
+
+(global-set-key "\C-cm" 'markdown-preview-file)
+
+(use-package fountain-mode)
+  
+(use-package wordsmith-mode)
+  
+
+(setq tramp-default-method "ssh")
+
+(global-set-key (kbd "RET") 'newline-and-indent)
+
+(defadvice find-tag (around refresh-etags activate)
+  "Rerun etags and reload tags if tag not found and redo find-tag.
+   If buffer is modified, ask about save before running etags."
+  (let ((extension (file-name-extension (buffer-file-name))))
+    (condition-case err
+        ad-do-it
+      (error (and (buffer-modified-p)
+                  (not (ding))
+                  (y-or-n-p "Buffer is modified, save it? ")
+                  (save-buffer))
+             (er-refresh-etags extension)
+             ad-do-it))))
+
+(defun er-refresh-etags (&optional extension)
+  "Run etags on all peer files in current dir and reload them silently."
+  (interactive)
+  (shell-command (format "etags *.%s" (or extension "el")))
+  (let ((tags-revert-without-query t))  ; don't query, revert silently
+    (visit-tags-table default-directory nil)))
+
+(setq tags-revert-without-query t)
+
+(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+  "After popping back to where find-tag was invoked,
+   center screen on cursor"
+  (let ((current-prefix-arg '(4)))
+  (call-interactively 'recenter-top-bottom)))
+
+(setq diff-switches "-a -c")
+
+(use-package magit
+             :diminish magit-auto-revert-mode)
+
+(defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (prin1 (eval (read (current-kill 0)))
+           (current-buffer)))
+  
+  (global-set-key (kbd "C-c e") 'eval-and-replace)
 
 
+(defun byte-compile-current-buffer ()
+  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+  (interactive)
+  (when (and (eq major-mode 'emacs-lisp-mode)
+             (file-exists-p (byte-compile-dest-file buffer-file-name)))
+    (byte-compile-file buffer-file-name)))
+
+(add-hook 'after-save-hook 'byte-compile-current-buffer)
+
+(global-set-key (kbd "<C-escape>") 'top-level)  
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(add-hook 'org-mode-hook
+          (lambda()
+            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+
+(use-package virtualenvwrapper)
+
+(use-package jedi)
+
+(use-package web-mode)
+
+(use-package skewer-mode)
+
+(use-package js2-mode)
+
+(use-package js2-refactor)
 
 
 (desktop-read)
@@ -454,6 +560,28 @@ of windows in the frame simply by calling this command again."
 (require 'pallet)
 
 (require 'use-package)
+
+(require 'cl)
+
+(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+  (setenv "PATH" jcs:shell-path)
+  (setq exec-path (split-string jcs:shell-path ":")))
+
+(setq home-dir "/Users/jstautz/"
+      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
+      emacs-dir "/Applications/Emacs.app/Contents/"
+      emacs-bin (concat emacs-dir "MacOS/Emacs")
+      info-dir (concat emacs-dir "Resources/info/"))
+
+(add-to-list 'load-path dotemacs-dir)
+
+(setq custom-file (concat dotemacs-dir "emacs-custom.el"))
+
+(setq gc-cons-threshold 20000000)
+
+(defun jcs:decrypt-secrets ()
+  (interactive)
+  (require 'secrets))
 
 (tool-bar-mode -1)
 
@@ -942,7 +1070,8 @@ of windows in the frame simply by calling this command again."
 
 (setq diff-switches "-a -c")
 
-(use-package magit)
+(use-package magit
+             :diminish magit-auto-revert-mode)
 
 (defun eval-and-replace ()
     "Replace the preceding sexp with its value."
@@ -1035,28 +1164,6 @@ of windows in the frame simply by calling this command again."
 
 (defun jcs:clock-out (&optional theString theCategory)
   (org-clock-out))
-
-(require 'cl)
-
-(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
-  (setenv "PATH" jcs:shell-path)
-  (setq exec-path (split-string jcs:shell-path ":")))
-
-(setq home-dir "/Users/jstautz/"
-      dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
-      emacs-dir "/Applications/Emacs.app/Contents/"
-      emacs-bin (concat emacs-dir "MacOS/Emacs")
-      info-dir (concat emacs-dir "Resources/info/"))
-
-(add-to-list 'load-path dotemacs-dir)
-
-(setq custom-file (concat dotemacs-dir "emacs-custom.el"))
-
-(setq gc-cons-threshold 20000000)
-
-(defun jcs:decrypt-secrets ()
-  (interactive)
-  (require 'secrets))
 
 (desktop-read)
 

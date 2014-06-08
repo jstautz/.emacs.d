@@ -1770,8 +1770,9 @@ Add some flags to the default diff command so it works with .org files and other
 
 #+name: coding-magit
 #+begin_src emacs-lisp   
-  (use-package magit)
-  
+    (use-package magit
+                 :diminish magit-auto-revert-mode)
+    
 #+end_src
 
 ** Emacs Lisp
