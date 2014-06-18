@@ -61,7 +61,7 @@ On startup, emacs pulls out ("tangles") the code snippets in this file and uses 
 
 ** Why use literate programming for my Emacs config?
 :PROPERTIES:
-:CUSTOM_ID: why-literate
+:CUSTOM_ID: why_literate
 :END:
 
 It's an experiment. We'll see how well it works out.
@@ -72,28 +72,43 @@ Using a literate programming approach has a number of advantages that appeal to 
 
 1. *Better organization of my .emacs lisp files*
    - My elisp code snippets are embedded within the fold-able goodness of org-mode's outline structure.
-   - I'm able to add headers and subsections to better organize my code -- way better than using giant banner-style comment blocks or squirreling things away in separate files all over the place.
-   - My configuration is easier to read and understand.
+   - My configuration is better organized and easier to understand.
+
 2. *I'm better able to follow my own thought processes.*
-   - Code is organized according to how I think, not how the interpreter thinks -- I can explain code snippets in an order that makes sense to me, and org-babel later compiles these into the correct order.
    - Explanations take priority, code is secondary.
-   - When I revisit code I wrote ten years ago, I have a hope of understanding not just what it does, but /what the hell I was thinking./
+   - When I revisit code I wrote ten years ago, I have a hope of understanding /what the hell I was thinking./
+
 3. *Sharing my setup is easier*
-   - Org-mode's publishing features mean that it's pretty simple to export my documentation and publish it.
    - I have one file that generates nice-looking documentation and the code itself.
-   - Even better: more detailed explanations of my code mean it's easier for others to understand it and benefit from it.
-     
+   - Detailed explanations of my setup mean it's easier for others to understand it and benefit from it.
+
+** But how do I use this?
+:PROPERTIES:
+:CUSTOM_ID: how_do_i_use
+:END:
+
+Hey, I'm not gonna tell you what to do. But here are a couple of suggestions:
+
+1. Sit back, pour yourself a beer, and read through this documentation.
+   - I've tried to make it reasonably readable, even for folks who are relatively new to futzing around with Emacs configs.
+2. Pour yourself another beer.
+3. Trawl through the code snippets contained in this documentation
+   - Try them in your own Emacs setup. See what works for you.
+4. Repeat steps 2 and 3. Steal anything that's useful.
+5. Clone the repo and check out the emacs-init.org file itself.
+6. If you're feeling really adventurous, try installing the whole shebang [[Installation][as per the instructions below]].
+
 ** Disclaimers and Warnings
 :PROPERTIES:
 :CUSTOM_ID: disclaimer
 :END:
 
-You /don't/ want to try and use my configs straight out of the box. 
+Fair warning:
 
 - This is a perpetual work in progress. 
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
 - Requires Emacs 24.3. Only tested on Mac OS X.
-- I'm not responsible if any of this blows up on you.
+- I'm not responsible if any of this blows up on you. 
 
 ** License
 :PROPERTIES:
@@ -130,53 +145,62 @@ The code examples and CSS stylesheets are licensed under the GNU General Public 
 :CUSTOM_ID: installation
 :END:
 
-#+begin_quote
-Accio Emacs packages!
-
--- Harry Potter
-#+end_quote
+If you really want to take the plunge and try this thing out, follow these simple steps...
 
 ** Clone this repo into your .emacs.d/ 
+:PROPERTIES:
+:CUSTOM_ID: clone_repo
+:END:
 
-You probably want to back up your current config first.
+You probably want to back up your current config before you clobber it with mine.
+
+Once you've backed things up, clone the repo like so:
 
 #+begin_example
-git clone https://github.com/jstautz/.emacs.d ~/.emacs.d
+$> git clone https://github.com/jstautz/.emacs.d ~/.emacs.d
 #+end_example
 
-** Run the install.sh script
+** Now run the install.sh script 
 
 Special thanks to [[http://www.swaroopch.com/2013/10/17/emacs-configuration-tutorial/][Swaroop C H]] for this script.
 
 #+begin_example
-cd ~/.emacs.d/
-./install.sh
+$> cd ~/.emacs.d/
+$> ./install.sh
 #+end_example
 
-This will:
+install.sh will:
 - Install [[http://cask.github.io/][Cask]] if you don't already have it installed
 - Add the ~/.cask directory to your $PATH
-  - note: assumes you're using bash. If you're using another shell, edit install.sh before running
+  - Note: assumes you're using bash. If you're using another shell, you may need to edit install.sh before running
 - Runs =cask install= to install packages listed in my Cask file, along with any dependencies
 
-=cask install= will hit various Emacs package repositories (ELPA, MELPA, Marmalade, and Org) and download packages for you. Magic!
+=cask install= will hit various remote Emacs package repositories (ELPA, MELPA, Marmalade, and Org) and download packages for you. Magic!
 
 ** Fire up Emacs
+:PROPERTIES:
+:CUSTOM_ID: start_emacs
+:END:
+
 
 Packages installed via Cask should be in your load path, and you should be ready to rock. 
 
 If you're *not* ready to rock at this point... sorry. Don't say I didn't [[Disclaimers and Warnings][warn you]].
 
-* Structure 
+* Structure -- how this works 
 :PROPERTIES:
 :CUSTOM_ID: structure
 :END:
 
-A couple of details about how all this works:
+Before we get too deep into my settings, I should explain a little about the magic that makes my setup work.
 
-** =init.el=
+** init.el
 
-This is the first file that Emacs loads on startup. It bootstraps the rest of my config by loading it via org-babel.
+The init.el file is [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][the first file that Emacs loads on startup]]. My init.el bootstraps the rest of my config by loading it via org-babel.
+
+Huh? Org what?
+
+Don't worry, I'll explain how it works in a second. 
 
 My init.el currently looks like this:
 
@@ -206,51 +230,30 @@ Ignore the bits about Cask for now -- we'll get to that later. The important par
 (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)
 #+end_src
 
-This line calls org-babel to export ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then load that file.
+This line calls org-babel to extract ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=. It then tells Emacs to load all the configurations in that .el file.
 
 [[http://orgmode.org/worg/org-contrib/babel/][Org-babel is Merlin-level wizardry.]] Eric Schulte, Dan Davison, and everyone who's worked on it all deserve medals. 
 
-The =if= statement wrapping this =org-babel-load-file= expression will improve load time if my config hasn't changed. If my "tangled" =emacs-init.el= file is newer than the most recent changes to =emacs-init.org=, then I load the .el file directly.
+Because tangling and loading my .org file takes a few seconds (there are a lot of code blocks to deal with), I've wrapped this call to org-babel in an =if= statement that checks to see if tangling is even necessary.
 
-** =emacs-init.org=
+If my "tangled" =emacs-init.el= file is newer than the most recent changes to =emacs-init.org=, then everything's up to date and I can I load the .el file directly.
+
+** emacs-init.org
 
 The emacs-init.org file is the meat of my emacs config. It's also the document you're reading right now.
 
-When this document is tangled and loaded by org-babel, all the elisp code snippets contained within it are re-arranged and loaded. 
-
-That re-arranging bit is important. Expressions in my config file need to be in a particular order for Emacs to understand them. But I also want to be able to document them in =emacs-init.org= in a totally different order -- one that makes sense to a human reader.
-
-I can define that Emacs-friendly code order here, using "noweb" syntax[fn:2], which looks something like:
-
-#+begin_src emacs-lisp :tangle yes :noweb tangle
-<<Prerequisites and setup -- load basic support libraries, set some useful variables>>
-<<Load and configure Cask & Pallet to load packages>>
-<<General Editor Settings: UI, files, navigation, editing, scrolling>>
-<<Load settings for writing fiction>>
-<<Load some editor customizations>>
-<<Configure programming-related packages and settings>>
-<<Set up org-mode>>
-<<Post-flight: load Emacs desktop and start server>>
-#+end_src
-
-(removed <<Load a bunch of custom functions>> from this temporarily.)
-
-When I tangle this file, the noweb headers above will be expanded to the matching sections of elisp. 
+When this document is tangled and loaded by org-babel, all the elisp code snippets contained within it are tangled and loaded. 
 
 I try to treat the resulting =emacs-init.el= file like /compiled code/. It's the machine-readable file that I never really look at. 
 
-Any edits or changes, even if they're experimental, are made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date. I'm explaining changes as I make them rather than documenting them after the fact.
-
-[fn:2] Found a possible bug with noweb and comments. 
-
-If I set =comments noweb=, the links generated in the code don't seem to correctly link. Noweb-referenced code sections have empty file/search links. It would be best if they linked to the custom_id property of the subtree they're in. Might be something I can hack on and fix later.
-
--------------------------------------
+Any edits or changes, even if they're experimental, are made in the org-mode files instead of directly in the .el files. This way, I'm ensuring my documentation always stays up to date.
 
 ** Loading packages 
 :PROPERTIES:
 :noweb-ref: Load and configure Cask & Pallet to load packages
 :END:
+
+Emacs is crazy customizable, and a lot of these customizations are organized into packages.
 
 Back in the dark ages, I would find third-party elisp packages on the interwebs and install them manually. This got nasty pretty quickly.
 
@@ -258,13 +261,13 @@ Back in the dark ages, I would find third-party elisp packages on the interwebs 
     - I could never rememember where I grabbed packages from
     - Updating packages was a chore
 
-Emacs 24 introduced a really nice package management system. I used it for a while on its own, then supplemented it with [[http://cask.github.io/][Cask]], [[https://github.com/rdallasgray/pallet][Pallet]], and [[https://github.com/jwiegley/use-package][use-package]].
+Emacs 24 introduced a really nice package management system, =package.el=. I used it for a while on its own, then supplemented it with [[http://cask.github.io/][Cask]], [[https://github.com/rdallasgray/pallet][Pallet]], and [[https://github.com/jwiegley/use-package][use-package]].
 
 *** package.el
 
-The default package manager in Emacs 24 is super handy. Use =package-list-packages= to browse packages on all source repos, then install/uninstall/update them. Slick.
+The default package manager in Emacs 24 is super handy. Use =package-list-packages= to browse packages on all source repos, then install/uninstall/update them from within Emacs. Super slick.
 
-Before using it, I want to add a few other sources (notably marmalade and melpa) to my package source list.
+Before using it, I want to add a few other sources (notably [[http://marmalade-repo.org/][marmalade]] and [[http://melpa.milkbox.net/#/][melpa]]) to my package source list.
   
 #+name: packages-set-sources
 #+begin_src emacs-lisp
@@ -276,52 +279,94 @@ Before using it, I want to add a few other sources (notably marmalade and melpa)
   (add-to-list 'package-archives source t))
 (package-initialize)
 #+end_src
+
+Now we're ready to install packages!
+
+But wait... 
+
+I don't really want my .emacs.d repo to get bloated with third party libraries. I don't want to clutter my config's changelogs whenever I update an external package. 
+
+Git submodules are an option. But they also make me a little ill.
+
+What I really want is for my .emacs setup to contain only *my* configuration, and for any public packages to be downloaded from the interwebs on-demand. And I want a really nice, clean, easy-to-understand method for doing all this.
  
 *** Cask
 
 Cask is a [[http://cask.readthedocs.org/en/latest/][dependency manager and much more.]]
 
-The =Cask= file in my .emacs.d/ lists the packages that my setup depends on, as well as specifying some source repositories (the same ones I specify for package.el, above).
+The =Cask= file in my .emacs.d/ lists all the packages that my setup depends on, as well as specifying some source repositories (the same ones I specify for package.el, above).
 
-I don't keep *any* of my packages under version control at the moment. If I install Emacs config from scratch, my installation script + Cask will download and load all the packages I need.
+Even though I don't keep *any* of my packages under version control, Cask lets me download + load all the packages I need whenever I install my Emacs config from scratch.[fn:2]
 
 #+name: package-cask :tangle no
 #+begin_src emacs-lisp 
+
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 #+end_src
 
+As mentioned in the [[Installation]] section above, a simple =cask install= in my .emacs.d directory will download all required packages and dependencies.
+
+[fn:2] One downside to this is on every cask init, you'll pull down the latest versions of each package. *This may include unstable bleeding-edge versions.*
+
+There are only two real methods to deal with this:
+
+- Be careful and judicious about updating your packages -- any update could be a breaking change
+- Keep all your 3rd party packages under your own version control
+
+This is a problem are with *any* package management setup in Emacs. It's extraordinarily difficult to create a setup that says "I want to use only this specific version of package x and this specific version of package y." 
+
+Cask appears to come close to this ideal, but you can still run into edge cases. 
+
+For example, consider the case where package A depends on version 2.0 of package B, while package C depends on version 1.5 of package B. Which version of Package B should be installed? Emacs's global namespace makes having both versions impossible.
+
+In any case, this is a problem with my current setup that I'm still working on.
+
+-------------------------------------
+
 *** Pallet
 
-So =package.el= lets me browse and install packages from within Emacs... but Cask manages packages outside emacs based on a Cask file... so how am I supposed to keep these in sync?
+So =package.el= lets me browse and install packages from within Emacs... and Cask manages packages outside Emacs based on a Cask file... so how am I supposed to keep these in sync?
 
 Enter Pallet.
 
 If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything in lockstep. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
 
-Note that the reverse is true if I remove a package using the built-in package manager -- Pallet removes its line from my Cask file.
+Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. 
 
 #+name: package-use-package
 #+begin_src emacs-lisp 
 (require 'pallet)
-
 #+end_src
+
 *** use-package
  
-John Wiegley's use-package lets me nicely isolate loading packages and their configurations. It handles a lot of things for me out of the box, including:
+Now that I've got a way to easily install, manage, and update external packages, *and* I've got a way to seamlessly track these packages in my config... I need to declare and configure these packages.
+
+Normally in an Emacs config, you'll see a lot of =(require 'packagename)= expressions, much like I've done with Cask and Pallet packages above. These =require= statements will find the package in the list of =load-path= directories and actually load/initialize all of the package's elisp.
+
+This can be slow. I don't always want to load *every* single package at startup time. I'd rather load only the essentials and lazy-load the rest when I need them.
+
+The best way to do this is to make judicious use of [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][=autoload=]]. This function lets you tell Emacs that a library or function exists, but to hold off on loading it until it's actually called. 
+
+It's sometimes difficult to know where or how to use =autoload=, however -- for example, there are times when you may want to configure some parts of a package at Emacs startup time, but wait until the package is fully loaded to fire off other config options.
+
+John Wiegley's use-package provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
 
 - Handling missing packages without choking
-- Initializing packages
-- Set keybindings
+- Initializing and autoloading packages
+- Nicely isolating package-specific configs
+- Setting keybindings in a very readable way
 - Deferring configuration elisp until after a package actually gets used
 - And more!
 
 #+name: package-use-package
 #+begin_src emacs-lisp 
+
 (require 'use-package)
 #+end_src
 
-You'll see use-package and its syntax all over the place in my setup.
+You'll see =use-package= and its syntax all over the place in my setup.
 
 * What I use Emacs for
 :PROPERTIES:
@@ -1424,7 +1469,7 @@ If I'm working in the terminal and I need to edit a file in my current directory
 $> emacsclient filename.txt
 #+end_example
 
-This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:3]
+This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:2]
 
 *** Connecting to Emacs server shouldn't pop up frames
 
@@ -1436,7 +1481,7 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 
 #+end_src
 
-[fn:3] I actually aliased emacsclient to =em= in bash to make this even simpler. =$>em filename.txt= drops me into my existing already-running Emacs session and visits the file.
+[fn:2] I actually aliased emacsclient to =em= in bash to make this even simpler. =$>em filename.txt= drops me into my existing already-running Emacs session and visits the file.
 
 -------------------------------------
 
@@ -1866,8 +1911,7 @@ Skewer-mode is rad. It uses simple-http to connect your HTML/CSS/js buffer to yo
 #+begin_src emacs-lisp
   (use-package skewer-mode)
   
-#+end_src  
-
+#+end_src
 *** js2 mode
 
 Steve Yegge built this. I think it's useful.
