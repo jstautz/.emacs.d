@@ -580,7 +580,7 @@ Skips capture tasks."
   (interactive)
   (save-excursion
     (beginning-of-line 0)
-    (org-remove-empty-drawer-at (point))))
+    (org-remove-empty-drawer-at "LOGBOOK" (point))))
 
 (add-hook 'org-clock-out-hook 'jcs:remove-empty-drawer-on-clock-out 'append)
 
