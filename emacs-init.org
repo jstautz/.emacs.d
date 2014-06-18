@@ -1887,6 +1887,14 @@ There's also a "refactored" version. I have yet to decide which is best.
 #+end_src  
 
 
+*** json mode
+
+#+name: coding-json-mode
+#+begin_src emacs-lisp
+  (use-package json-mode)
+  
+#+end_src  
+
 * Org-mode
 :PROPERTIES:
 :noweb-ref: Set up org-mode
