@@ -1901,7 +1901,23 @@ Haven't used web-mode much yet -- still trying it out.
 #+begin_src emacs-lisp
   (use-package web-mode)
   
-#+end_src  
+#+end_src
+
+*** rainbow mode
+
+Rainbow mode is useful when working on CSS, or anything where you're using hex colour values. 
+
+A screenshot's worth a thousand words. This is what it looks like:
+
+[[file:rainbow-mode.png]]
+
+I'm not doing any fancy configuration with it, just initializing it with use-package.
+
+#+name: coding-webmode
+#+begin_src emacs-lisp
+  (use-package rainbow-mode)
+
+#+end_src
 
 *** skewer
 
