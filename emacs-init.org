@@ -187,10 +187,6 @@ Before we get too deep into my settings, I should explain a little about how all
 
 The init.el file is [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][the first file that Emacs loads on startup]]. My init.el bootstraps the rest of my config by loading it via org-babel.
 
-Huh? Org what?
-
-Don't worry, I'll explain in a second. 
-
 My init.el currently looks like this:
 
 #+begin_src emacs-lisp :tangle no
@@ -281,9 +277,7 @@ But wait...
 
 I don't really want my .emacs.d repo to get bloated with third party libraries. I don't want to clutter my config's changelogs whenever I update an external package. 
 
-Git submodules are an option. But they also make me a little ill.
-
-What I really want is for my .emacs setup to contain only *my* configuration, and for any public packages to be downloaded from the interwebs on-demand. And I want a really nice, clean, easy-to-understand method for doing all this. So...
+Git submodules are an option. But what I really want is for my .emacs setup to contain only *my* configuration, and for any public packages to be downloaded from the interwebs on-demand. And I want a really nice, clean, easy-to-understand method for doing all this. So...
  
 *** Cask
 :PROPERTIES:
@@ -331,14 +325,14 @@ So =package.el= lets me browse and install packages from within Emacs... and Cas
 
 Enter Pallet.
 
-If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything in lockstep. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
-
-Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. 
-
 #+name: package-use-package
 #+begin_src emacs-lisp 
 (require 'pallet)
 #+end_src
+
+If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
+
+Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. 
 
 *** use-package
 :PROPERTIES:
@@ -347,13 +341,11 @@ Note that the reverse is also true. If I remove a package using the built-in pac
  
 Now that I've got a way to easily install, manage, and update external packages, *and* I've got a way to seamlessly track these packages in my config... I need to declare and configure these packages.
 
-Normally in an Emacs config, you'll see a lot of =(require 'packagename)= expressions, much like I've done with Cask and Pallet packages above. These =require= statements will find the package in the list of =load-path= directories and actually load/initialize all of the package's elisp.
+Normally in an Emacs config, you'll see a lot of =(require 'package-name)= expressions, much like I've done with Cask and Pallet packages above. These =require= statements will find the package in the list of =load-path= directories and actually load/initialize all of the package's elisp.
 
 This can be slow. I don't always want to load *every* single package at startup time. I'd rather load only the essentials and lazy-load the rest when I need them.
 
 The best way to do this is to make judicious use of [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][=autoload=]]. This function lets you tell Emacs that a library or function exists, but to hold off on loading it until it's actually called. 
-
-It's sometimes difficult to know where or how to use =autoload=, though. For example, there are times when you may want to configure some parts of a package at Emacs startup time, but wait until the package is fully loaded to fire off other config options.
 
 John Wiegley's use-package provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
 
@@ -371,61 +363,6 @@ John Wiegley's use-package provides some really nice macros for autoloading and 
 #+end_src
 
 You'll see =use-package= and its syntax all over the place in my setup.
-
-* What I use Emacs for
-:PROPERTIES:
-:CUSTOM_ID: what-i-do-in-emacs
-:END:
-
-#+begin_quote
-This is my rifle. There are many like it, but this one is mine.
-
---Major General William H. Rupertus, "The Rifleman's Creed," 1942
-#+end_quote
-
-In order to understand why I've configured things the way I did, it might help to understand some things I do in Emacs.
-
-** Org-mode
-
-I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
-
-I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]]
-
-It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
-
-** Writing Fiction
-
-For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
-
-Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
-
-Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
-
-The details of [[file:./emacs-init.org][how I use Emacs for fiction writing are documented later in this file]]. 
-
-** Programming
-
-Unlike most Emacs users, I'm not a professional software engineer. 
-
-I've done a bunch of development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
-
-[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
-
-When I grow up maybe I'll be an engineer.
-
-A couple of languages I work with in Emacs:
-
-- I work with Emacs lisp quite a bit (of course)
-- I'm learning python
-- I play around with javascript (and HTML/CSS, obviously)
-
-[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
-
-** Manipulating files and text of all kinds
-
-Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
-
-[[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
 * Prerequisites and setup
 :PROPERTIES:
@@ -525,6 +462,12 @@ I do this *before* I begin loading packages so that package configs can access v
 :PROPERTIES:
 :noweb-ref: General Editor Settings: UI, files, navigation, editing, scrolling
 :END:
+
+#+begin_quote
+This is my rifle. There are many like it, but this one is mine.
+
+--Major General William H. Rupertus, "The Rifleman's Creed," 1942
+#+end_quote
 
 ** Interface tweaks
 
