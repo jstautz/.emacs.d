@@ -14,7 +14,7 @@
 
 (require 'use-package)
 
-(require 'cl)
+(use-package cl)
 
 (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
@@ -555,6 +555,8 @@ of windows in the frame simply by calling this command again."
 (use-package jedi)
 
 (use-package web-mode)
+
+(use-package rainbow-mode)
 
 (use-package skewer-mode)
 

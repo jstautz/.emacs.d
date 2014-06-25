@@ -441,7 +441,7 @@ This is generally a good idea.
 
 #+name: setup-require-cl :comments both
 #+begin_src emacs-lisp
-(use-package 'cl)
+(use-package cl)
 
 #+end_src
 
