@@ -545,6 +545,28 @@ This s-exp lets you just type "y" or "n" like in any other sane application:
 (fset 'yes-or-no-p 'y-or-n-p)
 
 #+end_src
+*** Full screen
+
+"Full screen" mode has historically been a bit of a pain for me with Emacs.
+
+Back in the old days of [[http://th.nao.ac.jp/MEMBER/zenitani/emacs-e.html][Carbon Emacs]] on pre-Lion OS X, the custom =ns-toggle=fullscreen= worked beautifully.
+
+Then along came OS X Lion and its utterly stupid native fullscreen mode -- if you've got a multiple-monitor setup, fullscreen renders your second display useless. Builds of Emacs 24 that enthusiastically plugged into the "native OS X fullscreen" mode. So I stopped using fullscreen.
+
+Then OS X Mavericks came out, and its fullscreen mode became slightly more sane.
+
+#+name: UI-fullscreen
+#+begin_src emacs-lisp
+  (defun toggle-fullscreen ()
+    "Toggle full screen"
+    (interactive)
+    (set-frame-parameter
+       nil 'fullscreen
+       (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
+
+  (toggle-fullscreen)
+
+#+end_src
 
 
 *** Confirm before quitting Emacs
@@ -956,7 +978,7 @@ However... it's still kind of a pain in the ass.
 
 Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually want to work on shorter lines than that, just for usability's sake.
 
-I've since discovered wrap-to-fill-column-mode (packaged with nxhtml-mode). This allows me to use visual-line-mode for word.
+I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode -- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also nicely centers the text in my window.
 
 #+name: auto-fill-options
 #+begin_src emacs-lisp
@@ -967,7 +989,9 @@ I've since discovered wrap-to-fill-column-mode (packaged with nxhtml-mode). This
   (wrap-to-fill-column-mode 1)
   (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
   (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+
 #+end_src
+
 ** Desktop & Bookmark Settings
 
 Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings). It's pretty rad.
