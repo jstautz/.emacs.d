@@ -28,6 +28,7 @@
 (depends-on "markdown-mode")
 (depends-on "multiple-cursors")
 (depends-on "org-plus-contrib")
+(depends-on "org-trello")
 (depends-on "pallet")
 (depends-on "popwin")
 (depends-on "psvn")
