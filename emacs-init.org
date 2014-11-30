@@ -167,7 +167,6 @@ install.sh will:
 :CUSTOM_ID: start_emacs
 :END:
 
-
 Packages installed via Cask should be in your load path, and you should be ready to rock. 
 
 If you're *not* ready to rock at this point... sorry. Don't say I didn't [[Disclaimers and Warnings][warn you]].
@@ -234,7 +233,7 @@ When this document is tangled and loaded by org-babel, =emacs-init.el= is update
 
 I try to treat the resulting =emacs-init.el= file like /compiled code/. It's the machine-readable file that I never really look at. Except maybe when debugging.
 
-Any edits or changes, even if they're experimental, are made in the org-mode file instead of directly in the .el file. This way, I'm ensuring my documentation always stays up to date.
+Any edits or changes, even if they're experimental, are made in the .org file instead of directly in the .el file. This way, I'm ensuring my documentation always stays up to date.
 
 ** Loading packages 
 :PROPERTIES:
@@ -299,20 +298,20 @@ Even though I don't keep *any* of my packages under version control, Cask lets m
 
 As mentioned in the [[Installation]] section above, a simple =cask install= in my .emacs.d directory will download all required packages and dependencies.
 
-[fn:2] One downside to this is on every cask init, you'll pull down the latest versions of each package. *This may include unstable bleeding-edge versions.*
+[fn:2] One downside to this is that on every cask init, you'll pull down the latest versions of each package. *This may include unstable bleeding-edge versions.*
 
 There are only two real methods to deal with this:
 
 - Be careful and judicious about updating your packages -- any update could be a breaking change
 - Keep all your 3rd party packages under your own version control
 
-This is a problem are with *any* package management setup in Emacs. It's extraordinarily difficult to create a setup that says "I want to use only this specific version of package x and this specific version of package y." 
+This is a problem with *any* package management setup in Emacs. It's extraordinarily difficult to create a setup that says "I want to use only this specific version of package x and this specific version of package y." 
 
 Cask appears to come close to this ideal, but you can still run into edge cases. 
 
 For example, consider the case where package A depends on version 2.0 of package B, while package C depends on version 1.5 of package B. Which version of Package B should be installed? Emacs's global namespace makes having both versions impossible.
 
-In any case, this is a problem with my current setup that I'm still working on.
+In any case, this is a known issue with my current setup that I'm still working on.
 
 -------------------------------------
 
@@ -332,7 +331,7 @@ Enter Pallet.
 
 If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
 
-Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. 
+Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. So handy.
 
 *** use-package
 :PROPERTIES:
@@ -364,23 +363,32 @@ John Wiegley's use-package provides some really nice macros for autoloading and 
 
 You'll see =use-package= and its syntax all over the place in my setup.
 
-* Prerequisites and setup
+* Prerequisites
 :PROPERTIES:
 :noweb-ref: Prerequisites and setup -- load basic support libraries, set some useful variables
 :CUSTOM_ID: setup
 :END:  
 
-This section contains the first bits of elisp in my config that get loaded. 
+Okay. You've got a pretty good picture of how my config is structured, how it's loaded via org-babel, and how packages are loaded with Cask, Pallet, and use-package. 
 
-** First, let's load common lisp libraries
+Now let's get into the config itself.
 
-This is generally a good idea.
+This first section contains some libraries and basic settings that the rest of my configuration depends on.
+
+** First, let's load Common Lisp libraries
+
+This is generally a good idea.[fn:3] There's a lot of good stuff in the CL package that many other packages rely on.
 
 #+name: setup-require-cl :comments both
 #+begin_src emacs-lisp
 (use-package cl)
 
 #+end_src
+
+[fn:3] I should probably revisit this at some point. Apparently as of Emacs 24, this should be =(use-package cl-lib)=? Will need to investigate and test. Later.
+
+
+-------------------------------------
 
 ** Then set our path appropriately.
 
@@ -393,12 +401,16 @@ This is kind of a gross hack to grab the $PATH environment variable from my ~/.b
   (setq exec-path (split-string jcs:shell-path ":")))
 
 #+end_src
+
+...Yeah, you read that elisp right. Icky, but it works. The only other solution would be to mess around with =launchctl= on OS X, and I really don't want to do that right now.
  
 ** Set a few variables for directories
 
 Define our home directory, dot emacs directory (where the config lives), emacs binary directory (where Emacs.app lives), and info file directory.
 
 I use these =*-dir= variables all over the place in my config.
+
+Some of these are obviously going to be different in your setup, so you'll want to change these accordingly.
 
 #+name: setup-dirs :comments both
 #+begin_src emacs-lisp
@@ -411,7 +423,7 @@ I use these =*-dir= variables all over the place in my config.
 
 ** Add .emacs.d to load-path
 
-...Kinda necessary.
+Our load-path defines where Emacs should look for packages, functions, variables, etc. 
 
 #+name: setup-load-path
 #+begin_src emacs-lisp
@@ -447,7 +459,7 @@ Props to Le Wang for this one.
 
 Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
 
-I do this *before* I begin loading packages so that package configs can access variables stored in the secrets file.
+I do this *before* I begin loading packages, so that package configs can access variables stored in the secrets file.
 
 #+name: setup-decrypt-secrets-function
 #+begin_src emacs-lisp
@@ -456,7 +468,6 @@ I do this *before* I begin loading packages so that package configs can access v
   (require 'secrets))
 
 #+end_src
-
 
 * General Editor Settings
 :PROPERTIES:
@@ -477,16 +488,14 @@ Even so, there are a couple of changes I like to make in order to make things a 
 
 *** Remove distracting UI elements
 
-Emacs comes with a fat ugly toolbar turned on by default. It's seriously gross looking. 
-
-Turning it off is one of the first things I do.
+Emacs comes with a fat ugly toolbar turned on by default. Turning it off is one of the first things I do.
 
 #+name: UI-toolbar
 #+begin_src emacs-lisp 
 (tool-bar-mode -1)
 #+end_src
 
-I don't really use the side fringe at all, so I set it to blend in with my background face.
+I don't really use the side fringe at all, so I set it to blend in with my background face. ("face" in Emacs basically means "text style".)
 
 #+name: UI-fringe
 #+begin_src emacs-lisp 
@@ -536,9 +545,9 @@ Let's also turn on the visible-bell option so that the screen blinks/alerts me.
 
 #+end_src
 
-Another obnoxious default to change: the requirement that you actually type the letters "y" "e" and "s" at a yes/no prompt. Whose dumb idea was that? 
+Another obnoxious default to change: the requirement that you actually type the letters "y" "e" and "s" at a yes/no prompt. Whose idea was that? 
 
-This s-exp lets you just type "y" or "n" like in any other sane application:
+This s-exp lets you just type "y" or "n" to answer these prompts.
 
 #+name: UI-yorn
 #+begin_src emacs-lisp 
@@ -557,17 +566,17 @@ Then OS X Mavericks came out, and its fullscreen mode became slightly more sane.
 
 #+name: UI-fullscreen
 #+begin_src emacs-lisp
-  (defun toggle-fullscreen ()
-    "Toggle full screen"
-    (interactive)
-    (set-frame-parameter
-       nil 'fullscreen
-       (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
+    (defun toggle-fullscreen ()
+      "Toggle full screen"
+      (interactive)
+      (set-frame-parameter
+         nil 'fullscreen
+         (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
-  (toggle-fullscreen)
+  ;; (toggle-fullscreen)
 
 #+end_src
-
+**** TODO note that I've currently disabled "native" fullscreen because the way it handles other apps on multi-monitor setups annoys me.
 
 *** Confirm before quitting Emacs
 
@@ -588,6 +597,17 @@ If I want to quit Emacs (gasp!) I now need to do it *very* deliberately via =M-x
 (setq confirm-kill-emacs 'y-or-n-p)
 
 #+end_src
+*** Themes
+
+I want to trust all themes -- mostly so the mode-line setup below doesn't spit warnings at me on startup.
+
+#+name: UI-trust-themes
+#+begin_src emacs-lisp
+(setq custom-safe-themes t)
+
+#+end_src
+
+
 *** Mode-line settings
 **** Show both line and column numbers in mode-line
 
@@ -603,6 +623,7 @@ The column number display isn't as immediately useful, but it does come in handy
 #+end_src
 
 **** Smart-mode-line setup
+
 I use smart-mode-line to pack a bunch of useful info into my mode line.
 
 #+name: UI-smart-mode-line
@@ -698,6 +719,7 @@ Thanks to [[http://www.masteringemacs.org/articles/2011/10/02/improving-performa
 #+end_src
 
 I believe this is now on by default in Emacs 24, so I may no longer need to set this explicitly.
+
 ** Backups & Trash settings
 
 Emacs has some pretty useful features for auto-saving backups and integrating with the OS Trash / filesystem.
@@ -726,6 +748,7 @@ You have to explicitly tell Emacs to keep saving backups of files if they're und
 (setq vc-make-backup-files t)
 
 #+end_src
+
 *** ~/.Trash integration
 
 Instead of just blowing files away, I want all file-deletion events in emacs to do a =mv file.txt ~/.Trash= rather than a simple =rm file.txt=. This is just another layer of protecting myself from myself.
@@ -742,7 +765,7 @@ Instead of just blowing files away, I want all file-deletion events in emacs to 
 
 First let's unset a couple of keybindings:
 - Read-only-toggle is bound by default to =C-x C-q=. It's a useless command that I toggle by accident way too often.
-- I also hit =F2= accidentally way too often.
+- I also hit =F2= accidentally way too often. I may eventually use it for something, but for now I just want to remove its default binding.
 
 #+name: keybindings-unsets
 #+begin_src emacs-lisp 
@@ -782,6 +805,7 @@ First, I want to treat Command *and* Option keys as Meta in Emacs. I know, this 
 (setq ns-command-modifier (quote meta))
 
 #+end_src
+
 *** Mouse settings
 
 Emulate a three-button mouse for copy/paste/select:
@@ -791,12 +815,13 @@ Emulate a three-button mouse for copy/paste/select:
 (setq mac-emulate-three-button-mouse t)
 
 #+end_src
+
 ** Cursor and Scrolling
 *** Highlight cursor location
 
 I realize a lot of people hate blinking cursors, but I like them because:
 
-- It lets me quickly find my cursor on a large screen
+- I can quickly find my cursor on a large screen
 - The persistent blinking indicates Emacs is waiting for my input -- it's pushing me to write, to get shit done. 
 
 #+name: UI-cursor
@@ -812,6 +837,8 @@ Another helpful inidicator: I like having my current line highlighted. =grey93= 
 (set-face-background 'hl-line "grey93")
 
 #+end_src
+
+If you're using a dark theme, you should probably change this.
 
 *** Cursor scroll settings
 
@@ -846,6 +873,7 @@ This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't ha
       scroll-preserve-screen-position t)
 
 #+end_src
+
 *** Scrolling when on fringe
 
 Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide), or on the mode-line. Let's bind margin and mode-line scroll events appropriately:
@@ -869,7 +897,9 @@ Use =M-n= and =M-p= to scroll the window view up or down... without moving the p
 #+begin_src emacs-lisp 
 (global-set-key "\M-n" 'scroll-up-line)
 (global-set-key "\M-p" 'scroll-down-line)
+
 #+end_src
+
 *** Selecting and deleting text
 
 When I select text between point and mark, I want to see this selection highlighted with transient-mark mode. I find it difficult to use Emacs effectively without having transient-mark-mode turned on.
@@ -880,7 +910,9 @@ Delete-selection-mode is also important to me -- it allows overwriting selected 
 #+begin_src emacs-lisp
 (transient-mark-mode t)
 (delete-selection-mode t)
+
 #+end_src
+
 *** Rectangle selection
 
 CUA mode has [[https://www.youtube.com/watch?v=k-6BVjlBSVo][a really nice facility for editing rectangular regions]]. 
@@ -909,6 +941,7 @@ I set my keybindings for this to ones that are very close to those for expand-re
 :bind (("C-+" . mc/mark-next-like-this)
        ("C--" . mc/mark-previous-like-this)
        ("C-*" . mc/mark-all-like-this)
+
 #+end_src
 
 And some keybindings for activating multiple-cursors when a region is selected:
@@ -933,24 +966,27 @@ This feature works nicely with various programming languages as well, allowing y
 #+begin_src emacs-lisp
 (use-package expand-region
 :bind (("C-=" . er/expand-region)))
+
 #+end_src
 
 
 ** Auto-fill & Word Wrap
 
-By defauly, Emacs doesn't automatically wrap words onto the next line.
+By default, Emacs doesn't automatically wrap words onto the next line. (I know! What decade are we in?)
 
 There are two options to change this. 
 
-In the first option, setting fill-column defines the column number at which Emacs will auto-insert a linebreak.
+In the first option, =auto-fill-mode= will automatically insert linebreaks at a certain column number, preventing any lines from being longer than your screen's viewable area. setting fill-column defines the column number at which Emacs will auto-insert a linebreak.
 
-In the second option, visual-line-mode, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's visually wrapped onto multiple lines. Cursor movement and end-of-line + beginning-of-line commands work within the wrapped line.
+In the second option, =visual-line-mode=, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's *visually* wrapped onto multiple lines. Cursor movement and end-of-line + beginning-of-line commands work within the wrapped line. 
+
+The second option is more like a "modern" word processor, but still has its quirks.
 
 *** Auto-fill-mode
 
 I typically run Emacs.app in full screen, and a 120-character fill-column feels pretty good to me. 
 
-I know an 80-column limit would be more compatible... but it feels cramped. Especially when dealing with creative writing.
+I know an 80-column limit would be more compatible... but it feels cramped. Especially when I'm writing or editing fiction.
 
 #+name: auto-fill-options
 #+begin_src emacs-lisp
@@ -978,7 +1014,7 @@ However... it's still kind of a pain in the ass.
 
 Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually want to work on shorter lines than that, just for usability's sake.
 
-I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode -- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also nicely centers the text in my window.
+I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode -- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
 
 #+name: auto-fill-options
 #+begin_src emacs-lisp
@@ -1026,6 +1062,20 @@ Define my bookmarks file.
 
 
 ** Window Navigation
+
+*** Winner-mode
+
+I don't use this as much anymore, but winner-mode lets you flip between various window/frame configurations.
+
+For example, if I have a frame split by multiple windows, then later close/split/expand some of those windows, winner-mode lets me easily walk back through to my previous window setup.
+
+#+name: window-winner-mode
+#+begin_src emacs-lisp
+  (winner-mode 1)
+#+end_src
+
+Most of the time I'm flipping between a split-pane view and a single view, which means I end up using [[Zoom between split window and single window][=toggle-window-split=]] more than winner-mode. 
+
 *** Move to other window
 
 I'm experimenting with using =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
@@ -1033,27 +1083,22 @@ I'm experimenting with using =M-o= to move between windows. The default =C-x o= 
 #+name: window-other-window
 #+begin_src emacs-lisp 
 (global-set-key (kbd "M-o") 'other-window)
+
 #+end_src
 
 *** ace-jump between windows
+
+=ace-jump-mode= is pretty amazing, but [[https://www.youtube.com/watch?v=UZkpmegySnc][hard to describe unless you see it in action]]. =ace-window= takes the awesome interface of ace-jump-mode and applies it to navigating windows. This is really useful if you have your frame split into 3 or more windows.
 
 #+name: window-ace-window
 #+begin_src emacs-lisp 
     (use-package ace-window
                  :bind ("M-p" . ace-window))
+
 #+end_src
 
 
  
-*** Winner-mode
-
-I don't use this as much anymore, but winner-mode lets you flip between various window/frame configurations.
-
-#+name: window-winner-mode
-#+begin_src emacs-lisp
-  (winner-mode 1)
-
-#+end_src
 *** Previous buffer when splitting window 
 
 Whenever I split my frame into multiple windows (e.g. with =C-x 2= or =C-x 3=), Emacs will open the current buffer in both windows. This isn't always useful.
@@ -1132,7 +1177,9 @@ And now we bind these to some familiar keybindings -- =C-<tab>= and =C-S-<tab>= 
   (global-set-key [(shift control tab)] 'other-window-backward)
 
 #+end_src
-*** TODO note that C-<tab> doesn't work in org-mode because of binding conflict
+
+*** TODO note that C-<tab> doesn't work in org-mode because of a keybinding conflict
+
 *** Shrink/expand windows
 
 Sometimes I want to adjust the size of a window in my split-frame configuration. For example, I may not want my split at 50%, I may want 75% of my frame filled with a view into my source code and 25% showing a REPL. 
@@ -1158,12 +1205,14 @@ I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=.
 (global-set-key "\C-x\C-b" 'ibuffer)
 
 #+end_src
+
 *** Edit filenames in dired
+
 Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome -- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
 
 I like having wdired bound to the 'r' key inside dired.
 
-(note that I'm eval-ing this only after loading dired, otherwise Emacs chokes on an undefined dired-mode-map var)
+(note that I'm eval-ing this *only after* loading dired, otherwise Emacs chokes on an undefined dired-mode-map var)
 
 #+name: wdired
 #+begin_src emacs-lisp
@@ -1172,6 +1221,7 @@ I like having wdired bound to the 'r' key inside dired.
      'wdired-change-to-wdired-mode))
 
 #+end_src
+
 *** Make =C-<= and =C->= work nicely in dired-mode
 
 Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the cursor to the beginning/end of the filenames in dired buffers. Handy!
@@ -2020,3 +2070,5 @@ Now that everything's good to go, start the emacs server so we can connect to it
 #+begin_src emacs-lisp
 (server-start)
 #+end_src
+
+

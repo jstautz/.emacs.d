@@ -53,16 +53,18 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (defun toggle-fullscreen ()
-  "Toggle full screen"
-  (interactive)
-  (set-frame-parameter
-     nil 'fullscreen
-     (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
+    "Toggle full screen"
+    (interactive)
+    (set-frame-parameter
+       nil 'fullscreen
+       (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
-(toggle-fullscreen)
+;; (toggle-fullscreen)
 
 (global-unset-key "\C-x\C-c")
 (setq confirm-kill-emacs 'y-or-n-p)
+
+(setq custom-safe-themes t)
 
 (line-number-mode 1)                         
 (column-number-mode 1)
@@ -204,12 +206,12 @@
 
 (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
+(winner-mode 1)
+
 (global-set-key (kbd "M-o") 'other-window)
 
 (use-package ace-window
              :bind ("M-p" . ace-window))
-
-(winner-mode 1)
 
 (defun vsplit-last-buffer ()
   (interactive)
