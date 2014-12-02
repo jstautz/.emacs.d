@@ -140,10 +140,9 @@
 
 ;; Custom function to return agenda header strings based on WIP limit
 (defun jcs:wip-text (tags todo limit)
-  "Return string to indicate whether WIP limit is exceeded for a
-particular tag/todo keyword/limit. For use in
-agenda-overriding-header functions. If limit exceeded, string
-returned is wrapped in #s"
+  "Return string to indicate whether WIP limit is exceeded for a particular
+tag/todo keyword/limit. For use in agenda-overriding-header functions.
+If limit exceeded, string returned is wrapped in #s"
   (cond
    ((equal "TODO" todo)
     (setq org-wip-header-text "Queue"))
@@ -320,17 +319,8 @@ returned is wrapped in #s"
                
                ))
              ("p" "Public @work todos"
-               ((tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
-                             (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
-                             (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
-                     ((org-agenda-overriding-header "Completed Today")))
-               (tags-todo "@work-REFILE-noexport/!STARTED" 
-						  ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
-						   (org-agenda-todo-ignore-scheduled 'future)
-						   (org-agenda-sorting-strategy
-							'(todo-state-down priority-down effort-up category-keep))))
-               (tags-todo "@work-REFILE-noexport/!NEXT"
-                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
+              ((tags-todo "@work-REFILE-noexport/!TODO"
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 20))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
@@ -339,11 +329,20 @@ returned is wrapped in #s"
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
-               (tags-todo "@work-REFILE-noexport/!TODO"
-                          ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 15))
+               (tags-todo "@work-REFILE-noexport/!NEXT"
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
+               (tags-todo "@work-REFILE-noexport/!STARTED" 
+						  ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
+						   (org-agenda-todo-ignore-scheduled 'future)
+						   (org-agenda-sorting-strategy
+							'(todo-state-down priority-down effort-up category-keep))))               
+               (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
+                             (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
+                             (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
+                     ((org-agenda-overriding-header "Completed Today")))
                (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
                              (format-time-string "[%Y-%m-%d]"
                                                  (time-subtract (current-time) (days-to-time 1)))
