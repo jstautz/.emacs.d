@@ -12,6 +12,8 @@
 (depends-on "dash")
 (depends-on "diminish")
 (depends-on "easy-kill")
+(depends-on "el-mock")
+(depends-on "ert-expectations")
 (depends-on "expand-region")
 (depends-on "f")
 (depends-on "fountain-mode")
