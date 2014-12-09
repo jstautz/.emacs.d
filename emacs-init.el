@@ -204,6 +204,8 @@
                 tags-file-name
                 register-alist)))
 
+(setq desktop-load-locked-desktop t)
+
 (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
 (winner-mode 1)
@@ -636,3 +638,7 @@ of windows in the frame simply by calling this command again."
 (desktop-read)
 
 (server-start)
+
+(load-file "~/.emacs.d/config/init-org-mode.el")
+
+(load-file "~/.emacs.d/.cask/24.3.92.1/elpa/org-plus-contrib-20140630/org-habit.el")

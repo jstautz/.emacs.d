@@ -1049,6 +1049,13 @@ Emacs Desktop allows you to save your current workspace (frame dimensions, windo
                   (shell-command-history    . 50)
                   tags-file-name
                   register-alist)))
+#+end_src
+
+Don't warn me about desktop locks
+
+#+name: desktop-lock-warn
+#+begin_src emacs-lisp
+(setq desktop-load-locked-desktop t)
 
 #+end_src
 
@@ -1059,6 +1066,7 @@ Define my bookmarks file.
   (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
 #+end_src
+
 
 
 ** Window Navigation
@@ -2070,5 +2078,17 @@ Now that everything's good to go, start the emacs server so we can connect to it
 #+begin_src emacs-lisp
 (server-start)
 #+end_src
+* Temporary hacks
+** TODO fix these
+** Load org-mode setup (still need to get this into separate org doc)
 
+#+name: hacks-org-setup
+#+begin_src emacs-lisp
+(load-file "~/.emacs.d/config/init-org-mode.el")
+#+end_src
+** Load org-habit (not sure why doesn't load as a module)
 
+#+name: hacks-org-habit
+#+begin_src emacs-lisp
+(load-file "~/.emacs.d/.cask/24.3.92.1/elpa/org-plus-contrib-20140630/org-habit.el")
+#+end_src
