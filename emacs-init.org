@@ -2,12 +2,12 @@
 #+AUTHOR: Jeff Stautz
 #+EMAIL: jeff@jeffstautz.com
 #+LANGUAGE:  en
-#+OPTIONS: toc:nil num:t ^:nil
+#+OPTIONS: toc:nil num:t ^:nil H:4
 
 #+begin_quote
-People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -- the editor should get used to us.
+People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen --- the editor should get used to us.
 
--- [[http://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Hadlar]]
+--- [[http://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Hadlar]]
 #+end_quote
 
 #+TOC: headlines 2
@@ -48,7 +48,7 @@ Or as Knuth puts it:
 #+begin_quote 
 Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to humans what we want the computer to do.
 
--- Donald E. Knuth, Literate Programming, 1984
+--- Donald E. Knuth, Literate Programming, 1984
 #+end_quote
 
 The document you're reading now is an [[http://org-mode.org][org-mode]] text file[fn:1] that contains both code and documentation. 
@@ -91,7 +91,7 @@ Fair warning:
 
 - This is a perpetual work in progress. 
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
-- Requires Emacs 24.3. Only tested on Mac OS X.
+- Requires Emacs 24.3+. Only tested on Mac OS X.
 - I'm not responsible if any of this blows up on you. 
 
 ** License
@@ -171,7 +171,7 @@ Packages installed via Cask should be in your load path, and you should be ready
 
 If you're *not* ready to rock at this point... sorry. Don't say I didn't [[Disclaimers and Warnings][warn you]].
 
-* Structure -- how this works 
+* Structure --- how this works 
 :PROPERTIES:
 :CUSTOM_ID: structure
 :END:
@@ -208,7 +208,7 @@ My init.el currently looks like this:
 
 That's it.
 
-Ignore the bits about Cask for now -- we'll get to that later. The important part is that last s-expression: 
+Ignore the bits about Cask for now --- we'll get to that later. The important part is that last s-expression: 
 
 #+begin_src emacs-lisp :tangle no
 (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)
@@ -218,9 +218,7 @@ This line calls org-babel to extract ("tangle") the code blocks from the =emacs-
 
 [[http://orgmode.org/worg/org-contrib/babel/][Org-babel is Merlin-level wizardry.]] Eric Schulte, Dan Davison, and everyone who's worked on it all deserve medals. 
 
-Because tangling and loading my .org file takes a few seconds (there are a lot of code blocks to deal with), I've wrapped this call to org-babel in an =if= statement that checks to see if tangling is even necessary.
-
-If my "tangled" =emacs-init.el= file is newer than the most recent changes to =emacs-init.org=, then everything's up to date and I can I load the .el file directly. 
+Because tangling and loading my .org file takes a few seconds (there are a lot of code blocks to deal with), I've wrapped this call to org-babel in an =if= statement that checks to see if tangling is even necessary, or if I can load the .el file directly. 
 
 ** emacs-init.org
 :PROPERTIES:
@@ -302,7 +300,7 @@ As mentioned in the [[Installation]] section above, a simple =cask install= in m
 
 There are only two real methods to deal with this:
 
-- Be careful and judicious about updating your packages -- any update could be a breaking change
+- Be careful and judicious about updating your packages --- any update could be a breaking change
 - Keep all your 3rd party packages under your own version control
 
 This is a problem with *any* package management setup in Emacs. It's extraordinarily difficult to create a setup that says "I want to use only this specific version of package x and this specific version of package y." 
@@ -329,7 +327,7 @@ Enter Pallet.
 (require 'pallet)
 #+end_src
 
-If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el -- it's all still in my config and can be pulled down via =cask install=. 
+If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el --- it's all still in my config and can be pulled down via =cask install=. 
 
 Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. So handy.
 
@@ -346,7 +344,7 @@ This can be slow. I don't always want to load *every* single package at startup 
 
 The best way to do this is to make judicious use of [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][=autoload=]]. This function lets you tell Emacs that a library or function exists, but to hold off on loading it until it's actually called. 
 
-John Wiegley's use-package provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
+John Wiegley's =use-package= provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
 
 - Handling missing packages without choking
 - Initializing and autoloading packages
@@ -365,7 +363,7 @@ You'll see =use-package= and its syntax all over the place in my setup.
 
 * Prerequisites
 :PROPERTIES:
-:noweb-ref: Prerequisites and setup -- load basic support libraries, set some useful variables
+:noweb-ref: Prerequisites and setup --- load basic support libraries, set some useful variables
 :CUSTOM_ID: setup
 :END:  
 
@@ -402,7 +400,7 @@ This is kind of a gross hack to grab the $PATH environment variable from my ~/.b
 
 #+end_src
 
-...Yeah, you read that elisp right. Icky, but it works. The only other solution would be to mess around with =launchctl= on OS X, and I really don't want to do that right now.
+(Yeah, you read that elisp right. Icky, but it works. The only other solution would be to mess around with =launchctl= on OS X, and I really don't want to do that right now.)
  
 ** Set a few variables for directories
 
@@ -433,9 +431,9 @@ Our load-path defines where Emacs should look for packages, functions, variables
 
 Emacs has a neat customize feature, accessible via =M-x customize=, which lets you modify user-configurable variables in a simpler (read: non-elisp) interface.
 
-I don't generally use it -- I prefer to =setq= these variables in my init files manually -- but sometimes I'll fiddle with settings in customize to try things out.
+I don't generally use it --- I prefer to =setq= these variables in my init files manually --- but sometimes I'll fiddle with settings in customize to try things out.
 
-When I do so, I'd like customize to save things in a separate =emcas-custom= file. I treat this file as temporary storage. If I like the changes, I'll pull them out of this file and place them in the appropriate places in my config.
+When I do so, I'd like customize to save things in a separate =emacs-custom= file. I treat this file as temporary storage. If I like the changes, I'll pull them out of this file and place them in the appropriate places in my config.
 
 #+name: setup-custom-file
 #+begin_src emacs-lisp
@@ -477,7 +475,7 @@ I do this *before* I begin loading packages, so that package configs can access 
 #+begin_quote
 This is my rifle. There are many like it, but this one is mine.
 
---Major General William H. Rupertus, "The Rifleman's Creed," 1942
+--- Major General William H. Rupertus, "The Rifleman's Creed," 1942
 #+end_quote
 
 ** Interface tweaks
@@ -554,29 +552,6 @@ This s-exp lets you just type "y" or "n" to answer these prompts.
 (fset 'yes-or-no-p 'y-or-n-p)
 
 #+end_src
-*** Full screen
-
-"Full screen" mode has historically been a bit of a pain for me with Emacs.
-
-Back in the old days of [[http://th.nao.ac.jp/MEMBER/zenitani/emacs-e.html][Carbon Emacs]] on pre-Lion OS X, the custom =ns-toggle=fullscreen= worked beautifully.
-
-Then along came OS X Lion and its utterly stupid native fullscreen mode -- if you've got a multiple-monitor setup, fullscreen renders your second display useless. Builds of Emacs 24 that enthusiastically plugged into the "native OS X fullscreen" mode. So I stopped using fullscreen.
-
-Then OS X Mavericks came out, and its fullscreen mode became slightly more sane.
-
-#+name: UI-fullscreen
-#+begin_src emacs-lisp
-    (defun toggle-fullscreen ()
-      "Toggle full screen"
-      (interactive)
-      (set-frame-parameter
-         nil 'fullscreen
-         (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
-
-  ;; (toggle-fullscreen)
-
-#+end_src
-**** TODO note that I've currently disabled "native" fullscreen because the way it handles other apps on multi-monitor setups annoys me.
 
 *** Confirm before quitting Emacs
 
@@ -599,7 +574,7 @@ If I want to quit Emacs (gasp!) I now need to do it *very* deliberately via =M-x
 #+end_src
 *** Themes
 
-I want to trust all themes -- mostly so the mode-line setup below doesn't spit warnings at me on startup.
+I want to trust all themes --- mostly so the mode-line setup below doesn't spit warnings at me on startup.
 
 #+name: UI-trust-themes
 #+begin_src emacs-lisp
@@ -778,7 +753,7 @@ First let's unset a couple of keybindings:
 
 Now let's set a couple of bindings based on my muscle memory:
 
-- Rebind M-s to save-buffer -- I never center lines
+- Rebind M-s to save-buffer --- I never center lines
 
 #+name: keybindings-save
 #+begin_src emacs-lisp 
@@ -822,14 +797,14 @@ Emulate a three-button mouse for copy/paste/select:
 I realize a lot of people hate blinking cursors, but I like them because:
 
 - I can quickly find my cursor on a large screen
-- The persistent blinking indicates Emacs is waiting for my input -- it's pushing me to write, to get shit done. 
+- The persistent blinking indicates Emacs is waiting for my input --- it's pushing me to write, to get shit done. 
 
 #+name: UI-cursor
 #+begin_src emacs-lisp 
 (setq blink-cursor-mode t)
 #+end_src
 
-Another helpful inidicator: I like having my current line highlighted. =grey93= is nice and subtle against a white background.
+Another helpful indicator: I like having my current line highlighted. =grey93= is nice and subtle against a white background.
 
 #+name: UI-highlight-line
 #+begin_src emacs-lisp 
@@ -904,7 +879,7 @@ Use =M-n= and =M-p= to scroll the window view up or down... without moving the p
 
 When I select text between point and mark, I want to see this selection highlighted with transient-mark mode. I find it difficult to use Emacs effectively without having transient-mark-mode turned on.
 
-Delete-selection-mode is also important to me -- it allows overwriting selected text to work the way I expect.
+Delete-selection-mode is also important to me --- it allows overwriting selected text to work the way I expect.
 
 #+name:cursor-transient
 #+begin_src emacs-lisp
@@ -1014,7 +989,7 @@ However... it's still kind of a pain in the ass.
 
 Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually want to work on shorter lines than that, just for usability's sake.
 
-I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode -- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
+I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
 
 #+name: auto-fill-options
 #+begin_src emacs-lisp
@@ -1175,7 +1150,7 @@ First we define an "other-window-backward" function that acts just like =C-x-o= 
 
 #+end_src   
 
-And now we bind these to some familiar keybindings -- =C-<tab>= and =C-S-<tab>= to cycle backward and foward through windows, and also [prior] and [next] keys.
+And now we bind these to some familiar keybindings --- =C-<tab>= and =C-S-<tab>= to cycle backward and foward through windows, and also [prior] and [next] keys.
 
 #+name: window-move-bindings
 #+begin_src emacs-lisp
@@ -1216,7 +1191,7 @@ I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=.
 
 *** Edit filenames in dired
 
-Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome -- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
+Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome --- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
 
 I like having wdired bound to the 'r' key inside dired.
 
@@ -1426,7 +1401,7 @@ Hitting =M-y= activates browse-kill-ring and let you dig through your kill histo
 
 *** Search kill ring
 
-Also useful -- search the kill-ring directly with =C-M-y=. Type a string to do an incremental-search on the whole kill ring for that string.
+Also useful --- search the kill-ring directly with =C-M-y=. Type a string to do an incremental-search on the whole kill ring for that string.
 
 #+name: browse-kill-ring
 #+begin_src emacs-lisp
@@ -1502,7 +1477,7 @@ This will open filename.txt within my already-running Emacs.app instance. Sweet.
 
 *** Connecting to Emacs server shouldn't pop up frames
 
-One thing I had to tweak: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing -- I want to use the existing frame.
+One thing I had to tweak: I want to make sure connecting via emacsclient doesn't spawn a new frame for editing --- I want to use the existing frame.
 
 #+name: UI-pop-up-frames
 #+begin_src emacs-lisp 
@@ -1526,7 +1501,7 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
       ido-everywhere nil
       ido-is-tramp-root nil
       ido-max-prospects 20
-      ;; don't save tramp work directories -- this caused stalls for me in the past
+      ;; don't save tramp work directories --- this caused stalls for me in the past
       ido-record-ftp-work-directories nil
       ido-show-dot-for-dired t
       ;; be able to re-visit recently closed buffers
@@ -1667,7 +1642,7 @@ I like aspell for ispell.
 
 ** Unfill-paragraph
 
-I sometimes want to "unfill" a paragraph -- that is, take a block of text that's had hard linebreaks inserted into it, and turn it into a single line of text. 
+I sometimes want to "unfill" a paragraph --- that is, take a block of text that's had hard linebreaks inserted into it, and turn it into a single line of text. 
 
 I borrowed this snippet from [[https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org][Kyle Machulis]].
 
@@ -1685,7 +1660,7 @@ I borrowed this snippet from [[https://raw.github.com/qdot/conf_emacs/master/ema
 
 When I'm writing or working, I find it useful to be able to focus on a narrow region of text. The =narrow-to-region= command, when invoked on a selected region of text, will hide everything else in the buffer except for that text. 
 
-It's as if you're editing a file containing *only* that information -- you can't see anything else, can't scroll beyond it, etc. In addition, most editing commands will only apply to the narrowed region of the buffer. 
+It's as if you're editing a file containing *only* that information --- you can't see anything else, can't scroll beyond it, etc. In addition, most editing commands will only apply to the narrowed region of the buffer. 
 
 It's pretty damn handy. It's also disbled by default, so let's turn it on.
 
@@ -1924,7 +1899,7 @@ Jedi is awesome for autocompletion and more when working with Python.
 ** Web development
 *** web mode
 
-Haven't used web-mode much yet -- still trying it out.
+Haven't used web-mode much yet --- still trying it out.
 
 #+name: coding-webmode
 #+begin_src emacs-lisp
@@ -1999,7 +1974,7 @@ There's also a "refactored" version. I have yet to decide which is best.
 #+begin_src emacs-lisp
   
   ;;-----------------------------------------------------------------------------
-  ;; jcs:getcals -- Sync my Google Calendars to emacs diary
+  ;; jcs:getcals --- Sync my Google Calendars to emacs diary
   ;;-----------------------------------------------------------------------------
   (require 'icalendar)
   
@@ -2023,7 +1998,7 @@ There's also a "refactored" version. I have yet to decide which is best.
   
   
   ;;-----------------------------------------------------------------------------
-  ;; jcs:clock functions -- Functions to clock into/out of  a particular item in
+  ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
   ;; projects.org (OR create a new item and clock into it)
   ;;-----------------------------------------------------------------------------
    (defun jcs:clock-in-to-string (theString &optional theCategory)
@@ -2055,7 +2030,7 @@ There's also a "refactored" version. I have yet to decide which is best.
     (org-clock-out))
     
 #+end_src
-* Post-flight -- final steps
+* Post-flight --- final steps
 :PROPERTIES:
 :noweb-ref: Post-flight: load Emacs desktop and start server
 :CUSTOM_ID: final-steps
@@ -2063,7 +2038,7 @@ There's also a "refactored" version. I have yet to decide which is best.
 
 ** Restore my desktop
 
-(I'm not sure why this is required now when it wasn't before -- something slightly different after changing my config.)
+(I'm not sure why this is required now when it wasn't before --- something slightly different after changing my config.)
 
 #+name: desktop-read
 #+begin_src emacs-lisp
