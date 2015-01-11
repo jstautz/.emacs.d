@@ -2,7 +2,7 @@
 #+AUTHOR: Jeff Stautz
 #+EMAIL: jeff@jeffstautz.com
 #+LANGUAGE:  en
-#+OPTIONS: toc:nil num:t ^:nil H:4
+#+OPTIONS: toc:nil num:2 ^:nil H:4
 
 #+begin_quote
 People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen --- the editor should get used to us.
@@ -41,7 +41,7 @@ Props and praises are scattered throughout my config in places where I can remem
 :CUSTOM_ID: what_is_literate
 :END: 
 
-Short answer: instead of writing separate documentation, the documentation /contains/ the program. 
+Short answer: instead of writing separate documentation, the documentation /contains/ the program. The code itself is secondary to the explanation about how it works.
 
 Or as Knuth puts it:
 
@@ -51,13 +51,9 @@ Let us change our traditional attitude to the construction of programs: Instead 
 --- Donald E. Knuth, Literate Programming, 1984
 #+end_quote
 
-The document you're reading now is an [[http://org-mode.org][org-mode]] text file[fn:1] that contains both code and documentation. 
+The document you're reading now is an [[http://org-mode.org][org-mode]] text file that contains both code *and* documentation. 
 
 On startup, emacs pulls out ("tangles") the code snippets in this file and uses them to configure the editor.
-
-[fn:1] Okay, technically you're reading HTML that's exported from the org-mode text file. The point is that the *source file* that I edit when I update my Emacs config *is the documentation.* The elisp is compiled (tangled) from the documentation org-mode files. Org-mode files can be exported in a number of nifty formats, including HTML.
-
--------------------------------------
 
 ** Why use literate programming for my Emacs config?
 :PROPERTIES:
@@ -169,7 +165,7 @@ install.sh will:
 
 Packages installed via Cask should be in your load path, and you should be ready to rock. 
 
-If you're *not* ready to rock at this point... sorry. Don't say I didn't [[Disclaimers and Warnings][warn you]].
+If you're *not* ready to rock at this point... sorry. Don't say I didn't [[emacs-init.org#14-disclaimers-and-warnings][warn you]].
 
 * Structure --- how this works 
 :PROPERTIES:
@@ -285,7 +281,7 @@ Cask is a [[http://cask.readthedocs.org/en/latest/][dependency manager and much 
 
 The =Cask= file in my .emacs.d/ lists all the packages that my setup depends on, as well as specifying some source repositories (the same ones I specify for package.el, above).
 
-Even though I don't keep *any* of my packages under version control, Cask lets me download + load all the packages I need whenever I install my Emacs config from scratch.[fn:2]
+Even though I don't keep *any* of my packages under version control, Cask lets me download + load all the packages I need whenever I install my Emacs config from scratch.
 
 #+name: package-cask :tangle no
 #+begin_src emacs-lisp 
@@ -295,23 +291,6 @@ Even though I don't keep *any* of my packages under version control, Cask lets m
 #+end_src
 
 As mentioned in the [[Installation]] section above, a simple =cask install= in my .emacs.d directory will download all required packages and dependencies.
-
-[fn:2] One downside to this is that on every cask init, you'll pull down the latest versions of each package. *This may include unstable bleeding-edge versions.*
-
-There are only two real methods to deal with this:
-
-- Be careful and judicious about updating your packages --- any update could be a breaking change
-- Keep all your 3rd party packages under your own version control
-
-This is a problem with *any* package management setup in Emacs. It's extraordinarily difficult to create a setup that says "I want to use only this specific version of package x and this specific version of package y." 
-
-Cask appears to come close to this ideal, but you can still run into edge cases. 
-
-For example, consider the case where package A depends on version 2.0 of package B, while package C depends on version 1.5 of package B. Which version of Package B should be installed? Emacs's global namespace makes having both versions impossible.
-
-In any case, this is a known issue with my current setup that I'm still working on.
-
--------------------------------------
 
 *** Pallet
 :PROPERTIES:
@@ -340,9 +319,7 @@ Now that I've got a way to easily install, manage, and update external packages,
 
 Normally in an Emacs config, you'll see a lot of =(require 'package-name)= expressions, much like I've done with Cask and Pallet packages above. These =require= statements will find the package in the list of =load-path= directories and actually load/initialize all of the package's elisp.
 
-This can be slow. I don't always want to load *every* single package at startup time. I'd rather load only the essentials and lazy-load the rest when I need them.
-
-The best way to do this is to make judicious use of [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][=autoload=]]. This function lets you tell Emacs that a library or function exists, but to hold off on loading it until it's actually called. 
+This can be slow. I don't always want to load *every* single package at startup time. I'd rather load only the essentials and lazy-load (autoload) the rest when I need them.
 
 John Wiegley's =use-package= provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
 
@@ -360,6 +337,65 @@ John Wiegley's =use-package= provides some really nice macros for autoloading an
 #+end_src
 
 You'll see =use-package= and its syntax all over the place in my setup.
+* How I Use Emacs
+:PROPERTIES:
+:CUSTOM_ID: how-i-use-emacs
+:END:
+
+#+begin_quote
+This is my rifle. There are many like it, but this one is mine.
+
+--- Major General William H. Rupertus, "The Rifleman's Creed," 1942
+#+end_quote
+
+
+Okay. You've got a pretty good picture of how my config is structured, how it's loaded via org-babel, and how packages are loaded with Cask, Pallet, and use-package. 
+
+Before we get into the actual configuration, it might help to understand some things I do in Emacs.
+
+
+
+** Org-mode
+
+I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
+
+I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]]
+
+It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
+
+** Writing Fiction
+
+For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
+
+Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
+
+Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
+
+The details of [[file:./emacs-init.org][how I use Emacs for fiction writing are documented later in this file]]. 
+
+** Programming
+
+Unlike most Emacs users, I'm not a professional software engineer. 
+
+I've done a bunch of development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
+
+[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
+
+When I grow up maybe I'll be an engineer.
+
+A couple of languages I work with in Emacs:
+
+- I work with Emacs lisp quite a bit (of course)
+- I'm learning python
+- I play around with javascript (and HTML/CSS, obviously)
+
+[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
+
+** Manipulating files and text of all kinds
+
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
+
+[[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
 * Prerequisites
 :PROPERTIES:
@@ -367,26 +403,19 @@ You'll see =use-package= and its syntax all over the place in my setup.
 :CUSTOM_ID: setup
 :END:  
 
-Okay. You've got a pretty good picture of how my config is structured, how it's loaded via org-babel, and how packages are loaded with Cask, Pallet, and use-package. 
-
 Now let's get into the config itself.
 
 This first section contains some libraries and basic settings that the rest of my configuration depends on.
 
 ** First, let's load Common Lisp libraries
 
-This is generally a good idea.[fn:3] There's a lot of good stuff in the CL package that many other packages rely on.
+This is generally a good idea. There's a lot of good stuff in the CL package that many other packages rely on.
 
 #+name: setup-require-cl :comments both
 #+begin_src emacs-lisp
 (use-package cl)
 
 #+end_src
-
-[fn:3] I should probably revisit this at some point. Apparently as of Emacs 24, this should be =(use-package cl-lib)=? Will need to investigate and test. Later.
-
-
--------------------------------------
 
 ** Then set our path appropriately.
 
@@ -471,12 +500,6 @@ I do this *before* I begin loading packages, so that package configs can access 
 :PROPERTIES:
 :noweb-ref: General Editor Settings: UI, files, navigation, editing, scrolling
 :END:
-
-#+begin_quote
-This is my rifle. There are many like it, but this one is mine.
-
---- Major General William H. Rupertus, "The Rifleman's Creed," 1942
-#+end_quote
 
 ** Interface tweaks
 
@@ -1473,7 +1496,7 @@ If I'm working in the terminal and I need to edit a file in my current directory
 $> emacsclient filename.txt
 #+end_example
 
-This will open filename.txt within my already-running Emacs.app instance. Sweet.[fn:2]
+This will open filename.txt within my already-running Emacs.app instance. Sweet.
 
 *** Connecting to Emacs server shouldn't pop up frames
 
@@ -1484,10 +1507,6 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 (setq ns-pop-up-frames nil)
 
 #+end_src
-
-[fn:2] I actually aliased emacsclient to =em= in bash to make this even simpler. =$>em filename.txt= drops me into my existing already-running Emacs session and visits the file.
-
--------------------------------------
 
 ** ido & smex
 *** Ido settings
