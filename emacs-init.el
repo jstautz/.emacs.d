@@ -48,18 +48,8 @@
 (setq inhibit-startup-message t)
 
 (setq ring-bell-function (lambda ()))
-(setq visible-bell 1)
 
 (fset 'yes-or-no-p 'y-or-n-p)
-
-(defun toggle-fullscreen ()
-    "Toggle full screen"
-    (interactive)
-    (set-frame-parameter
-       nil 'fullscreen
-       (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
-
-;; (toggle-fullscreen)
 
 (global-unset-key "\C-x\C-c")
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -89,8 +79,6 @@
     ("^~/Dropbox/Writing/05-published/" ":Published:")
     ("^~/Dropbox/Writing/06-cold_storage/" ":ColdStore:")
     ("^~/Dropbox/Writing/" ":Writing:")
-    ("^~/Dropbox/finance/taxes 2013/" ":Tax2013:")
-    ("^~/Dropbox/finance/taxes 2014/" ":Tax2014:")
     ("^~/Dropbox/" ":DB:")
     ("^~/Documents/Writing/01-composting/" ":Compost:")
     ("^~/Documents/Writing/02-draft_in_progress/" ":Drafts:")
@@ -174,14 +162,11 @@
 (use-package expand-region
 :bind (("C-=" . er/expand-region)))
 
-;; auto-fill options 
 (setq fill-column 120)
 (setq default-fill-column 120)
 
 (setq eol-mnemonic-mac "(Mac)")
 
-;;(auto-fill-mode 1)
-;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
 (require 'wrap-to-fill)
 (visual-line-mode 1)
 (wrap-to-fill-column-mode 1)
@@ -213,7 +198,7 @@
 (global-set-key (kbd "M-o") 'other-window)
 
 (use-package ace-window
-             :bind ("M-p" . ace-window))
+             :bind ("C-M-p" . ace-window))
 
 (defun vsplit-last-buffer ()
   (interactive)
@@ -342,27 +327,24 @@ of windows in the frame simply by calling this command again."
     (goto-line line)
     (goto-char (+ (point) column))))
 
-;;-----------------------------------------------------------------------------
-;; Nice functions to change copy-kill region to copy or kill current line
-;; if no active region.
-;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
-;;-----------------------------------------------------------------------------
-(defadvice kill-ring-save (before slick-copy activate compile)
-  "When called interactively with no active region, copy the current line."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (progn
-       (message "Current line copied to kill-ring.")
-       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+(defvar isearch-initial-string nil)
 
-(defadvice kill-region (before slick-copy activate compile)
-  "When called interactively with no active region, cut the current line."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (progn
-       (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+(defun isearch-set-initial-string ()
+  (remove-hook 'isearch-mode-hook 'isearch-set-initial-string)
+  (setq isearch-string isearch-initial-string)
+  (isearch-search-and-update))
+
+(defun isearch-forward-at-point (&optional regexp-p no-recursive-edit)
+  "Interactive search forward for the symbol at point."
+  (interactive "P\np")
+  (if regexp-p (isearch-forward regexp-p no-recursive-edit)
+    (let* ((end (progn (skip-syntax-forward "w_") (point)))
+           (begin (progn (skip-syntax-backward "w_") (point))))
+      (if (eq begin end)
+          (isearch-forward regexp-p no-recursive-edit)
+        (setq isearch-initial-string (buffer-substring begin end))
+        (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
+        (isearch-forward regexp-p no-recursive-edit)))))
 
 (use-package ace-jump-mode
              :bind ("C-." . ace-jump-mode))
@@ -411,29 +393,24 @@ of windows in the frame simply by calling this command again."
 
 (ido-mode t)
 (setq ido-enable-flex-matching t
-      ido-enable-tramp-completion nil
-      ;; since we're using ido-ubiquitous, we don't need this on
-      ido-everywhere nil
-      ido-is-tramp-root nil
+      ido-everywhere t
+      completion-ignore-case t           
+      read-file-name-completion-ignore-case t
       ido-max-prospects 20
-      ;; don't save tramp work directories -- this caused stalls for me in the past
-      ido-record-ftp-work-directories nil
-      ido-show-dot-for-dired t
-      ;; be able to re-visit recently closed buffers
-      ido-use-virtual-buffers t
-      ;; No automatic searching if no matches found
-      ido-auto-merge-work-directories-length -1
-      ido-use-faces t
-      ;; for find-file-at-point
-      ido-use-filename-at-point 'guess)
-;; use recentf for visiting recent buffers
-(recentf-mode t)
-;; don't need this function disabled (it is by default)
-(put 'ido-exit-minibuffer 'disabled nil)
+      ido-use-faces t)
 
-;; ignore case when completing, including filenames
-  (setq completion-ignore-case t           
-    read-file-name-completion-ignore-case t)
+(setq ido-record-ftp-work-directories nil
+      ido-enable-tramp-completion nil
+      ido-is-tramp-root nil)
+
+(recentf-mode t)
+(setq ido-use-virtual-buffers t)
+
+(setq ido-auto-merge-work-directories-length -1
+      ido-show-dot-for-dired t
+      ido-use-filename-at-point 'guess)
+
+(put 'ido-exit-minibuffer 'disabled nil)
 
 (use-package ido-ubiquitous
              :init (ido-ubiquitous))
@@ -459,7 +436,8 @@ of windows in the frame simply by calling this command again."
 
 (defun guide-key/jcs-hook-function-for-org-mode ()
   (guide-key/add-local-guide-key-sequence "C-c")
-  (guide-key/add-local-guide-key-sequence "C-c C-x"))
+  (guide-key/add-local-guide-key-sequence "C-c C-x")
+  (guide-key/add-local-guide-key-sequence "C-x"))
 (add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
 
 (setq guide-key/idle-delay 1)
@@ -536,6 +514,10 @@ of windows in the frame simply by calling this command again."
 
 (setq diff-switches "-a -c")
 
+;; Actually I think this causes things to hang on commit
+;; (setq magit-emacsclient-executable
+;;   "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10.9/emacsclient")
+
 (use-package magit
              :diminish magit-auto-revert-mode)
 
@@ -579,8 +561,10 @@ of windows in the frame simply by calling this command again."
 
 (use-package json-mode)
 
+(use-package applescript-mode)
+
 ;;-----------------------------------------------------------------------------
-;; jcs:getcals -- Sync my Google Calendars to emacs diary
+;; jcs:getcals --- Sync my Google Calendars to emacs diary
 ;;-----------------------------------------------------------------------------
 (require 'icalendar)
 
@@ -604,7 +588,7 @@ of windows in the frame simply by calling this command again."
 
 
 ;;-----------------------------------------------------------------------------
-;; jcs:clock functions -- Functions to clock into/out of  a particular item in
+;; jcs:clock functions --- Functions to clock into/out of  a particular item in
 ;; projects.org (OR create a new item and clock into it)
 ;;-----------------------------------------------------------------------------
  (defun jcs:clock-in-to-string (theString &optional theCategory)

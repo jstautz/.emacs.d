@@ -3,6 +3,7 @@
 #+EMAIL: jeff@jeffstautz.com
 #+LANGUAGE:  en
 #+OPTIONS: toc:nil num:2 ^:nil H:4
+#+PROPERTY: tangle emacs-init.el
 
 #+begin_quote
 People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen --- the editor should get used to us.
@@ -36,7 +37,7 @@ My current setup borrows liberally from Emacs users far smarter than I am, inclu
 
 Props and praises are scattered throughout my config in places where I can remember who I stole something from.
 
-** What the hell is literate programming?
+** What's literate programming?
 :PROPERTIES:
 :CUSTOM_ID: what_is_literate
 :END: 
@@ -95,8 +96,6 @@ Fair warning:
 :CUSTOM_ID: license
 :END:
 
-I don't actually need a license for this, but I feel /way/ cooler having one here.
-
 #+begin_example
 Copyright (C)  2014  Jeff Stautz
 
@@ -118,7 +117,6 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 This document (including HTML format or raw org-mode format) is licensed under the GNU Free Documentation License version 1.3 or later (http://www.gnu.org/copyleft/fdl.html).
 
 The code examples and CSS stylesheets are licensed under the GNU General Public License v3 or later (http://www.gnu.org/licenses/gpl.html).
-
 
 * Installation
 :PROPERTIES:
@@ -157,6 +155,10 @@ install.sh will:
 - Runs =cask install= to install packages listed in my Cask file, along with any dependencies
 
 =cask install= will hit various remote Emacs package repositories (ELPA, MELPA, Marmalade, and Org) and download packages for you. Magic!
+
+** Update paths and directories
+
+There are several path variables in the config that [[Set a few variables for directories][you'll want to change to match your .emacs directory's structure.]] 
 
 ** Fire up Emacs
 :PROPERTIES:
@@ -249,7 +251,10 @@ Emacs 24 introduced a really nice package management system, =package.el=. I use
 :CUSTOM_ID: package.el
 :END:
 
-The default package manager in Emacs 24 is super handy. Use =M-x package-list-packages= to browse packages on all source repos, then install/uninstall/update them from within Emacs. Slick.
+The default package manager in Emacs 24 is super handy. Use =M-x package-list-packages= to browse packages on all source repos, then install/uninstall/update them from within Emacs. Slick!
+
+
+[[file:img/list-packages.png]]
 
 Before using it, I want to add a few other sources (notably [[http://marmalade-repo.org/][marmalade]] and [[http://melpa.milkbox.net/#/][melpa]]) to my package source list.
   
@@ -299,7 +304,7 @@ As mentioned in the [[Installation]] section above, a simple =cask install= in m
 
 So =package.el= lets me browse and install packages from within Emacs... and Cask manages packages outside Emacs based on a Cask file... so how am I supposed to keep these in sync?
 
-Enter Pallet.
+Enter [[https://github.com/rdallasgray/pallet][Pallet]].
 
 #+name: package-use-package
 #+begin_src emacs-lisp 
@@ -308,8 +313,11 @@ Enter Pallet.
 
 If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el --- it's all still in my config and can be pulled down via =cask install=. 
 
-Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file. So handy.
+Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file.
+*** TODO update Cask and Pallet
 
+/As I'm working on this documentation, I just noticed that Pallet and Cask now support pinning specific version numbers or git branches. This is something I want to try at some point, and should really update these packages sometime soon./
+ 
 *** use-package
 :PROPERTIES:
 :CUSTOM_ID: use-packages
@@ -348,24 +356,23 @@ This is my rifle. There are many like it, but this one is mine.
 --- Major General William H. Rupertus, "The Rifleman's Creed," 1942
 #+end_quote
 
-
 Okay. You've got a pretty good picture of how my config is structured, how it's loaded via org-babel, and how packages are loaded with Cask, Pallet, and use-package. 
 
 Before we get into the actual configuration, it might help to understand some things I do in Emacs.
 
-
+My use of Emacs is by no means typical, and my configuration reflects this fact.
 
 ** Org-mode
 
 I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
 
-I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]]
+I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. It's a brilliant piece of software that's totally changed how I organize my digital life. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]] 
 
 It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
 
 ** Writing Fiction
 
-For the last 9 years, I've done most of my writing, editing, and revising in plain text within Emacs.
+For the last 9 years, I've done most of my fiction writing, editing, and revising in plain text within Emacs.
 
 Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
 
@@ -383,13 +390,13 @@ I've done a bunch of development work in the past, and I enjoy messing around in
 
 When I grow up maybe I'll be an engineer.
 
-A couple of languages I work with in Emacs:
+A couple of languages I work regularly:
 
-- I work with Emacs lisp quite a bit (of course)
+- I use Emacs lisp quite a bit (of course)
 - I'm learning python
-- I play around with javascript (and HTML/CSS, obviously)
+- I play around with javascript (and HTML/CSS)
 
-[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt -- these parts of my config aren't very mature and I'm probably doing everything wrong.
+[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt --- these parts of my config aren't very mature and I'm probably doing everything wrong.
 
 ** Manipulating files and text of all kinds
 
@@ -407,9 +414,10 @@ Now let's get into the config itself.
 
 This first section contains some libraries and basic settings that the rest of my configuration depends on.
 
+
 ** First, let's load Common Lisp libraries
 
-This is generally a good idea. There's a lot of good stuff in the CL package that many other packages rely on.
+This is generally a good idea. There's a lot of good stuff in the CL package that many other packages need.
 
 #+name: setup-require-cl :comments both
 #+begin_src emacs-lisp
@@ -419,7 +427,7 @@ This is generally a good idea. There's a lot of good stuff in the CL package tha
 
 ** Then set our path appropriately.
 
-This is kind of a gross hack to grab the $PATH environment variable from my ~/.bashrc and use this. This way my path is consistent between Emacs and my shell elsewhere.
+This is a gross hack to grab the $PATH environment variable from my ~/.bashrc and use it. This way my path is consistent between Emacs and my shell elsewhere.
 
 #+name: setup-path :comments both
 #+begin_src emacs-lisp
@@ -437,7 +445,7 @@ Define our home directory, dot emacs directory (where the config lives), emacs b
 
 I use these =*-dir= variables all over the place in my config.
 
-Some of these are obviously going to be different in your setup, so you'll want to change these accordingly.
+Some of these are obviously going to be different in your setup, so you'll want to change them accordingly.
 
 #+name: setup-dirs :comments both
 #+begin_src emacs-lisp
@@ -455,6 +463,7 @@ Our load-path defines where Emacs should look for packages, functions, variables
 #+name: setup-load-path
 #+begin_src emacs-lisp
 (add-to-list 'load-path dotemacs-dir)
+
 #+end_src
 ** Tell 'customize' where to save changes
 
@@ -522,14 +531,13 @@ I don't really use the side fringe at all, so I set it to blend in with my backg
 #+begin_src emacs-lisp 
 (set-face-background 'fringe (face-background 'default))
 (set-face-foreground 'fringe (face-background 'default))
-
 #+end_src
 
 Scroll bars are also pretty useless in this age of scroll wheels and trackpads, so I turn that off as well.
 
 The only *good* part about a scroll bar? Its size and position give you a quick visual indication of how far down in the current file you are, and how large the file is.
 
-I make up for this by [[File position][displaying a position indicator in my modeline]]-- I'll explain that setup a bit further down.
+I make up for this by [[File position][displaying a position indicator in my modeline]] --- I'll explain that a bit further down.
 
 #+name: UI-fringe
 #+begin_src emacs-lisp 
@@ -541,32 +549,28 @@ I make up for this by [[File position][displaying a position indicator in my mod
 
 We're all professionals, here. We know what we're doing. 
 
-So let's ditch the splash screen, the startup message, and the default text on the scratch buffer:
+Let's ditch the splash screen, the startup message, and the default text on the scratch buffer:
 
 #+name: UI-splash
 #+begin_src emacs-lisp 
 (setq inhibit-splash-screen 1)               
 (setq initial-scratch-message "")
 (setq inhibit-startup-message t)
-
 #+end_src 
 
 *** Kill some annoyances
 
-Seriously, screw the audible alert bell.
+I hate the audible alert bell.
 
 Let's set the ring-bell function to an empty function instead of the deafult (which is named, appropriately, =ding=).
-
-Let's also turn on the visible-bell option so that the screen blinks/alerts me.
 
 #+name: UI-bells
 #+begin_src emacs-lisp 
 (setq ring-bell-function (lambda ()))
-(setq visible-bell 1)                        
 
 #+end_src
 
-Another obnoxious default to change: the requirement that you actually type the letters "y" "e" and "s" at a yes/no prompt. Whose idea was that? 
+Another obnoxious default to change: the requirement that you actually type the letters "y" "e" and "s" at a yes/no prompt. 
 
 This s-exp lets you just type "y" or "n" to answer these prompts.
 
@@ -604,7 +608,6 @@ I want to trust all themes --- mostly so the mode-line setup below doesn't spit 
 (setq custom-safe-themes t)
 
 #+end_src
-
 
 *** Mode-line settings
 **** Show both line and column numbers in mode-line
@@ -656,8 +659,6 @@ smart-mode-line has a useful feature that allows you to replace elements of a pa
           ("^~/Dropbox/Writing/05-published/" ":Published:")
           ("^~/Dropbox/Writing/06-cold_storage/" ":ColdStore:")
           ("^~/Dropbox/Writing/" ":Writing:")
-          ("^~/Dropbox/finance/taxes 2013/" ":Tax2013:")
-          ("^~/Dropbox/finance/taxes 2014/" ":Tax2014:")
           ("^~/Dropbox/" ":DB:")
           ("^~/Documents/Writing/01-composting/" ":Compost:")
           ("^~/Documents/Writing/02-draft_in_progress/" ":Drafts:")
@@ -720,11 +721,11 @@ I believe this is now on by default in Emacs 24, so I may no longer need to set 
 
 ** Backups & Trash settings
 
-Emacs has some pretty useful features for auto-saving backups and integrating with the OS Trash / filesystem.
+Emacs has some pretty useful features for auto-saving backups and integrating with OS X's Trash / filesystem.
 
 *** Set backup directory
 
-One problem with the default auto-save in Emacs is that it peppers your working directories with duplicates of your files, e.g. =#init.el#= =init.el~=. Ugly. 
+One problem with the default auto-save in Emacs is that it peppers your working directories with duplicates of your files, e.g. =#init.el#= =init.el~=.
 
 Let's tell Emacs to put all these auto-saves and backups into a more useful location:
 
@@ -889,7 +890,7 @@ Scolling via mouse wheel / trackpad works great, except if my mouse is on the fr
 
 *** Scroll view without moving cursor
 
-Use =M-n= and =M-p= to scroll the window view up or down... without moving the point.
+Use =M-n= and =M-p= to scroll the window view up or down... without moving the point. This is handy for quickly peeking beyond the bounds of the screen without losing my place.
 
 #+name: keybindings-scroll-view
 #+begin_src emacs-lisp 
@@ -924,14 +925,13 @@ I dislike using CUA-mode's default keybindings, but I do like the rectangle edit
 
 #+end_src
 
-
 *** Multiple cursors
 
 Sometimes editing a rectangular region just isn't enough power. Sometimes I need to perform the same action across several lines of varying length. Or sometimes those lines I need to edit aren't consecutive but scattered throughout the file.
 
 Multiple-cursors solves this problem nicely. [[https://www.youtube.com/watch?v=jNa3axo40qM][Check out this raw power.]]
 
-I set my keybindings for this to ones that are very close to those for expand-region, since I often use them in sequence. Expand-region is C-=, so expand-region + mark-next are just a shift key apart.
+I set my keybindings for this to ones that are very close to those for expand-region, since I often use them in sequence. Expand-region is =C-==, so expand-region + mark-next are just a shift key apart.
 
 #+name: cursor-mc
 #+begin_src emacs-lisp
@@ -967,16 +967,15 @@ This feature works nicely with various programming languages as well, allowing y
 
 #+end_src
 
-
 ** Auto-fill & Word Wrap
 
 By default, Emacs doesn't automatically wrap words onto the next line. (I know! What decade are we in?)
 
 There are two options to change this. 
 
-In the first option, =auto-fill-mode= will automatically insert linebreaks at a certain column number, preventing any lines from being longer than your screen's viewable area. setting fill-column defines the column number at which Emacs will auto-insert a linebreak.
+In the first option, =auto-fill-mode= will automatically insert linebreaks at a certain column number, preventing any lines from being longer than your screen's viewable area. Setting the =fill-column= variable defines the column number at which Emacs will auto-insert a linebreak.
 
-In the second option, =visual-line-mode=, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's *visually* wrapped onto multiple lines. Cursor movement and end-of-line + beginning-of-line commands work within the wrapped line. 
+In the second option, =visual-line-mode=, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's *visually* wrapped onto multiple lines. Cursor movement, end-of-line, and beginning-of-line commands all work within the wrapped line. 
 
 The second option is more like a "modern" word processor, but still has its quirks.
 
@@ -988,7 +987,6 @@ I know an 80-column limit would be more compatible... but it feels cramped. Espe
 
 #+name: auto-fill-options
 #+begin_src emacs-lisp
-  ;; auto-fill options 
   (setq fill-column 120)
   (setq default-fill-column 120)
   
@@ -1010,14 +1008,12 @@ Previously I kept auto-fill-mode turned on. The hard linebreaks didn't bother me
 
 However... it's still kind of a pain in the ass.
 
-Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually want to work on shorter lines than that, just for usability's sake.
+Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually have my frame full-screen and like working in a narrower band within this frame, my text surrounded by whitespace.
 
-I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
+I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
 
-#+name: auto-fill-options
+#+name: wrap-fill-options
 #+begin_src emacs-lisp
-  ;;(auto-fill-mode 1)
-  ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
   (require 'wrap-to-fill)
   (visual-line-mode 1)
   (wrap-to-fill-column-mode 1)
@@ -1028,7 +1024,7 @@ I've since discovered wrap-to-fill-column-mode (was packaged with nxhtml-mode --
 
 ** Desktop & Bookmark Settings
 
-Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings). It's pretty rad.
+Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings).
 
 #+name: desktop-settings
 #+begin_src emacs-lisp
@@ -1049,7 +1045,7 @@ Emacs Desktop allows you to save your current workspace (frame dimensions, windo
                   register-alist)))
 #+end_src
 
-Don't warn me about desktop locks
+Don't warn me about desktop locks.
 
 #+name: desktop-lock-warn
 #+begin_src emacs-lisp
@@ -1064,8 +1060,6 @@ Define my bookmarks file.
   (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
 #+end_src
-
-
 
 ** Window Navigation
 
@@ -1099,11 +1093,11 @@ I'm experimenting with using =M-o= to move between windows. The default =C-x o= 
 #+name: window-ace-window
 #+begin_src emacs-lisp 
     (use-package ace-window
-                 :bind ("M-p" . ace-window))
+                 :bind ("C-M-p" . ace-window))
 
 #+end_src
 
-
+I've bound this to =C-M-p=, so it's similar to my keybinding for =other-window=, but I'm not totally bought into this keybinding just yet.
  
 *** Previous buffer when splitting window 
 
@@ -1199,8 +1193,7 @@ I can use the mouse to drag the window boundaries, sure... but it's sometimes fa
   (define-key global-map (kbd "C-M-<up>") 'enlarge-window)
   (define-key global-map (kbd "C-M-<down>") 'shrink-window)
 
-#+end_src  
-
+#+end_src
 ** File & Buffer Navigation & Manipulation
 *** Buffer lists
 
@@ -1214,7 +1207,7 @@ I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=.
 
 *** Edit filenames in dired
 
-Dired is awesome for viewing and manipulating files in a directory. Wdired makes it even more awesome --- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
+Dired is awesome for viewing and manipulating files in a directory. wdired makes it even more awesome --- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
 
 I like having wdired bound to the 'r' key inside dired.
 
@@ -1256,7 +1249,7 @@ Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the
 
 *** Auto-revert dired buffers
 
-This code is supposed to auto-revert (refresh) dired buffers when things change, but I don't think it works the way I want it to work:
+This code is supposed to auto-revert (refresh) dired buffers when things change, but I don't think it works quite the way I want it to work:
 
 #+name: auto-revert-dired
 #+begin_src emacs-lisp
@@ -1319,6 +1312,7 @@ And =C-x C-w= is bound to write-file... but a more useful feature would be to si
   
   (global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
   #+end_src
+
 *** Drag and drop file support
 
 When I drag and drop a file onto Emacs.app, visit that file rather than just appending it to the currently open buffer (which is a horrible default).
@@ -1329,6 +1323,7 @@ When I drag and drop a file onto Emacs.app, visit that file rather than just app
 (define-key global-map [ns-drag-file] 'ns-find-file) 
 
 #+end_src
+
 *** Make M-x locate use OS X's Spotlight
 
 Leverage OS X's mdfind util for crazy-fast file locating. Try it with =M-x locate=.
@@ -1338,9 +1333,12 @@ Leverage OS X's mdfind util for crazy-fast file locating. Try it with =M-x locat
   (setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
 
 #+end_src
+
 *** Re-open file as root
 
-[[http://t.co/KiAWcJoo][Thanks to @christopherdone for this one]].
+[[http://t.co/KiAWcJoo][Thanks to @christopherdone for this one]]. I occasionally need to edit a file as root. This is possible to do within my running Emacs instance with [[Tramp][tramp]], but I usually forget exactly how to do it. 
+
+This function encapsulates this inside an easier-to-remember function name. If I type =M-x sudo=, I'll get =tramp-sudo-reopen= in my autocomplete list.
 
 #+name: open-as-root
 #+begin_src emacs-lisp
@@ -1358,42 +1356,52 @@ Leverage OS X's mdfind util for crazy-fast file locating. Try it with =M-x locat
 #+end_src
 *** isearch using token at point
 
+This is a convenient [[http://platypope.org/blog/2007/8/5/a-compendium-of-awesomeness][function I stole from Platypope,]] but I don't use it all that often anymore.
+
+When your cursor's on a particular word or token, calling =isearch-forward-at-point= will search forward in the buffer for another symbol or word that matches the one you're on.
+
+I should really bind this to a key if I want to get any use out of it.
+
 #+name: isearch-token
 #+begin_src emacs-lisp
-  ;;-----------------------------------------------------------------------------
-  ;; Nice functions to change copy-kill region to copy or kill current line
-  ;; if no active region.
-  ;; Stolen from http://xahlee.org/emacs/emacs_copy_cut_current_line.html
-  ;;-----------------------------------------------------------------------------
-  (defadvice kill-ring-save (before slick-copy activate compile)
-    "When called interactively with no active region, copy the current line."
-    (interactive
-     (if mark-active
-         (list (region-beginning) (region-end))
-       (progn
-         (message "Current line copied to kill-ring.")
-         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
-  
-  (defadvice kill-region (before slick-copy activate compile)
-    "When called interactively with no active region, cut the current line."
-    (interactive
-     (if mark-active
-         (list (region-beginning) (region-end))
-       (progn
-         (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+(defvar isearch-initial-string nil)
 
-   #+end_src
-*** TODO finish documenting this
+(defun isearch-set-initial-string ()
+  (remove-hook 'isearch-mode-hook 'isearch-set-initial-string)
+  (setq isearch-string isearch-initial-string)
+  (isearch-search-and-update))
+
+(defun isearch-forward-at-point (&optional regexp-p no-recursive-edit)
+  "Interactive search forward for the symbol at point."
+  (interactive "P\np")
+  (if regexp-p (isearch-forward regexp-p no-recursive-edit)
+    (let* ((end (progn (skip-syntax-forward "w_") (point)))
+           (begin (progn (skip-syntax-backward "w_") (point))))
+      (if (eq begin end)
+          (isearch-forward regexp-p no-recursive-edit)
+        (setq isearch-initial-string (buffer-substring begin end))
+        (add-hook 'isearch-mode-hook 'isearch-set-initial-string)
+        (isearch-forward regexp-p no-recursive-edit)))))
+
+#+end_src
+
 *** ace-jump mode
 
-Handy for very fast navigation around a file.
+As I mentioned earlier, it's [[https://www.youtube.com/watch?v=UZkpmegySnc][hard to describe ace-jump-mode unless you see it in action]]. 
+
+Let's say I want to move to the "m" in the word "mentioned" in the line above. I just activate ace-jump-mode (I've bound it to =C-.=), then type "m". At this point, emacs highlights all matches in the buffer, like this:
+
+[[file:img/ace-jump.png]]
+
+Notice each word beginning with "m" now starts with a red letter. I type "b" to jump to the word "mentioned."
 
 #+name: ace-jump
 #+begin_src emacs-lisp
   (use-package ace-jump-mode
                :bind ("C-." . ace-jump-mode))
+
 #+end_src
-*** TODO document ace-jump-mode usage more
+
 ** Copy & Kill
 *** Use Mac clipboard for copying/killing
 
@@ -1407,7 +1415,7 @@ Copy and paste should use the OS clipboard.
 
 *** Browse kill ring
 
-=C-y= yanks from the top of the kill ring, and hitting =C-y M-y, M-y, M-y= repeatedly will cycle through previous kills. But what if you want to browse through the whole kill ring and find that text you kileld a few hours ago?
+=C-y= yanks from the top of the kill ring, and hitting =C-y M-y, M-y, M-y= repeatedly will cycle through previous kills. But what if you want to browse through the whole kill ring and find that text you killed a few hours ago?
 
 Hitting =M-y= activates browse-kill-ring and let you dig through your kill history, select an item, and yank it into the buffer.
 
@@ -1433,6 +1441,7 @@ Also useful --- search the kill-ring directly with =C-M-y=. Type a string to do 
   
 #+end_src
 
+
 *** Fix =zap-to-char=
 
 One thing that annoys me about the default zap-to-char is that it nukes everything up to and *including* the char you enter. Usually I found that this behaviour isn't what I want. So let's create a function called =zap-*up*-to-char=.
@@ -1444,6 +1453,7 @@ One thing that annoys me about the default zap-to-char is that it nukes everythi
     The CHAR is replaced and the point is put before CHAR."
     (insert char)
     (forward-char -1))
+
 #+end_src
 
 Thanks to [[http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions/][Eric Himmelreich]] for this one.
@@ -1451,6 +1461,8 @@ Thanks to [[http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions
 *** Kill line + easy-kill
 
 [[https://github.com/leoliu/easy-kill/][Easy-kill]] is a package that lets me quickly copy a line, word, or series of words. 
+
+I haven't used this a ton, honestly, and it's something I'll likely remove from my config at some point.
 
 #+name: easy-kill
 #+begin_src emacs-lisp
@@ -1463,7 +1475,7 @@ Thanks to [[http://rawsyntax.com/blog/learn-emacs-use-defadvice-modify-functions
 
 Related to this, I want to advise =kill-ring-save= and =kill-region= functions so they copy/kill the current line if there's no active region. [[http://xahlee.org/emacs/emacs_copy_cut_current_line.html][I stole this from Xah Lee]].
 
-I don't use this a ton, but when I remember it's there, it's nice. I usually use it for killing a line when I'm in the middle of that line.
+I don't use this a ton either, but when I remember it's there, it's nice. I usually use it for killing a line when I'm in the middle of that line.
 
 #+name: kill-ring-save-functions
 #+begin_src emacs-lisp
@@ -1509,44 +1521,72 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 #+end_src
 
 ** ido & smex
-*** Ido settings
 
-#+name: ido-settings
+
+[[file:img/ido.png]]
+
+ido (short for "*interactively do* things") is a fantastic package, and one of the first things I recommend a new Emacs user set up. It's actually a part of Emacs as of v22, but requires a bit of configuration to make it *really* powerful.
+
+ido provides autocomplete features for files and buffers, and it supports things like fuzzy matching and "virtual buffers" for revising recently-closed buffers.
+
+*** ido settings
+
+Let's turn on ido and configure it, shall we? It's got a lot of bells and whistles.
+
+The first things we want to do are to enable flex matching, turn ido on everywhere, ignore case when completing, and set up max prospects and faces. 
+
+#+name: ido-settings-1
 #+begin_src emacs-lisp
 (ido-mode t)
 (setq ido-enable-flex-matching t
-      ido-enable-tramp-completion nil
-      ;; since we're using ido-ubiquitous, we don't need this on
-      ido-everywhere nil
-      ido-is-tramp-root nil
+      ido-everywhere t
+      completion-ignore-case t           
+      read-file-name-completion-ignore-case t
       ido-max-prospects 20
-      ;; don't save tramp work directories --- this caused stalls for me in the past
-      ido-record-ftp-work-directories nil
-      ido-show-dot-for-dired t
-      ;; be able to re-visit recently closed buffers
-      ido-use-virtual-buffers t
-      ;; No automatic searching if no matches found
-      ido-auto-merge-work-directories-length -1
-      ido-use-faces t
-      ;; for find-file-at-point
-      ido-use-filename-at-point 'guess)
-;; use recentf for visiting recent buffers
+      ido-use-faces t)
+#+end_src
+
+Next, I want to turn off some of the tramp-related and ftp-related options --- these caused stalls for me in the past.
+
+#+name: ido-settings-2
+#+begin_src emacs-lisp
+(setq ido-record-ftp-work-directories nil
+      ido-enable-tramp-completion nil
+      ido-is-tramp-root nil)
+#+end_src
+
+Now let's add some magic: we'll turn on recentf-mode and allow ido to list my recently-closed buffers as possible matches. This is so damn handy.
+
+#+name: ido-settings-3
+#+begin_src emacs-lisp
 (recentf-mode t)
-;; don't need this function disabled (it is by default)
+(setq ido-use-virtual-buffers t)
+#+end_src
+
+Let's fix a couple of navigation-related annoyances as well. By default, if no matches are found, ido will kick off a search for the file you might have meant. I found this annoying, so I disable it.
+
+I also like being able to navigate into a directory and hit =.= to get dropped into dired in that directory.
+
+And I want to invoke ido when my cursor is on a filename in the buffer text and have that file suggested as a completion. 
+
+#+name: ido-settings-4
+#+begin_src emacs-lisp
+(setq ido-auto-merge-work-directories-length -1
+      ido-show-dot-for-dired t
+      ido-use-filename-at-point 'guess)
+#+end_src
+
+I'm not sure why this is disabled by default, but let's enable it:
+
+#+name: ido-settings-5
+#+begin_src emacs-lisp
 (put 'ido-exit-minibuffer 'disabled nil)
 
 #+end_src
 
-
-#+name: ignore-case-completion
-#+begin_src emacs-lisp
-
-;; ignore case when completing, including filenames
-  (setq completion-ignore-case t           
-    read-file-name-completion-ignore-case t)
-#+end_src
-
 *** ido-ubiquitous
+
+ido-ubiquitous is an additional package that enables ido in even more places. Let's fire it up:
 
 #+name:ido-ubiquitous
 #+begin_src emacs-lisp
@@ -1554,7 +1594,15 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
                :init (ido-ubiquitous))
 #+end_src
 
+With this enabled, you'll be able to do things like hit =C-h f= (describe-function) and see a nice list of possible completions --- it'll even default suggest the function your cursor's sitting on.
+
 *** ido-vertical
+
+By default, ido lists possible completions horizontally, wrapping them if there are more completions than fit on the line. 
+
+I prefer having completion candidates listed vertically and left-aligned --- they're much easier to scan that way.
+
+We'll use the ido-vertical-mode package to set this up, and define keys for navigating up and down between candidates in the list.
 
 #+name:ido-vertical
 #+begin_src emacs-lisp
@@ -1564,13 +1612,23 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
                       (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
     
 #+end_src
+
 *** smex
 
-(I need to rework this a bit)
+[[file:img/smex.png]]
+
+The smex package gives you all the autocompletion and fuzzy-matching goodness of ido, but for =M-x=, the infamous =execute-extended-command= function. 
+
+Instead of hunting and scraping to find the function I'm looking for, I use smex + fuzzy matching and feel like an Emacs god.
+
+The setup for smex is a bit weird, and I could probably rewrite this to load via use-package.
+
+The gist of the snippet below is that we want to lazy-load smex so that it only initializes after the first time I try hitting =M-x=. 
+
+We do this in a hacky (but clever?) way by defining a function called =jcs:smex-init= that does the initialization and sets keybindings, and then bind this new function to =M-x=.
 
 #+name: smex-settings
 #+begin_src emacs-lisp 
-
 (defun jcs:smex-init ()
   (interactive)
   (condition-case description
@@ -1587,8 +1645,11 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 
 #+end_src
 
+Note that I can get back to my original =M-x= functionality if I need it by using =C-c C-c M-x=.
+
 ** Help
 *** Guide Key
+
 
 (need to rework this to use use-package)
 
@@ -1596,7 +1657,8 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 #+begin_src emacs-lisp
 (defun guide-key/jcs-hook-function-for-org-mode ()
   (guide-key/add-local-guide-key-sequence "C-c")
-  (guide-key/add-local-guide-key-sequence "C-c C-x"))
+  (guide-key/add-local-guide-key-sequence "C-c C-x")
+  (guide-key/add-local-guide-key-sequence "C-x"))
 (add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
 
 (setq guide-key/idle-delay 1)
@@ -1639,7 +1701,7 @@ I am firmly in the "spaces" camp on the whole "tabs v. spaces" debate. I also li
   
 #+end_src  
 
-And don't even get me started on one space vs. two after sentences.
+And don't even get me started on one space vs. two after sentences. 
 
 #+name: writing-spaces
 #+begin_src emacs-lisp
@@ -1647,8 +1709,6 @@ And don't even get me started on one space vs. two after sentences.
   
 #+end_src  
   
-
-
 ** Spell-check settings
 
 I like aspell for ispell.
@@ -1657,7 +1717,9 @@ I like aspell for ispell.
 #+begin_src emacs-lisp
   (setq ispell-program-name "aspell")
   
-#+end_src  
+#+end_src
+*** TODO ispell is currently broken on my machine -- can't find the right dictionaries. 
+I know I've solved this problem before and will need to investigate & fix. When I do, I'll document it here.
 
 ** Unfill-paragraph
 
@@ -1675,6 +1737,8 @@ I borrowed this snippet from [[https://raw.github.com/qdot/conf_emacs/master/ema
 
 #+end_src  
 
+This is especially relevant now that I'm using auto-fill less often and relying on visual-line-mode rather than hard line breaks.
+
 ** Narrow-to-region
 
 When I'm writing or working, I find it useful to be able to focus on a narrow region of text. The =narrow-to-region= command, when invoked on a selected region of text, will hide everything else in the buffer except for that text. 
@@ -1688,6 +1752,7 @@ It's pretty damn handy. It's also disbled by default, so let's turn it on.
   (put 'narrow-to-region 'disabled nil)
   
 #+end_src
+
 ** Upcase / downcase
 
 Upcase-region and downcase-region are disabled by default. Let's turn them on.  
@@ -1836,12 +1901,28 @@ Add some flags to the default diff command so it works with .org files and other
 
 ** Magit
 
+We need to specify the location of the emacsclient executable, otherwise Magit will whine about it. 
+
+Details on why this is needed are found here: https://github.com/magit/magit/wiki/Emacsclient
+
+NOTE: Actually, I am commenting this out. I think it causes things to hang on commit. Possibly because I'm getting in an infinite loop. 
+
+#+name: coding-magit-executable
+#+begin_src emacs-lisp
+;; Actually I think this causes things to hang on commit
+;; (setq magit-emacsclient-executable
+;;   "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10.9/emacsclient")
+
+#+end_src
+
+
 #+name: coding-magit
 #+begin_src emacs-lisp   
     (use-package magit
                  :diminish magit-auto-revert-mode)
     
 #+end_src
+
 
 ** Emacs Lisp
 *** eval and replace
@@ -1913,8 +1994,7 @@ Jedi is awesome for autocompletion and more when working with Python.
 #+begin_src emacs-lisp
   (use-package jedi)
   
-#+end_src  
-
+#+end_src
 ** Web development
 *** web mode
 
@@ -1932,7 +2012,7 @@ Rainbow mode is useful when working on CSS, or anything where you're using hex c
 
 A screenshot's worth a thousand words. This is what it looks like:
 
-[[file:rainbow-mode.png]]
+[[file:img/rainbow-mode.png]]
 
 I'm not doing any fancy configuration with it, just initializing it with use-package.
 
@@ -1978,12 +2058,25 @@ There's also a "refactored" version. I have yet to decide which is best.
   
 #+end_src  
 
+** Applescript
+
+Applescript is a frustrating language to work in, but I occasionally need to use it as the glue to tie some scripts and apps together.
+
+#+name: coding-applescript-mode
+#+begin_src emacs-lisp
+  (use-package applescript-mode)
+  
+#+end_src  
+
+ 
+
+
 * Org-mode
 :PROPERTIES:
 :noweb-ref: Set up org-mode
 :END:
 
-* Custom functions and tweaks
+* Custom functions and tweaks (these should go in my org config)
 :PROPERTIES:
 :noweb-ref: Load a bunch of custom functions
 :CUSTOM_ID: custom-functions
@@ -2072,6 +2165,7 @@ Now that everything's good to go, start the emacs server so we can connect to it
 #+begin_src emacs-lisp
 (server-start)
 #+end_src
+
 * Temporary hacks
 ** TODO fix these
 ** Load org-mode setup (still need to get this into separate org doc)
