@@ -6,6 +6,7 @@
 
 (depends-on "ace-jump-mode")
 (depends-on "ace-window")
+(depends-on "applescript-mode")
 (depends-on "auto-complete")
 (depends-on "browse-kill-ring")
 (depends-on "cask")
@@ -29,6 +30,7 @@
 (depends-on "magit")
 (depends-on "markdown-mode")
 (depends-on "multiple-cursors")
+(depends-on "oauth2")
 (depends-on "org-plus-contrib")
 (depends-on "org-trello")
 (depends-on "pallet")
