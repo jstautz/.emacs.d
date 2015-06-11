@@ -238,7 +238,7 @@ If limit exceeded, string returned is wrapped in #s"
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@home-REFILE/!WAITING"
-                          ((org-agenda-overriding-header (jcs:wip-text "@home" "WAITING" 1))
+                          ((org-agenda-overriding-header (jcs:wip-text "@home" "WAITING" 3))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
@@ -287,7 +287,7 @@ If limit exceeded, string returned is wrapped in #s"
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
                (tags-todo "@work-REFILE/!WAITING"
-                          ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 1))
+                          ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 5))
 						   (org-agenda-todo-ignore-scheduled 'future)
 						   (org-agenda-sorting-strategy
 							'(todo-state-down priority-down effort-up category-keep))))
@@ -597,6 +597,24 @@ Skips capture tasks."
 ;; Archiving options
 (setq org-archive-location (concat org-dir "archives.org::")
       org-archive-mark-done nil)
+
+;; Refile to date tree -- useful for refiling into a journal file organized in org datetree format
+(defun org-refile-to-datetree ()
+  "Refile a subtree to a datetree corresponding to its timestamp."
+  (interactive)
+  (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
+         (date (org-date-to-gregorian datetree-date)))
+    (when date
+      (save-excursion
+        (org-cut-subtree)
+        (org-datetree-find-date-create date)
+        (org-narrow-to-subtree)
+        (show-subtree)
+        (org-end-of-subtree t)
+        (newline)
+        (goto-char (point-max))
+        (org-paste-subtree 4)
+        (widen)))))
 
 
 ;;-----------------------------------------------------------------------------
