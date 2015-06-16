@@ -47,7 +47,7 @@ Short answer: instead of writing separate documentation, the documentation /cont
 Or as Knuth puts it:
 
 #+begin_quote 
-Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to humans what we want the computer to do.
+Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on /explaining to humans/ what we want the computer to do.
 
 --- Donald E. Knuth, Literate Programming, 1984
 #+end_quote
@@ -89,7 +89,7 @@ Fair warning:
 - This is a perpetual work in progress. 
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
 - Requires Emacs 24.3+. Only tested on Mac OS X.
-- I'm not responsible if any of this blows up on you. 
+- I'm not responsible if any of this blows up on you.
 
 ** License
 :PROPERTIES:
@@ -123,12 +123,18 @@ The code examples and CSS stylesheets are licensed under the GNU General Public 
 :CUSTOM_ID: installation
 :END:
 
+It's probably best if you *don't try to install this* as a drop-in replacement for your current config. 
+
+You're better off using this document as inspiration, cherrying picking useful bits and pieces for yourself while discarding the sections that you don't need. 
+
+The installation instructions that follow are mostly notes for my future self. Follow them at your own peril.
+
 ** Clone this repo into your .emacs.d/ 
 :PROPERTIES:
 :CUSTOM_ID: clone_repo
 :END:
 
-You probably want to back up your current config before you clobber it with mine.
+You probably want to back up your current config before you clobber it with this one.
 
 Once you've backed things up, clone the repo like so:
 
@@ -159,6 +165,8 @@ install.sh will:
 ** Update paths and directories
 
 There are several path variables in the config that [[Set a few variables for directories][you'll want to change to match your .emacs directory's structure.]] 
+
+After you change those, you'll need to scour the config for any other hard-coded paths and change them before you even try to use it. I'm trying to consolidate these paths in one configurable place, but that's not always easy. Maybe in v2.
 
 ** Fire up Emacs
 :PROPERTIES:
@@ -251,12 +259,15 @@ Emacs 24 introduced a really nice package management system, =package.el=. I use
 :CUSTOM_ID: package.el
 :END:
 
-The default package manager in Emacs 24 is super handy. Use =M-x package-list-packages= to browse packages on all source repos, then install/uninstall/update them from within Emacs. Slick!
+The default package manager in Emacs 24 is super handy. Use =M-x package-list-packages= to browse packages on all source repos, then install/uninstall/update them from within Emacs. Slick! 
 
+Here's what it looks like:
 
 [[file:img/list-packages.png]]
 
-Before using it, I want to add a few other sources (notably [[http://marmalade-repo.org/][marmalade]] and [[http://melpa.milkbox.net/#/][melpa]]) to my package source list.
+Beautiful.
+
+Before using the package manager, I want to add a few other sources (notably [[http://marmalade-repo.org/][marmalade]] and [[http://melpa.milkbox.net/#/][melpa]]) to my package source list.
   
 #+name: packages-set-sources
 #+begin_src emacs-lisp
@@ -314,6 +325,7 @@ Enter [[https://github.com/rdallasgray/pallet][Pallet]].
 If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el --- it's all still in my config and can be pulled down via =cask install=. 
 
 Note that the reverse is also true. If I remove a package using the built-in package manager, Pallet removes its line from my Cask file.
+
 *** TODO update Cask and Pallet
 
 /As I'm working on this documentation, I just noticed that Pallet and Cask now support pinning specific version numbers or git branches. This is something I want to try at some point, and should really update these packages sometime soon./
@@ -345,6 +357,7 @@ John Wiegley's =use-package= provides some really nice macros for autoloading an
 #+end_src
 
 You'll see =use-package= and its syntax all over the place in my setup.
+
 * How I Use Emacs
 :PROPERTIES:
 :CUSTOM_ID: how-i-use-emacs
@@ -364,21 +377,23 @@ My use of Emacs is by no means typical, and my configuration reflects this fact.
 
 ** Org-mode
 
+[[file:img/org.png]]
+
 I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
 
-I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. It's a brilliant piece of software that's totally changed how I organize my digital life. I've got a [[file:./init-org.org][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]] 
+I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. It's a brilliant piece of software that's totally changed how I organize my digital life. 
 
-It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
+I've got a [[Org-mode][whole section of my Emacs config dedicated to the ins and outs of my org-mode configuration.]] It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
 
-** Writing Fiction
+** Writing
 
-For the last 9 years, I've done most of my fiction writing, editing, and revising in plain text within Emacs.
+For the last 10 years, I've done most of my fiction writing, journalling, editing, and revising in plain text within Emacs.
 
 Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
 
 Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
 
-The details of [[file:./emacs-init.org][how I use Emacs for fiction writing are documented later in this file]]. 
+The details of [[Writing Fiction][how I use Emacs for fiction writing are documented later in this file]]. 
 
 ** Programming
 
@@ -393,16 +408,16 @@ When I grow up maybe I'll be an engineer.
 A couple of languages I work regularly:
 
 - I use Emacs lisp quite a bit (of course)
-- I'm learning python
-- I play around with javascript (and HTML/CSS)
+- I'm learning Python
+- I play around with Javascript (and HTML/CSS)
 
-[[file::./emacs-init.org][My Emacs settings for software development]] should be taken with several grains of salt --- these parts of my config aren't very mature and I'm probably doing everything wrong.
+[[Coding][My Emacs settings for software development]] should be taken with several grains of salt --- these parts of my config aren't very mature and I'm probably doing everything wrong.
 
 ** Manipulating files and text of all kinds
 
 Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
 
-[[file:./emacs-init.org][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
+[[General Editor Settings][There are large chunks of my config]] that deal with sharpening various blades of said Swiss Army Knife.
 
 * Prerequisites
 :PROPERTIES:
@@ -413,7 +428,6 @@ Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs 
 Now let's get into the config itself.
 
 This first section contains some libraries and basic settings that the rest of my configuration depends on.
-
 
 ** First, let's load Common Lisp libraries
 
@@ -505,11 +519,10 @@ I do this *before* I begin loading packages, so that package configs can access 
 
 #+end_src
 
-* General Editor Settings
+* <<General Editor Settings>> General Editor Settings
 :PROPERTIES:
 :noweb-ref: General Editor Settings: UI, files, navigation, editing, scrolling
 :END:
-
 ** Interface tweaks
 
 I know, I know. Emacs doesn't have much of an interface to begin with. 
@@ -625,7 +638,9 @@ The column number display isn't as immediately useful, but it does come in handy
 
 **** Smart-mode-line setup
 
-I use smart-mode-line to pack a bunch of useful info into my mode line.
+[[file:img/modeline.png]]
+
+I use smart-mode-line to pack a bunch of useful info into my mode line. 
 
 #+name: UI-smart-mode-line
 #+begin_src emacs-lisp
@@ -644,6 +659,8 @@ When use-package initializes smart-mode-line, I want to set up the theme and wid
 #+end_src
 
 smart-mode-line has a useful feature that allows you to replace elements of a path with an abbreviation. So instead of seeing =/Users/jstautz/Documents/Work/filename.txt= in the modeline, I'll see =:Work:filename.txt=. 
+
+In the screenshot above, you'll notice my .emacs.d/ directory has been shortened to =:ED:=.
 
 #+name: UI-sml-replacer
 #+begin_src emacs-lisp
@@ -777,7 +794,7 @@ First let's unset a couple of keybindings:
 
 Now let's set a couple of bindings based on my muscle memory:
 
-- Rebind M-s to save-buffer --- I never center lines
+- Rebind M-s to save-buffer --- I never center lines.
 
 #+name: keybindings-save
 #+begin_src emacs-lisp 
@@ -967,61 +984,6 @@ This feature works nicely with various programming languages as well, allowing y
 
 #+end_src
 
-** Auto-fill & Word Wrap
-
-By default, Emacs doesn't automatically wrap words onto the next line. (I know! What decade are we in?)
-
-There are two options to change this. 
-
-In the first option, =auto-fill-mode= will automatically insert linebreaks at a certain column number, preventing any lines from being longer than your screen's viewable area. Setting the =fill-column= variable defines the column number at which Emacs will auto-insert a linebreak.
-
-In the second option, =visual-line-mode=, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's *visually* wrapped onto multiple lines. Cursor movement, end-of-line, and beginning-of-line commands all work within the wrapped line. 
-
-The second option is more like a "modern" word processor, but still has its quirks.
-
-*** Auto-fill-mode
-
-I typically run Emacs.app in full screen, and a 120-character fill-column feels pretty good to me. 
-
-I know an 80-column limit would be more compatible... but it feels cramped. Especially when I'm writing or editing fiction.
-
-#+name: auto-fill-options
-#+begin_src emacs-lisp
-  (setq fill-column 120)
-  (setq default-fill-column 120)
-  
-#+end_src
-
-*** Use Mac EOL characters
-
-Lines should end in plain old LFs, as god intended.
-
-#+name: UI-mac-settings-eol
-#+begin_src emacs-lisp 
-(setq eol-mnemonic-mac "(Mac)")
-
-#+end_src
-
-*** Visual-line mode and wrap-to-fill-column
-
-Previously I kept auto-fill-mode turned on. The hard linebreaks didn't bother me, and when diffing files in my git repo of creative writing, I could view changes on individual lines.
-
-However... it's still kind of a pain in the ass.
-
-Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually have my frame full-screen and like working in a narrower band within this frame, my text surrounded by whitespace.
-
-I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
-
-#+name: wrap-fill-options
-#+begin_src emacs-lisp
-  (require 'wrap-to-fill)
-  (visual-line-mode 1)
-  (wrap-to-fill-column-mode 1)
-  (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
-  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
-#+end_src
-
 ** Desktop & Bookmark Settings
 
 Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings).
@@ -1053,7 +1015,7 @@ Don't warn me about desktop locks.
 
 #+end_src
 
-Define my bookmarks file.
+Define my bookmarks file and save all my settings inside it.
 
 #+name: desktop-settings
 #+begin_src emacs-lisp
@@ -1441,7 +1403,6 @@ Also useful --- search the kill-ring directly with =C-M-y=. Type a string to do 
   
 #+end_src
 
-
 *** Fix =zap-to-char=
 
 One thing that annoys me about the default zap-to-char is that it nukes everything up to and *including* the char you enter. Usually I found that this behaviour isn't what I want. So let's create a function called =zap-*up*-to-char=.
@@ -1525,9 +1486,9 @@ One thing I had to tweak: I want to make sure connecting via emacsclient doesn't
 
 [[file:img/ido.png]]
 
-ido (short for "*interactively do* things") is a fantastic package, and one of the first things I recommend a new Emacs user set up. It's actually a part of Emacs as of v22, but requires a bit of configuration to make it *really* powerful.
+[[http://emacswiki.org/emacs/InteractivelyDoThings][ido (short for "*interactively do* things")]] is a fantastic package, and one of the first things I recommend a new Emacs user set up. It's actually a part of Emacs as of v22, but requires a bit of configuration to make it *really* powerful.
 
-ido provides autocomplete features for files and buffers, and it supports things like fuzzy matching and "virtual buffers" for revising recently-closed buffers.
+[[https://www.youtube.com/watch?v=lsgPNVIMkIE][ido provides autocomplete features for files and buffers]], and it supports things like fuzzy matching and "virtual buffers" for revising recently-closed buffers.
 
 *** ido settings
 
@@ -1586,7 +1547,7 @@ I'm not sure why this is disabled by default, but let's enable it:
 
 *** ido-ubiquitous
 
-ido-ubiquitous is an additional package that enables ido in even more places. Let's fire it up:
+[[https://github.com/DarwinAwardWinner/ido-ubiquitous][ido-ubiquitous]] is an additional package that enables ido in even more places. Let's fire it up:
 
 #+name:ido-ubiquitous
 #+begin_src emacs-lisp
@@ -1602,7 +1563,7 @@ By default, ido lists possible completions horizontally, wrapping them if there 
 
 I prefer having completion candidates listed vertically and left-aligned --- they're much easier to scan that way.
 
-We'll use the ido-vertical-mode package to set this up, and define keys for navigating up and down between candidates in the list.
+We'll use [[https://github.com/gempesaw/ido-vertical-mode.el][the ido-vertical-mode package]] to set this up, and define keys for navigating up and down between candidates in the list.
 
 #+name:ido-vertical
 #+begin_src emacs-lisp
@@ -1617,7 +1578,7 @@ We'll use the ido-vertical-mode package to set this up, and define keys for navi
 
 [[file:img/smex.png]]
 
-The smex package gives you all the autocompletion and fuzzy-matching goodness of ido, but for =M-x=, the infamous =execute-extended-command= function. 
+[[https://github.com/nonsequitur/smex][The smex package]] gives you all the autocompletion and fuzzy-matching goodness of ido, but for =M-x=, the infamous =execute-extended-command= function. 
 
 Instead of hunting and scraping to find the function I'm looking for, I use smex + fuzzy matching and feel like an Emacs god.
 
@@ -1650,15 +1611,22 @@ Note that I can get back to my original =M-x= functionality if I need it by usin
 ** Help
 *** Guide Key
 
+#+ATTR_HTML: :width 600
+1[[file:img/guide-key-example.png]]
 
-(need to rework this to use use-package)
+[[Guide-key lets you set up useful completion hints for certain key combinations. 
+
+For example, I'm always forgetting certain org-mode shortcuts, so I've set up guide-key so that when I'm working in org, I can type =C-c= and wait a second to see a menu of all possible commands that start with =C-c=. 
+
+It's especially useful when learning a new mode or new set of commands.
+
+I can and should probably tweak this a little more and add additional key sequences to it, but for now this setup meets most of my needs.
 
 #+name: guide-key
 #+begin_src emacs-lisp
 (defun guide-key/jcs-hook-function-for-org-mode ()
   (guide-key/add-local-guide-key-sequence "C-c")
-  (guide-key/add-local-guide-key-sequence "C-c C-x")
-  (guide-key/add-local-guide-key-sequence "C-x"))
+  (guide-key/add-local-guide-key-sequence "C-c C-x"))
 (add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
 
 (setq guide-key/idle-delay 1)
@@ -1667,13 +1635,19 @@ Note that I can get back to my original =M-x= functionality if I need it by usin
 
 (guide-key-mode 1)
 
+;;(setq guide-key/guide-key-sequence '("C-x" "C-c" "C-c C-x"))
+;;(setq guide-key/recursive-key-sequence-flag t)
+
 #+end_src
+
 *** popwin
 
+[[https://github.com/m2ym/popwin-el][Popwin]] is installed as a dependency of guide-key, and it makes certain kinds of "pop-up" windows within your frame act slightly differently from regular windows --- you're able to dismiss them quickly by typing =0=, and provides some other useful features.
+
+It's another package that I'm probably not taking full advantage of yet, but plan on exploring more someday.
 
 #+name: popwin
-#+begin_src: emacs-lisp
-
+#+begin_src emacs-lisp
 (defun popwin-bkr:update-window-reference ()
   (popwin:update-window-reference 'browse-kill-ring-original-window :safe t))
 
@@ -1685,43 +1659,59 @@ Note that I can get back to my original =M-x= functionality if I need it by usin
 
 #+end_src
 
-* Writing Fiction
+* <<Writing Fiction>> Writing Fiction
 :PROPERTIES:
 :noweb-ref: Load settings for writing fiction
 :END:
 
-** Tabs and spaces
 
-I am firmly in the "spaces" camp on the whole "tabs v. spaces" debate. I also like my tabs to insert 4 spaces.
 
-#+name: writing-tabs
+** Auto-fill & Word Wrap
+
+By default, Emacs doesn't automatically wrap words onto the next line. (I know! What decade are we in?)
+
+There are two options to change this. 
+
+In the first option, =auto-fill-mode= will automatically insert linebreaks at a certain column number, preventing any lines from being longer than your screen's viewable area. Setting the =fill-column= variable defines the column number at which Emacs will auto-insert a linebreak.
+
+In the second option, =visual-line-mode=, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's *visually* wrapped onto multiple lines. Cursor movement, end-of-line, and beginning-of-line commands all work within the wrapped line. 
+
+The second option is more like a "modern" word processor, but still has its quirks.
+
+*** Auto-fill-mode
+
+I typically run Emacs.app in full screen, and a 120-character fill-column feels pretty good to me. 
+
+I know an 80-column limit would be more compatible... but it feels cramped. Especially when I'm writing or editing fiction.
+
+#+name: auto-fill-options
 #+begin_src emacs-lisp
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
-  
-#+end_src  
-
-And don't even get me started on one space vs. two after sentences. 
-
-#+name: writing-spaces
-#+begin_src emacs-lisp
-  (setq sentence-end-double-space nil)
-  
-#+end_src  
-  
-** Spell-check settings
-
-I like aspell for ispell.
-
-#+name: coding-reload-tags
-#+begin_src emacs-lisp
-  (setq ispell-program-name "aspell")
+  (setq fill-column 120)
+  (setq default-fill-column 120)
   
 #+end_src
-*** TODO ispell is currently broken on my machine -- can't find the right dictionaries. 
-I know I've solved this problem before and will need to investigate & fix. When I do, I'll document it here.
 
-** Unfill-paragraph
+*** Visual-line mode and wrap-to-fill-column
+
+Previously I kept auto-fill-mode turned on. The hard linebreaks didn't bother me, and when diffing files in my git repo of creative writing, I could view changes on individual lines.
+
+However... it's still kind of a pain in the ass.
+
+Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the full width of the frame. I usually have my frame full-screen and like working in a narrower band within this frame, my text surrounded by whitespace.
+
+I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
+
+#+name: wrap-fill-options
+#+begin_src emacs-lisp
+  (require 'wrap-to-fill)
+  (visual-line-mode 1)
+  (wrap-to-fill-column-mode 1)
+  (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+
+#+end_src
+
+*** Unfill-paragraph
 
 I sometimes want to "unfill" a paragraph --- that is, take a block of text that's had hard linebreaks inserted into it, and turn it into a single line of text. 
 
@@ -1737,7 +1727,53 @@ I borrowed this snippet from [[https://raw.github.com/qdot/conf_emacs/master/ema
 
 #+end_src  
 
-This is especially relevant now that I'm using auto-fill less often and relying on visual-line-mode rather than hard line breaks.
+This is especially relevant now that I'm using auto-fill less often and relying on visual-line-mode rather than hard line breaks. I find myself revising old pieces of writing and wanting to update them to work better with visual-line-mode, and this function helps.
+
+(I should really rework this function so it operates on the entire buffer.)
+
+** Tabs, spaces, EOL characters
+
+I am firmly in the "spaces" camp on the whole "tabs v. spaces" debate. I also like my tabs to insert 4 spaces.
+
+#+name: writing-tabs
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  
+#+end_src  
+
+And don't even get me started on one space vs. two after sentences. Because Jesus, people.
+
+#+name: writing-spaces
+#+begin_src emacs-lisp
+  (setq sentence-end-double-space nil)
+  
+#+end_src  
+  
+Also, lines should end in plain old LFs, as god intended.
+
+#+name: UI-mac-settings-eol
+#+begin_src emacs-lisp 
+(setq eol-mnemonic-mac "(Mac)")
+
+#+end_src
+
+
+
+** Spell-check settings
+
+I like using aspell for spell checking in Emacs.
+
+#+name: coding-reload-tags
+#+begin_src emacs-lisp
+  (setq ispell-program-name "aspell")
+  
+#+end_src
+
+I could extend this further and use [[http://www.emacswiki.org/emacs/FlySpell][the flyspell package]] to perform spell checking on the fly as I type, but I haven't played around with this too much yet. 
+
+*** TODO ispell is currently broken on my machine -- can't find the right dictionaries. 
+I know I've solved this problem before and will need to investigate & fix. When I do, I'll document it here.
 
 ** Narrow-to-region
 
@@ -1755,7 +1791,7 @@ It's pretty damn handy. It's also disbled by default, so let's turn it on.
 
 ** Upcase / downcase
 
-Upcase-region and downcase-region are disabled by default. Let's turn them on.  
+Upcase-region and downcase-region are disabled by default. Let's turn them on. 
 
 #+name: writing-upcase
 #+begin_src emacs-lisp
@@ -1772,8 +1808,6 @@ Upcase-region and downcase-region are disabled by default. Let's turn them on.
                :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")  
 
 #+end_src  
-
-
 
 ** Marked.app integration
 
@@ -1814,12 +1848,10 @@ Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/
 
 
 ** writer-names
-* Coding
+* <<Coding>> Coding
 :PROPERTIES:
 :noweb-ref: Configure programming-related packages and settings
 :END:
-
-
 ** Tramp
 
 #+name: coding-tramp
@@ -2071,86 +2103,23 @@ Applescript is a frustrating language to work in, but I occasionally need to use
  
 
 
-* Org-mode
+* <<Org-mode>> Org-mode
 :PROPERTIES:
 :noweb-ref: Set up org-mode
 :END:
 
-* Custom functions and tweaks (these should go in my org config)
-:PROPERTIES:
-:noweb-ref: Load a bunch of custom functions
-:CUSTOM_ID: custom-functions
-:END:
-
-#+name: init-packages
-#+begin_src emacs-lisp
-  
-  ;;-----------------------------------------------------------------------------
-  ;; jcs:getcals --- Sync my Google Calendars to emacs diary
-  ;;-----------------------------------------------------------------------------
-  (require 'icalendar)
-  
-  (defun getcal (url)
-    "Download ics file and add to diary"
-    (let ((tmpfile (url-file-local-copy url)))
-      (icalendar-import-file tmpfile "~/org/calendar.diary" t)
-      (kill-buffer (car (last (split-string tmpfile "/"))))
-      )
-    )
-  
-  ;; Grab google calendars from secrets.el.gpg
-  (defun jcs:getcals ()
-    (interactive)
-    (if (not (boundp 'google-calendars))
-        (jcs:decrypt-secrets))
-      (find-file "~/org/calendar.diary")
-      (flush-lines "^[& ]")
-      (dolist (url google-calendars) (getcal url))
-      (kill-buffer "calendar.diary"))
-  
-  
-  ;;-----------------------------------------------------------------------------
-  ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
-  ;; projects.org (OR create a new item and clock into it)
-  ;;-----------------------------------------------------------------------------
-   (defun jcs:clock-in-to-string (theString &optional theCategory)
-    "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
-    (interactive)
-    (save-excursion
-      (let (filepath filename mybuffer)
-        (setq filepath "/Users/jstautz/org/projects.org"
-              filename (file-name-nondirectory filepath)
-              mybuffer (find-file filepath))
-        (goto-char (point-min))
-        (widen) 
-        ;; if no category defined, try to find string in file and clock in
-        (if (eq theCategory nil)
-            (if (search-forward theString nil t)
-                (org-clock-in)
-              ;; if not found in buffer, insert new item at end and clock into it
-              (goto-char (point-max))
-              (insert (concat "*** " theString))
-              (goto-char (point-max))
-              (org-clock-in))
-          ;; thecategory is non-nil, so this is a new item w/ category
-          (goto-char (point-max))
-          (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
-          (goto-char (point-max))
-          (org-clock-in)))))
-  
-  (defun jcs:clock-out (&optional theString theCategory)
-    (org-clock-out))
-    
-#+end_src
-* Post-flight --- final steps
+* Post-flight
 :PROPERTIES:
 :noweb-ref: Post-flight: load Emacs desktop and start server
 :CUSTOM_ID: final-steps
 :END:
 
+Now that my whole config's been loaded, there are a couple of final things to do before we finish starting up.
+
+
 ** Restore my desktop
 
-(I'm not sure why this is required now when it wasn't before --- something slightly different after changing my config.)
+This is new, and suddenly seems to be required in recent versions of Emacs and my configuration. This will load my previously-saved desktop config right before dropping me into the editor.
 
 #+name: desktop-read
 #+begin_src emacs-lisp
@@ -2159,7 +2128,7 @@ Applescript is a frustrating language to work in, but I occasionally need to use
 
 ** Start server
 
-Now that everything's good to go, start the emacs server so we can connect to it using =emacsclient= from the command line.
+Now that everything's good to go, start the emacs server so we can connect to it using =emacsclient= from the command line. Because Emacs should always *always* be running.
 
 #+name: server-start
 #+begin_src emacs-lisp
@@ -2167,6 +2136,11 @@ Now that everything's good to go, start the emacs server so we can connect to it
 #+end_src
 
 * Temporary hacks
+
+This are all things I should fix before showing this to anyone. 
+
+I'll clean this up before I release the final version of this config. Which means this text shouldn't appear in the final published version of my config. So that means if you're reading this, you're probably trawling my github commit history in great detail and should probably get a life.
+
 ** TODO fix these
 ** Load org-mode setup (still need to get this into separate org doc)
 
@@ -2174,7 +2148,9 @@ Now that everything's good to go, start the emacs server so we can connect to it
 #+begin_src emacs-lisp
 (load-file "~/.emacs.d/config/init-org-mode.el")
 #+end_src
-** Load org-habit (not sure why doesn't load as a module)
+** Load org-habit (not sure why doesn't load as a module).
+
+Oh god! The pain and the ugliness! Look at that grody hard-coded path!
 
 #+name: hacks-org-habit
 #+begin_src emacs-lisp

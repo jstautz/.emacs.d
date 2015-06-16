@@ -483,6 +483,63 @@ If limit exceeded, string returned is wrapped in #s"
     (org-clock-in '(16))))
 
 
+  ;;-----------------------------------------------------------------------------
+  ;; jcs:getcals --- Sync my Google Calendars to emacs diary
+  ;;-----------------------------------------------------------------------------
+  (require 'icalendar)
+  
+  (defun getcal (url)
+    "Download ics file and add to diary"
+    (let ((tmpfile (url-file-local-copy url)))
+      (icalendar-import-file tmpfile "~/org/calendar.diary" t)
+      (kill-buffer (car (last (split-string tmpfile "/"))))
+      )
+    )
+  
+  ;; Grab google calendars from secrets.el.gpg
+  (defun jcs:getcals ()
+    (interactive)
+    (if (not (boundp 'google-calendars))
+        (jcs:decrypt-secrets))
+      (find-file "~/org/calendar.diary")
+      (flush-lines "^[& ]")
+      (dolist (url google-calendars) (getcal url))
+      (kill-buffer "calendar.diary"))
+  
+  
+  ;;-----------------------------------------------------------------------------
+  ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
+  ;; projects.org (OR create a new item and clock into it)
+  ;;-----------------------------------------------------------------------------
+   (defun jcs:clock-in-to-string (theString &optional theCategory)
+    "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
+    (interactive)
+    (save-excursion
+      (let (filepath filename mybuffer)
+        (setq filepath "/Users/jstautz/org/projects.org"
+              filename (file-name-nondirectory filepath)
+              mybuffer (find-file filepath))
+        (goto-char (point-min))
+        (widen) 
+        ;; if no category defined, try to find string in file and clock in
+        (if (eq theCategory nil)
+            (if (search-forward theString nil t)
+                (org-clock-in)
+              ;; if not found in buffer, insert new item at end and clock into it
+              (goto-char (point-max))
+              (insert (concat "*** " theString))
+              (goto-char (point-max))
+              (org-clock-in))
+          ;; thecategory is non-nil, so this is a new item w/ category
+          (goto-char (point-max))
+          (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
+          (goto-char (point-max))
+          (org-clock-in)))))
+  
+  (defun jcs:clock-out (&optional theString theCategory)
+    (org-clock-out))
+
+
 (defun jcs:punch-in (arg)
   "Start continuous clocking and set the default task to the
 selected task.  If no task is selected set the Organization task

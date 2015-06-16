@@ -436,8 +436,7 @@ of windows in the frame simply by calling this command again."
 
 (defun guide-key/jcs-hook-function-for-org-mode ()
   (guide-key/add-local-guide-key-sequence "C-c")
-  (guide-key/add-local-guide-key-sequence "C-c C-x")
-  (guide-key/add-local-guide-key-sequence "C-x"))
+  (guide-key/add-local-guide-key-sequence "C-c C-x"))
 (add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
 
 (setq guide-key/idle-delay 1)

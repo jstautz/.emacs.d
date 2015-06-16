@@ -25,7 +25,7 @@ Bernt Hansen
 
 * Dealing with inputs
 ** Where new tasks come from
-** inbox.txt
+** inbox.txt (via Alfred)
 ** Gmail -> Zapier -> inbox.txt
 ** Alfred.app -> inbox.txt
 ** org-capture
@@ -42,32 +42,39 @@ Bernt Hansen
 ** Kanban style flow
 ** Fast todo selection
 ** Speed keys
-** Logging
+** Logging state changes
 ** Projects and subtasks
-** checklists
+** Checklists
+
 * Tags
 ** Tags
 ** File tags
+
 * Agenda
 ** Getting stuff done
 ** Custom views
 ** Work in progress limits
 ** How I work from the agenda
+
 * Deadlines and Scheduling
 ** Deadlines on agenda
 ** Scheduling = remind me later
 ** Appointments and reminders
 ** Google Cal sync
+
 * Habits and Recurring Tasks
 ** org-habit
-** 
+
 * Time Tracking
-* 
+** clock in, clock out
+** timeblock reports
+
 * Notes
 ** General note taking
 ** Journal
 ** Tech log
 ** Evernote
+
 * Attachments
 * The Archive
 * Exporting and Publishing
