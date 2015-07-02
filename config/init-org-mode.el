@@ -782,4 +782,12 @@ Skips capture tasks."
 (setq org-crypt-disable-auto-save nil)
 
 
+;;-----------------------------------------------------------------------------
+;; Fontify source blocks in org-mode (babel)
+;;-----------------------------------------------------------------------------
+
+
+(setq org-src-fontify-natively t)
+
+
 (provide 'init-org-mode)
