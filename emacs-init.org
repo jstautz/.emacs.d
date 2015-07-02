@@ -265,8 +265,6 @@ Here's what it looks like:
 
 [[file:img/list-packages.png]]
 
-Beautiful.
-
 Before using the package manager, I want to add a few other sources (notably [[http://marmalade-repo.org/][marmalade]] and [[http://melpa.milkbox.net/#/][melpa]]) to my package source list.
   
 #+name: packages-set-sources
@@ -278,6 +276,7 @@ Before using the package manager, I want to add a few other sources (notably [[h
                    ("melpa" . "http://melpa.milkbox.net/packages/")))
   (add-to-list 'package-archives source t))
 (package-initialize)
+
 #+end_src
 
 Now we're ready to install packages!
@@ -301,9 +300,9 @@ Even though I don't keep *any* of my packages under version control, Cask lets m
 
 #+name: package-cask :tangle no
 #+begin_src emacs-lisp 
-
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+
 #+end_src
 
 As mentioned in the [[Installation]] section above, a simple =cask install= in my .emacs.d directory will download all required packages and dependencies.
@@ -320,6 +319,7 @@ Enter [[https://github.com/rdallasgray/pallet][Pallet]].
 #+name: package-use-package
 #+begin_src emacs-lisp 
 (require 'pallet)
+
 #+end_src
 
 If I install a new package via =M-x list-packages=, Pallet automatically updates my Cask file and keeps everything working together. This way I don't lose track of anything installed via package.el --- it's all still in my config and can be pulled down via =cask install=. 
@@ -332,7 +332,7 @@ Note that the reverse is also true. If I remove a package using the built-in pac
  
 *** use-package
 :PROPERTIES:
-:CUSTOM_ID: use-packages
+:CUSTOM_ID: use-package
 :END:
  
 Now that I've got a way to easily install, manage, and update external packages, *and* I've got a way to seamlessly track these packages in my config... I need to declare and configure these packages.
@@ -352,8 +352,8 @@ John Wiegley's =use-package= provides some really nice macros for autoloading an
 
 #+name: package-use-package
 #+begin_src emacs-lisp 
-
 (require 'use-package)
+
 #+end_src
 
 You'll see =use-package= and its syntax all over the place in my setup.
@@ -1843,9 +1843,32 @@ Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/
 #+begin_src emacs-lisp
 (use-package wordsmith-mode)
   
-#+end_src  
+#+end_src
+** CriticMarkup for Emacs
 
+[[http://criticmarkup.com/][CriticMarkup]] is a Markdown-like syntax for authors and editors to track changes to documents in plain text. 
 
+{++Additions++} and {--Deletions--} and {~~substitutions~>replacements~~} appear inline just like Markdown syntax.
+
+#+name: writing-tabs
+#+begin_src emacs-lisp
+(use-package cm-mode)
+(setq cm-author "jstautz")
+
+#+end_src
+
+Enter CriticMarkup-mode by calling =M-x cm-mode= -- this will highlight items in CM syntax for easy visibility.
+
+To add CriticMarkup, use these keybindings:
+
+- =C-c * a=: add text
+- =C-c * d=: delete text
+- =C-c * s=: substitute text
+- =C-c * c=: insert a comment (possibly with highlight)
+
+To toggle a "track changes" mode where your edits appear in the buffer as marked-up {++changes++}, hit =C-c * F=. 
+
+Once you have a buffer with CM markup in it, you can walk through the changes and accept/reject/skip suggestions interactively with =C-c * I=.
 
 ** writer-names
 * <<Coding>> Coding

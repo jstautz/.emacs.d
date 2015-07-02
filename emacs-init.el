@@ -491,6 +491,9 @@ of windows in the frame simply by calling this command again."
 
 (use-package wordsmith-mode)
 
+(use-package cm-mode)
+(setq cm-author "jstautz")
+
 (setq tramp-default-method "ssh")
 
 (global-set-key (kbd "RET") 'newline-and-indent)

@@ -10,6 +10,7 @@
 (depends-on "auto-complete")
 (depends-on "browse-kill-ring")
 (depends-on "cask")
+(depends-on "cm-mode")
 (depends-on "dash")
 (depends-on "diminish")
 (depends-on "easy-kill")
