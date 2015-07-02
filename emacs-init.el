@@ -162,17 +162,6 @@
 (use-package expand-region
 :bind (("C-=" . er/expand-region)))
 
-(setq fill-column 120)
-(setq default-fill-column 120)
-
-(setq eol-mnemonic-mac "(Mac)")
-
-(require 'wrap-to-fill)
-(visual-line-mode 1)
-(wrap-to-fill-column-mode 1)
-(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
-(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
-
 (desktop-save-mode 1)
 (setq desktop-globals-to-save
       (append '((extended-command-history . 30)
@@ -445,18 +434,41 @@ of windows in the frame simply by calling this command again."
 
 (guide-key-mode 1)
 
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
+;;(setq guide-key/guide-key-sequence '("C-x" "C-c" "C-c C-x"))
+;;(setq guide-key/recursive-key-sequence-flag t)
 
-(setq sentence-end-double-space nil)
+(defun popwin-bkr:update-window-reference ()
+  (popwin:update-window-reference 'browse-kill-ring-original-window :safe t))
 
-(setq ispell-program-name "aspell")
+(add-hook 'popwin:after-popup-hook 'popwin-bkr:update-window-reference)
+
+(push "*Kill Ring*" popwin:special-display-config)
+
+(popwin-mode 1)
+
+(setq fill-column 120)
+(setq default-fill-column 120)
+
+(require 'wrap-to-fill)
+(visual-line-mode 1)
+(wrap-to-fill-column-mode 1)
+(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 (defun unfill-paragraph ()
   "Takes a multi-line paragraph and makes it into a single line of text."
   (interactive)
   (let ((fill-column (point-max)))
     (fill-paragraph nil)))
+
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+(setq sentence-end-double-space nil)
+
+(setq eol-mnemonic-mac "(Mac)")
+
+(setq ispell-program-name "aspell")
 
 (put 'narrow-to-region 'disabled nil)
 
@@ -561,62 +573,6 @@ of windows in the frame simply by calling this command again."
 (use-package json-mode)
 
 (use-package applescript-mode)
-
-;;-----------------------------------------------------------------------------
-;; jcs:getcals --- Sync my Google Calendars to emacs diary
-;;-----------------------------------------------------------------------------
-(require 'icalendar)
-
-(defun getcal (url)
-  "Download ics file and add to diary"
-  (let ((tmpfile (url-file-local-copy url)))
-    (icalendar-import-file tmpfile "~/org/calendar.diary" t)
-    (kill-buffer (car (last (split-string tmpfile "/"))))
-    )
-  )
-
-;; Grab google calendars from secrets.el.gpg
-(defun jcs:getcals ()
-  (interactive)
-  (if (not (boundp 'google-calendars))
-      (jcs:decrypt-secrets))
-    (find-file "~/org/calendar.diary")
-    (flush-lines "^[& ]")
-    (dolist (url google-calendars) (getcal url))
-    (kill-buffer "calendar.diary"))
-
-
-;;-----------------------------------------------------------------------------
-;; jcs:clock functions --- Functions to clock into/out of  a particular item in
-;; projects.org (OR create a new item and clock into it)
-;;-----------------------------------------------------------------------------
- (defun jcs:clock-in-to-string (theString &optional theCategory)
-  "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
-  (interactive)
-  (save-excursion
-    (let (filepath filename mybuffer)
-      (setq filepath "/Users/jstautz/org/projects.org"
-            filename (file-name-nondirectory filepath)
-            mybuffer (find-file filepath))
-      (goto-char (point-min))
-      (widen) 
-      ;; if no category defined, try to find string in file and clock in
-      (if (eq theCategory nil)
-          (if (search-forward theString nil t)
-              (org-clock-in)
-            ;; if not found in buffer, insert new item at end and clock into it
-            (goto-char (point-max))
-            (insert (concat "*** " theString))
-            (goto-char (point-max))
-            (org-clock-in))
-        ;; thecategory is non-nil, so this is a new item w/ category
-        (goto-char (point-max))
-        (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
-        (goto-char (point-max))
-        (org-clock-in)))))
-
-(defun jcs:clock-out (&optional theString theCategory)
-  (org-clock-out))
 
 (desktop-read)
 
