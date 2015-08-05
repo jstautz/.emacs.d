@@ -1,4 +1,3 @@
-
 (require 'package)
 (dolist (source '( ("gnu" . "http://elpa.gnu.org/packages/")
                    ("elpa" . "http://tromey.com/elpa/")
@@ -63,7 +62,7 @@
   :init
   (progn
 
-(setq sml/theme 'respectful
+(setq sml/theme 'light
       sml/name-width 40
       sml/mode-width 40)
 
@@ -532,8 +531,8 @@ of windows in the frame simply by calling this command again."
 ;; (setq magit-emacsclient-executable
 ;;   "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10.9/emacsclient")
 
-(use-package magit
-             :diminish magit-auto-revert-mode)
+(use-package magit)
+;;                 :diminish magit-auto-revert-mode)
 
 (defun eval-and-replace ()
     "Replace the preceding sexp with its value."

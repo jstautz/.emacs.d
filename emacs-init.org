@@ -649,11 +649,11 @@ I use smart-mode-line to pack a bunch of useful info into my mode line.
     (progn
 #+end_src 
 
-When use-package initializes smart-mode-line, I want to set up the theme and width right away. I like that the theme's called "respectful."
+When use-package initializes smart-mode-line, I want to set up the theme and width right away.
 
 #+name: UI-sml-settings
 #+begin_src emacs-lisp
-      (setq sml/theme 'respectful
+      (setq sml/theme 'light
             sml/name-width 40
             sml/mode-width 40)
 #+end_src
@@ -1973,8 +1973,8 @@ NOTE: Actually, I am commenting this out. I think it causes things to hang on co
 
 #+name: coding-magit
 #+begin_src emacs-lisp   
-    (use-package magit
-                 :diminish magit-auto-revert-mode)
+    (use-package magit)
+;;                 :diminish magit-auto-revert-mode)
     
 #+end_src
 
