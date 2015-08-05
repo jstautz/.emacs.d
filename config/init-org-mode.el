@@ -641,6 +641,20 @@ Skips capture tasks."
 (add-hook 'org-clock-out-hook 'jcs:remove-empty-drawer-on-clock-out 'append)
 
 
+;; Timeclock update -- convenience marco for updating timeclock logs in my timeclock.org file
+;; Typically I do this by going "org-clone-subtree-with-time-shift" to make copies of individual
+;; day timeclock entries. Then I need to update the date stamps in the clock tables. I can do that
+;; with this macro, as long as the timeclock org entry is in the right format.
+
+(fset 'jcs:update-timeclock
+      (lambda (&optional arg) "Keyboard macro."
+        (interactive "p")
+        (kmacro-exec-ring-item
+         (quote ([19 93 return 134217826 2 67108896 134217826 134217826 left 134217847 134217830 134217830 19 50 48 49 53 45 return backspace 134217828 134217828 25 134217849 14 14 14 14 16 16 19 93 return 1 1] 0 "%d")) arg)))
+
+
+
+
 ;;-----------------------------------------------------------------------------
 ;; Capture, Refile, Archive
 ;;-----------------------------------------------------------------------------
