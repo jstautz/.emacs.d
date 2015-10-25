@@ -38,6 +38,12 @@
 ;; Because typos. When switching between laptop keyboard and USB keyboard
 (global-set-key (kbd "<C-S-f5>") 'jcs:widen)
 
+;; I never want to accidentally turn on timestamp overlays.
+(org-defkey org-mode-map "\C-c\C-x\C-t" nil)
+
+
+;; Org indent (separate package, managed in Cask) -- diminish it.
+;;(diminish 'org-indent-mode)
 
 ;; Outline structure/style
 (setq org-startup-indented t
