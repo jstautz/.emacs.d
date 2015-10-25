@@ -1784,66 +1784,81 @@ It's as if you're editing a file containing *only* that information --- you can'
 It's pretty damn handy. It's also disbled by default, so let's turn it on.
 
 #+name: writing-narrow
-#+begin_src emacs-lisp
-  (put 'narrow-to-region 'disabled nil)
-  
-#+end_src
+#+BEGIN_SRC emacs-lisp
+(put 'narrow-to-region 'disabled nil)
+
+#+END_SRC
 
 ** Upcase / downcase
 
 Upcase-region and downcase-region are disabled by default. Let's turn them on. 
 
 #+name: writing-upcase
-#+begin_src emacs-lisp
-  (put 'downcase-region 'disabled nil)
-  (put 'upcase-region 'disabled nil)
-  
-#+end_src  
+#+BEGIN_SRC emacs-lisp
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+#+END_SRC
 
 ** Markdown mode
 
 #+name: writing-markdown
-#+begin_src emacs-lisp
-    (use-package markdown-mode
-               :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")  
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+           :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")  
 
-#+end_src  
+#+END_SRC
 
 ** Marked.app integration
 
 Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/emacs
 
 #+name: writing-marked-app
-#+begin_src emacs-lisp
-  (defun markdown-preview-file ()
-    "run Marked on the current file and revert the buffer"
-    (interactive)
-    (shell-command
-     (format "open -a /Applications/Marked.app %s"
-             (shell-quote-argument (buffer-file-name)))))
-  
-  (global-set-key "\C-cm" 'markdown-preview-file)
-  
-#+end_src  
+#+BEGIN_SRC emacs-lisp
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked.app %s"
+           (shell-quote-argument (buffer-file-name)))))
+
+(global-set-key "\C-cm" 'markdown-preview-file)
+
+#+END_SRC
 
 ** fountain-mode
 
 
 #+name: writing-tabs
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (use-package fountain-mode)
-  
-#+end_src  
+
+#+END_SRC
 
 
 ** wordsmith-mode
 
 
 #+name: writing-tabs
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (use-package wordsmith-mode)
-  
-#+end_src
+
+#+END_SRC
+** wc-goal-mode
+
+wc-goal-mode lets me replicate the experience of 750words.com. I can set word-count goals for myself and then write to meet them.
+
+One downside is that it becomes *super* slow on large files, especially large org-mode files.
+
+Generally I'll use it on a single smaller file, or when narrowed into a sub-tree for the section of the story I'm currently working on.
+
+#+name: writing-tabs
+#+BEGIN_SRC emacs-lisp
+(use-package wc-goal-mode)
+(setq wc-goal-modeline-format "WC[%w/%gw]") 
+
+#+END_SRC
+
 ** CriticMarkup for Emacs
 
 [[http://criticmarkup.com/][CriticMarkup]] is a Markdown-like syntax for authors and editors to track changes to documents in plain text. 
