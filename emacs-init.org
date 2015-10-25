@@ -2,7 +2,7 @@
 #+AUTHOR: Jeff Stautz
 #+EMAIL: jeff@jeffstautz.com
 #+LANGUAGE:  en
-#+OPTIONS: toc:nil num:2 ^:nil H:4
+#+OPTIONS: toc:nil num:nil ^:nil H:4
 #+PROPERTY: tangle emacs-init.el
 
 #+begin_quote
