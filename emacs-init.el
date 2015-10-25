@@ -432,6 +432,7 @@ of windows in the frame simply by calling this command again."
 (setq guide-key/popup-window-position 'bottom)
 
 (guide-key-mode 1)
+(diminish 'guide-key-mode " Gd")
 
 ;;(setq guide-key/guide-key-sequence '("C-x" "C-c" "C-c C-x"))
 ;;(setq guide-key/recursive-key-sequence-flag t)
@@ -453,6 +454,8 @@ of windows in the frame simply by calling this command again."
 (wrap-to-fill-column-mode 1)
 (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+(diminish 'visual-line-mode)
+(diminish 'wrap-to-fill-column-mode)
 
 (defun unfill-paragraph ()
   "Takes a multi-line paragraph and makes it into a single line of text."
@@ -468,6 +471,33 @@ of windows in the frame simply by calling this command again."
 (setq eol-mnemonic-mac "(Mac)")
 
 (setq ispell-program-name "aspell")
+
+(defvar ispell-local-dictionary-alist
+  '(("canadian"
+     "[A-Za-z]" "[^A-Za-z]" "[']" nil ("-B") nil iso-8859-1)))
+
+(setq ispell-local-dictionary "canadian")
+
+(add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
+(add-hook 'org-mode-hook (lambda () (flyspell-mode 1)))
+
+(eval-after-load "flyspell"
+  '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
+
+(add-to-list 'ispell-skip-region-alist '("^#\\+begin_src ". "#\\+end_src$"))
+(add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC ". "#\\+END_SRC$"))
+
+(add-to-list 'ispell-skip-region-alist '("^#\\+begin_example ". "#\\+end_example$"))
+(add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE ". "#\\+END_EXAMPLE$"))
+
+(add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
+
+(add-hook 'text-mode-hook (lambda () (abbrev-mode 1)))
+(add-hook 'org-mode-hook (lambda() (abbrev-mode 1)))
+
+(setq abbrev-file-name            
+        "~/.emacs.d/abbrev_defs")
+(setq save-abbrevs t)
 
 (put 'narrow-to-region 'disabled nil)
 
@@ -489,6 +519,9 @@ of windows in the frame simply by calling this command again."
 (use-package fountain-mode)
 
 (use-package wordsmith-mode)
+
+(use-package wc-goal-mode)
+(setq wc-goal-modeline-format "WC[%w/%gw]")
 
 (use-package cm-mode)
 (setq cm-author "jstautz")
@@ -540,7 +573,7 @@ of windows in the frame simply by calling this command again."
     (backward-kill-sexp)
     (prin1 (eval (read (current-kill 0)))
            (current-buffer)))
-  
+
   (global-set-key (kbd "C-c e") 'eval-and-replace)
 
 (defun byte-compile-current-buffer ()

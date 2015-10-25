@@ -29,5 +29,5 @@
        (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
       (load-file (expand-file-name "emacs-init.el" dotemacs-dir))
     (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir)))
-  
+
 ;;; init.el ends here
