@@ -661,15 +661,18 @@ Skips capture tasks."
 
 ;; Where to look for refile targets
 ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
-(setq org-refile-targets (quote ((("/Users/jstautz/org/personal.org"
-                                   "/Users/jstautz/org/work.org"
-                                   "/Users/jstautz/org/someday_maybe.org") :maxlevel . 2))))
+;; Note that because of the way my work.org file is organized, I want top-level targets there
+;; but 2nd-level targets everywhere else.
+(setq org-refile-targets (quote (("/Users/jstautz/org/work.org" :maxlevel . 1)
+                                 ("/Users/jstautz/org/personal.org" :maxlevel . 2)
+                                 ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2))))
 
 ;; Archiving options
 (setq org-archive-location (concat org-dir "archives.org::")
       org-archive-mark-done nil)
 
 ;; Refile to date tree -- useful for refiling into a journal file organized in org datetree format
+;; NOTE: this is finicky right now and I'm not sure why. Need to review at some point.
 (defun org-refile-to-datetree ()
   "Refile a subtree to a datetree corresponding to its timestamp."
   (interactive)
