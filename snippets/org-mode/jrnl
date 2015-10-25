@@ -1,0 +1,24 @@
+#key: jrnl
+#name : new journal entry with full metadata + location data from interwebs
+# --
+* <`(format-time-string "%Y-%m-%d %a %H:%M" (current-time))`> 
+:PROPERTIES:
+:Place:  $1
+:Lat-Lon: `(substring (shell-command-to-string "~/bin/whereami") 0 -1)`
+:Temp: 
+:Weather:
+:Visibility:
+:Humidity:
+:Pressure:
+:Wind:
+:Activity:  $2
+:Reading:  $3
+:Watching:  $4
+:Listening:  $5
+:Stress:  $6
+:Creativity:  $7
+:Energy:  $8
+:Happiness:  $9
+:END:
+
+$0
