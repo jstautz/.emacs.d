@@ -45,6 +45,7 @@
 (depends-on "smex")
 (depends-on "use-package")
 (depends-on "virtualenvwrapper")
+(depends-on "wc-goal-mode")
 (depends-on "web-mode")
 (depends-on "wordsmith-mode")
 (depends-on "yasnippet")
