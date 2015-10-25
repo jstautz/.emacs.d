@@ -23,6 +23,7 @@
 (depends-on "htmlize")
 (depends-on "ido-ubiquitous")
 (depends-on "ido-vertical-mode")
+(depends-on "inform7-mode")
 (depends-on "jedi")
 (depends-on "js2-mode")
 (depends-on "js2-refactor")

@@ -2087,59 +2087,67 @@ A screenshot's worth a thousand words. This is what it looks like:
 I'm not doing any fancy configuration with it, just initializing it with use-package.
 
 #+name: coding-webmode
-#+begin_src emacs-lisp
-  (use-package rainbow-mode)
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-mode)
 
-#+end_src
+#+END_SRC
 
 *** skewer
 
 Skewer-mode is rad. It uses simple-http to connect your HTML/CSS/js buffer to your browser, so you can live-edit your code and see the results instantly. 
 
 #+name: coding-skewer
-#+begin_src emacs-lisp
-  (use-package skewer-mode)
-  
-#+end_src
+#+BEGIN_SRC emacs-lisp
+(use-package skewer-mode)
+
+#+END_SRC
 *** js2 mode
 
 Steve Yegge built this. I think it's useful.
 
 #+name: coding-js2-mode
-#+begin_src emacs-lisp
-  (use-package js2-mode)
-  
-#+end_src  
+#+BEGIN_SRC emacs-lisp
+(use-package js2-mode)
+
+#+END_SRC
 
 There's also a "refactored" version. I have yet to decide which is best.
 
 #+name: coding-js2-refactor
-#+begin_src emacs-lisp
-  (use-package js2-refactor)
-  
-#+end_src  
+#+BEGIN_SRC emacs-lisp
+(use-package js2-refactor)
+
+#+END_SRC
 
 
 *** json mode
 
 #+name: coding-json-mode
-#+begin_src emacs-lisp
-  (use-package json-mode)
-  
-#+end_src  
+#+BEGIN_SRC emacs-lisp
+(use-package json-mode)
+
+#+END_SRC
 
 ** Applescript
 
 Applescript is a frustrating language to work in, but I occasionally need to use it as the glue to tie some scripts and apps together.
 
 #+name: coding-applescript-mode
-#+begin_src emacs-lisp
-  (use-package applescript-mode)
-  
-#+end_src  
+#+BEGIN_SRC emacs-lisp
+(use-package applescript-mode)
 
- 
+#+END_SRC
+** Inform 7
 
+I've been trying my hand at writing interactive fiction using the Inform7 language. 
+
+Inform comes with an amazing IDE of its own, and this Emacs mode will probably never match its power, unfortunately... but I've still been playing with it.
+
+#+name: coding-inform7-mode
+#+BEGIN_SRC emacs-lisp
+(use-package inform7-mode)
+
+#+END_SRC
 
 * <<Org-mode>> Org-mode
 :PROPERTIES:
