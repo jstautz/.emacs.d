@@ -1,5 +1,5 @@
-#name : new datestamped entry
+#name : new datestamped entry (inactive date stamp)
 # --
-* [`(format-time-string "%Y-%m-%d %a" (current-time))`]
+* [`(format-time-string "%Y-%m-%d %a %k:%M" (current-time))`]
 *** $0
 
