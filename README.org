@@ -15,3 +15,4 @@ Very [[http://orgmode.org/][org-mode]] heavy. My org-mode setup is ugly and comp
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies.
 - secrets.el.gpg is an encrypted store containing passwords, etc. You'll want to replace that with your own.
 - A perpetual work in progress.
+  
