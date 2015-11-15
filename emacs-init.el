@@ -432,7 +432,7 @@ of windows in the frame simply by calling this command again."
 (setq guide-key/popup-window-position 'bottom)
 
 (guide-key-mode 1)
-(diminish 'guide-key-mode " Gd")
+(diminish 'guide-key-mode)
 
 ;;(setq guide-key/guide-key-sequence '("C-x" "C-c" "C-c C-x"))
 ;;(setq guide-key/recursive-key-sequence-flag t)
