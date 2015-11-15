@@ -2179,6 +2179,19 @@ Jedi is awesome for autocompletion and more when working with Python.
 (use-package jedi)
 
 #+END_SRC
+*** Set python environment directory
+
+I like to store my python-env directory outside ~/.emacs.d. 
+
+Partly because you end up symlinking deep into /Library/Frameworks/Python.framework, and when I've got that action happening in my ~/.emacs.d/, Dropbox runs off and cries.
+
+#+name: coding-python-env
+#+BEGIN_SRC emacs-lisp
+(setq python-environment-directory "~/.python-environments")
+
+#+END_SRC
+
+
 ** Web development
 *** web mode
 

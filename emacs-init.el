@@ -598,6 +598,8 @@ of windows in the frame simply by calling this command again."
 
 (use-package jedi)
 
+(setq python-environment-directory "~/.python-environments")
+
 (use-package web-mode)
 
 (use-package rainbow-mode)
@@ -611,6 +613,8 @@ of windows in the frame simply by calling this command again."
 (use-package json-mode)
 
 (use-package applescript-mode)
+
+(use-package inform7-mode)
 
 (desktop-read)
 
