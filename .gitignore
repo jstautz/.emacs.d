@@ -15,7 +15,7 @@ tramp
 /eshell/history
 /eshell/lastdir
 /data/styles/*
-/.cask/24.3.50.1/bootstrap/*
+/.cask/*
 /.emacs.desktop.lock
 /skewer-cache/*
 /emacs-init.html
