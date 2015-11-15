@@ -516,13 +516,14 @@ If limit exceeded, string returned is wrapped in #s"
   ;;-----------------------------------------------------------------------------
   ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
   ;; projects.org (OR create a new item and clock into it)
+  ;; (NOTE: Doesn't work at the moment -- fix this)
   ;;-----------------------------------------------------------------------------
    (defun jcs:clock-in-to-string (theString &optional theCategory)
-    "Clock into a particular item in ~/org/projects.org file. Takes optional Category param."
+    "Clock into a particular item in ~/org/work.org file. Takes optional Category param."
     (interactive)
     (save-excursion
       (let (filepath filename mybuffer)
-        (setq filepath "/Users/jstautz/org/projects.org"
+        (setq filepath "/Users/jstautz/org/work.org"
               filename (file-name-nondirectory filepath)
               mybuffer (find-file filepath))
         (goto-char (point-min))
@@ -672,6 +673,7 @@ Skips capture tasks."
 (setq org-refile-targets (quote (("/Users/jstautz/org/work.org" :maxlevel . 1)
                                  ("/Users/jstautz/org/personal.org" :maxlevel . 2)
                                  ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2))))
+
 
 ;; Archiving options
 (setq org-archive-location (concat org-dir "archives.org::")
@@ -842,3 +844,5 @@ Skips capture tasks."
 
 
 (provide 'init-org-mode)
+
+(diminish 'org-indent-mode)
