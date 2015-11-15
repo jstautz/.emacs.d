@@ -483,6 +483,8 @@ of windows in the frame simply by calling this command again."
 
 (eval-after-load "flyspell"
   '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
+(eval-after-load "minor-mode"
+  '(define-key flyspell-mode-map (kbd "C-c $") nil))
 
 (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src ". "#\\+end_src$"))
 (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC ". "#\\+END_SRC$"))
@@ -494,10 +496,11 @@ of windows in the frame simply by calling this command again."
 
 (add-hook 'text-mode-hook (lambda () (abbrev-mode 1)))
 (add-hook 'org-mode-hook (lambda() (abbrev-mode 1)))
+(diminish 'abbrev-mode "Abr")
 
 (setq abbrev-file-name            
         "~/.emacs.d/abbrev_defs")
-(setq save-abbrevs t)
+(setq save-abbrevs 'silently)
 
 (put 'narrow-to-region 'disabled nil)
 

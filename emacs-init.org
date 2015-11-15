@@ -1830,6 +1830,8 @@ Of course, highlighting the words isn't enough. I'd like a quick way to fix them
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "flyspell"
   '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
+(eval-after-load "minor-mode"
+  '(define-key flyspell-mode-map (kbd "C-c $") nil))
 
 #+END_SRC
 
