@@ -791,14 +791,15 @@ Instead of just blowing files away, I want all file-deletion events in Emacs to 
 *** Unset some default keybindings
 
 First let's unset a couple of keybindings:
-- Read-only-toggle is bound by default to =C-x C-q=. It's a useless command that I toggle by accident way too often.
+- Read-only-toggle is bound by to =C-x C-q= by default. It's a useless command that I activate by accident way too often.
 - I also hit =F2= accidentally way too often. I may eventually use it for something, but for now I just want to remove its default binding.
+- =C-x .= is bound to =set-fill-prefix=, which I rarely need.
 
 #+name: keybindings-unsets
 #+BEGIN_SRC emacs-lisp
 (global-unset-key "\C-x\C-q")
 (global-unset-key (kbd "<f2>"))     
-
+(global-unset-key "\C-x.")
 #+END_SRC
 
 *** Save and Undo

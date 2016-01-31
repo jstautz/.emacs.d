@@ -109,7 +109,8 @@
 (setq trash-directory (concat home-dir ".Trash/"))
 
 (global-unset-key "\C-x\C-q")
-(global-unset-key (kbd "<f2>"))
+(global-unset-key (kbd "<f2>"))     
+(global-unset-key "\C-x.")
 
 (global-set-key (kbd "M-s") 'save-buffer)
 
