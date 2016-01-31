@@ -839,8 +839,17 @@ Skips capture tasks."
 ;; Fontify source blocks in org-mode (babel)
 ;;-----------------------------------------------------------------------------
 
-
 (setq org-src-fontify-natively t)
+
+
+;;-----------------------------------------------------------------------------
+;; Ditaa setup
+;;-----------------------------------------------------------------------------
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((ditaa . t)))
+(setq org-ditaa-jar-path (concat home-dir "bin/ditaa.jar"))
 
 
 (provide 'init-org-mode)
