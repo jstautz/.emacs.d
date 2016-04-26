@@ -530,6 +530,13 @@ of windows in the frame simply by calling this command again."
 (use-package cm-mode)
 (setq cm-author "jstautz")
 
+(use-package writer-names
+             :defer t
+             :init
+             (progn
+               (autoload 'writer-random-name "writer-names" 
+                "Generate random names from census data" t)))
+
 (setq tramp-default-method "ssh")
 
 (global-set-key (kbd "RET") 'newline-and-indent)

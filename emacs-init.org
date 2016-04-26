@@ -2001,6 +2001,20 @@ To toggle a "track changes" mode where your edits appear in the buffer as marked
 Once you have a buffer with CM markup in it, you can walk through the changes and accept/reject/skip suggestions interactively with =C-c * I=.
 
 ** writer-names
+
+#+name: writer-names
+#+BEGIN_SRC emacs-lisp
+  (use-package writer-names
+               :defer t
+               :init
+               (progn
+                 (autoload 'writer-random-name "writer-names" 
+                  "Generate random names from census data" t)))
+#+END_SRC
+
+
+
+
 * <<Coding>> Coding
 :PROPERTIES:
 :noweb-ref: Configure programming-related packages and settings

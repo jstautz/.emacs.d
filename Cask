@@ -52,4 +52,5 @@
 (depends-on "wc-goal-mode")
 (depends-on "web-mode")
 (depends-on "wordsmith-mode")
+(depends-on "writer-names" :git "https://github.com/jstautz/writer-names.git" :files ("writer-names.el" "*.first" "*.last"))
 (depends-on "yasnippet")
