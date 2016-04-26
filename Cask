@@ -40,6 +40,8 @@
 (depends-on "popwin")
 (depends-on "psvn")
 (depends-on "rainbow-mode")
+(depends-on "request")
+(depends-on "request-deferred")
 (depends-on "restclient")
 (depends-on "s")
 (depends-on "skewer-mode")
