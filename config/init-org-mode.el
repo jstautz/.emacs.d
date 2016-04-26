@@ -141,7 +141,7 @@
       org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
 
 ;; Definition of a "stuck project" for agenda
-(setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS/-DONE"
+(setq org-stuck-projects (quote ("+LEVEL=1-REFILE-UNFILED-HABITS/-DONE"
   ("TODO" "NEXT" "STARTED") ("NOTES") "")))
 
 ;; Custom function to return agenda header strings based on WIP limit
