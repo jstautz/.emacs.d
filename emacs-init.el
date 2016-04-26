@@ -111,6 +111,7 @@
 (global-unset-key "\C-x\C-q")
 (global-unset-key (kbd "<f2>"))     
 (global-unset-key "\C-x.")
+(global-unset-key "\M-`")
 
 (global-set-key (kbd "M-s") 'save-buffer)
 
@@ -377,6 +378,18 @@ of windows in the frame simply by calling this command again."
        (list (region-beginning) (region-end))
      (progn
        (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
+
+(defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+
+(defun terminal-notifier-notify (title message)
+  "Show a message with `terminal-notifier-command`."
+  (start-process "terminal-notifier"
+                 "*terminal-notifier*"
+                 terminal-notifier-command
+                 "-title" title
+                 "-message" message
+                 "-activate" "org.gnu.Emacs"
+                 "-sender" "org.gnu.Emacs"))
 
 (setq ns-pop-up-frames nil)
 

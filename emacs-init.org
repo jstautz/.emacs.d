@@ -1484,6 +1484,28 @@ I don't use this a ton either, but when I remember it's there, it's nice. I usua
 
 #+END_SRC
 
+** Alerts and Notifications
+
+I use [[https://github.com/julienXX/terminal-notifier][terminal-notifier]] to send alerts to the OS X Notification Center from other applications. I adapted [[https://gist.github.com/justinhj/eb2d354d06631076566f#file-gistfile1-el][this gist from justinhj]] to send events from emacs to the Notification Center.
+
+Note that this depends on having terminal-notifier installed. If you use homebrew, just use =brew install terminal-notifier=.
+
+#+name: UI-notifications
+#+BEGIN_SRC emacs-lisp
+(defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+
+(defun terminal-notifier-notify (title message)
+  "Show a message with `terminal-notifier-command`."
+  (start-process "terminal-notifier"
+                 "*terminal-notifier*"
+                 terminal-notifier-command
+                 "-title" title
+                 "-message" message
+                 "-activate" "org.gnu.Emacs"
+                 "-sender" "org.gnu.Emacs"))
+
+#+END_SRC
+
 ** Emacsclient / Server
 
 My preferred way of working is in a single fullscreen frame in Emacs.app that's open all the time, running as a server. 

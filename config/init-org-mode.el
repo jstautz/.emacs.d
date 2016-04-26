@@ -791,22 +791,11 @@ Skips capture tasks."
 (setq org-html-head-include-default-style nil)
 
 ;;-----------------------------------------------------------------------------
-;; Notifications -- use Growl to send org & calendar notifications
+;; Notifications -- use terminal-notifier to send org & calendar notifications
 ;;-----------------------------------------------------------------------------
-(defvar growl-program "/usr/local/bin/growlnotify")
-
-(defun growl (title message &optional id)
-  (if (eq id nil)
-      (start-process "growl" " growl"
-                     growl-program title "-w" "-a" "iCal.app")
-    (start-process "growl" " growl"
-                   growl-program title "-w" "-a" "iCal.app" "-d" id))
-  (process-send-string " growl" message)
-  (process-send-string " growl" "\n")
-  (process-send-eof " growl"))
 
 ;; Send org notifications to Growl
-(setq org-show-notification-handler '(lambda (notification) (growl "org-mode notification" notification)))
+(setq org-show-notification-handler '(lambda (notification) (terminal-notifier-notify "org-mode notification:" notification)))
 
 ;; Send Appt reminders to Growl
 (progn
@@ -814,7 +803,7 @@ Skips capture tasks."
   (setq appt-display-format 'window
         appt-disp-window-function (function my-appt-disp-window))
   (defun my-appt-disp-window (min-to-app new-time msg)
-    (growl "Reminder" (format "%s" msg))))
+    (terminal-notifier-notify "Reminder" (format "%s" msg))))
 
 
 ;;-----------------------------------------------------------------------------

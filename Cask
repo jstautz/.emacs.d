@@ -6,6 +6,7 @@
 
 (depends-on "ace-jump-mode")
 (depends-on "ace-window")
+(depends-on "alert")
 (depends-on "applescript-mode")
 (depends-on "auto-complete")
 (depends-on "browse-kill-ring")
