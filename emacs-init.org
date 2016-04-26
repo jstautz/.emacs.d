@@ -794,12 +794,14 @@ First let's unset a couple of keybindings:
 - Read-only-toggle is bound by to =C-x C-q= by default. It's a useless command that I activate by accident way too often.
 - I also hit =F2= accidentally way too often. I may eventually use it for something, but for now I just want to remove its default binding.
 - =C-x .= is bound to =set-fill-prefix=, which I rarely need.
+- Command-tilde (=M-`=) is the OS X keybinding to flip between windows in an app. I use it a lot, and don't want to enter tmm-menubar if I hit it when I'm in Emacs.
 
 #+name: keybindings-unsets
 #+BEGIN_SRC emacs-lisp
 (global-unset-key "\C-x\C-q")
 (global-unset-key (kbd "<f2>"))     
 (global-unset-key "\C-x.")
+(global-unset-key "\M-`")
 #+END_SRC
 
 *** Save and Undo
