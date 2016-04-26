@@ -1632,7 +1632,6 @@ We do this in a hacky (but clever?) way by defining a function called =jcs:smex-
 #+END_SRC
 
 Note that I can get back to my original =M-x= functionality if I need it by using =C-c C-c M-x=.
-
 ** Help
 *** Guide Key
 
@@ -1945,7 +1944,7 @@ Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/
 ** fountain-mode
 
 
-#+name: writing-tabs
+#+name: writing-fountain
 #+BEGIN_SRC emacs-lisp
 (use-package fountain-mode)
 
@@ -1955,7 +1954,7 @@ Open the current buffer in Marked.app. Stolen from https://github.com/mattsears/
 ** wordsmith-mode
 
 
-#+name: writing-tabs
+#+name: writing-wordsmith
 #+BEGIN_SRC emacs-lisp
 (use-package wordsmith-mode)
 
@@ -1968,7 +1967,7 @@ One downside is that it becomes *super* slow on large files, especially large or
 
 Generally I'll use it on a single smaller file, or when narrowed into a sub-tree for the section of the story I'm currently working on.
 
-#+name: writing-tabs
+#+name: writing-wc-goal
 #+BEGIN_SRC emacs-lisp
 (use-package wc-goal-mode)
 (setq wc-goal-modeline-format "WC[%w/%gw]") 
@@ -1981,7 +1980,7 @@ Generally I'll use it on a single smaller file, or when narrowed into a sub-tree
 
 {++Additions++} and {--Deletions--} and {~~substitutions~>replacements~~} appear inline just like Markdown syntax.
 
-#+name: writing-tabs
+#+name: writing-criticmarkup
 #+BEGIN_SRC emacs-lisp
 (use-package cm-mode)
 (setq cm-author "jstautz")
@@ -2283,7 +2282,6 @@ Inform comes with an amazing IDE of its own, and this Emacs mode will probably n
 :PROPERTIES:
 :noweb-ref: Set up org-mode
 :END:
-
 * Post-flight
 :PROPERTIES:
 :noweb-ref: Post-flight: load Emacs desktop and start server
