@@ -1654,6 +1654,16 @@ We do this in a hacky (but clever?) way by defining a function called =jcs:smex-
 #+END_SRC
 
 Note that I can get back to my original =M-x= functionality if I need it by using =C-c C-c M-x=.
+** Images
+Emacs can display image files out of the box. However, there are limitations around certain actions. The Image+ package gives us some additional features.
+
+#+name: image+
+#+BEGIN_SRC emacs-lisp
+(use-package image+)
+#+END_SRC
+
+To manipulate an image, use =M-x imagex-global-sticky-mode=, then use =C-c += and =C-c -= to zoom in and out.
+
 ** Help
 *** Guide Key
 

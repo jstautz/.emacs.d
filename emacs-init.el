@@ -436,6 +436,8 @@ of windows in the frame simply by calling this command again."
     (error (execute-extended-command))))
 (global-set-key (kbd "M-x") 'jcs:smex-init)
 
+(use-package image+)
+
 (defun guide-key/jcs-hook-function-for-org-mode ()
   (guide-key/add-local-guide-key-sequence "C-c")
   (guide-key/add-local-guide-key-sequence "C-c C-x"))
