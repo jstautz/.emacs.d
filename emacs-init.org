@@ -1,0 +1,93 @@
+#+TITLE: Jeff's Emacs config
+#+AUTHOR: Jeff Stautz
+#+EMAIL: jeff@jeffstautz.com
+#+LANGUAGE:  en
+#+OPTIONS: toc:nil num:nil ^:nil H:4
+#+PROPERTY: header-args :tangle "lisp/emacs-init.el"
+
+#+begin_quote
+People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen --- the editor should get used to us.
+
+--- [[http://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Hadlar]]
+#+end_quote
+
+#+TOC: headlines 2
+
+* Environment setup
+** Add /lisp to load-path
+
+Let's tell Emacs where to look for things...
+
+#+name: env-dotemacs-load-path
+#+BEGIN_SRC emacs-lisp
+;; Assume current directory is the dot-emacs directory
+(add-to-list 'load-path (concat dotemacs-dir "lisp/"))
+
+#+END_SRC
+
+** Set up variables for other useful directories
+
+Define my home directory, dot emacs directory (where the config lives), emacs binary directory (where Emacs.app lives), and info file directory.
+
+I use these =*-dir= variables all over the place in my config.
+
+Note that these are very specific to my machine and my setup -- it'll probably break on yours.
+
+#+name: env-directories
+#+BEGIN_SRC emacs-lisp
+;; Set some other useful environment vars, specific to my setup
+(setq home-dir "/Users/jeff.stautz/"
+      emacs-dir "/Applications/Emacs.app/Contents/"
+      emacs-bin (concat emacs-dir "MacOS/Emacs")
+      info-dir (concat emacs-dir "Resources/info/"))
+
+#+END_SRC
+
+** Set up $PATH and exec-path
+
+This is a gross hack to grab the $PATH environment variable from my ~/.bashrc and use it. This way my path is consistent between Emacs.app and my shell elsewhere.
+
+#+name: env-path
+#+BEGIN_SRC emacs-lisp
+;; Make my $PATH environment var the same as in bash
+(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+  (setenv "PATH" jcs:shell-path)
+  (setq exec-path (split-string jcs:shell-path ":")))
+
+#+END_SRC
+
+Yeah, you read that elisp right. 
+
+This workaround's required because of the way OS X launches the Emacs app. The only other solution would be to mess around with =launchctl=, and I really don't want to do that right now.
+* Install and configure packages
+
+#+name: install-packages
+#+BEGIN_SRC emacs-lisp
+;; Bootstrap & install packages:
+(load-file (concat dotemacs-dir "lisp/packages.el"))
+
+#+END_SRC
+
+
+* Load custom settings
+
+#+name: custom-settings
+#+BEGIN_SRC emacs-lisp
+;; Set up interface and editor options the way I like 'em:
+(load-file (concat dotemacs-dir "lisp/settings.el"))
+
+#+END_SRC
+
+
+* <<Org-mode>> Org-mode
+:PROPERTIES:
+:noweb-ref: Set up org-mode
+:END:
+
+** Load org-mode setup (still need to get this into separate org doc)
+
+#+name: hacks-org-setup
+#+BEGIN_SRC emacs-lisp
+(load-file "~/.emacs.d/lisp/init-org-mode.el")
+
+#+END_SRC
