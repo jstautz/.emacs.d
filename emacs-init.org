@@ -819,7 +819,7 @@ Now let's set a couple of bindings based on my muscle memory:
 
 #+name: keybindings-save
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-z") 'undo)     
+(global-set-key (kbd "C-z") 'undo)
 
 #+END_SRC
 
@@ -898,9 +898,9 @@ This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't ha
 
 #+name: UI-scroll-agg
 #+BEGIN_SRC emacs-lisp
-(setq scroll-up-aggressively nil
-      scroll-down-aggressively nil
-      scroll-preserve-screen-position t)
+  (setq scroll-up-aggressively nil
+	scroll-down-aggressively nil
+	scroll-preserve-screen-position t)
 
 #+END_SRC
 
@@ -1483,6 +1483,7 @@ I don't use this a ton either, but when I remember it's there, it's nice. I usua
        (list (line-beginning-position) (line-beginning-position 2)) ) ) ))
 
 #+END_SRC
+** Undo and redo
 
 ** Alerts and Notifications
 
@@ -1663,6 +1664,13 @@ Emacs can display image files out of the box. However, there are limitations aro
 #+END_SRC
 
 To manipulate an image, use =M-x imagex-global-sticky-mode=, then use =C-c += and =C-c -= to zoom in and out.
+** Emoji support
+For when you really need to 🎉🎈🙌. 
+
+#+name: emojify!
+#+BEGIN_SRC emacs-lisp
+(set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
+#+END_SRC
 
 ** Help
 *** Guide Key
