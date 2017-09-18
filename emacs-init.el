@@ -250,6 +250,13 @@ of windows in the frame simply by calling this command again."
   '(define-key dired-mode-map "r"
      'wdired-change-to-wdired-mode))
 
+(eval-after-load "dired"
+  '(progn
+     (define-key dired-mode-map (kbd "z")
+       (lambda () (interactive)
+         (let ((fn (dired-get-file-for-visit)))
+           (start-process "default-app" nil "open" fn))))))
+
 (defun dired-back-to-top ()
   (interactive)
   (beginning-of-buffer)
@@ -609,6 +616,8 @@ of windows in the frame simply by calling this command again."
 
 (use-package magit)
 ;;                 :diminish magit-auto-revert-mode)
+
+(setq magit-push-always-verify nil)
 
 (defun eval-and-replace ()
     "Replace the preceding sexp with its value."
