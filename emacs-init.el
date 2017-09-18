@@ -178,7 +178,7 @@
                 (minibuffer-history       . 50)
                 (query-replace-history    . 60)
                 (read-expression-history  . 60)
-                (regexp-history           . 60)
+                (Regexp-history           . 60)
                 (regexp-search-ring       . 20)
                 (search-ring              . 20)
                 (shell-command-history    . 50)

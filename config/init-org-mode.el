@@ -14,14 +14,6 @@
 (add-hook 'org-mode-hook '(lambda()
                             (local-unset-key (kbd "C-c SPC"))))
 
-;; Extra org modules to load
-;; TODO figure out why org-habit didn't load on startup
-(setq org-modules (quote (org-bbdb
-                          org-gnus
-                          org-habit
-                          org-info
-                          org-jsinfo
-                          org-mac-message)))
 
 ;;-----------------------------------------------------------------------------
 ;; Org interface tweaks
@@ -405,8 +397,8 @@ If limit exceeded, string returned is wrapped in #s"
 (setq diary-file (concat org-dir "calendar.diary"))
 (add-hook 'diary-display-hook 'fancy-diary-display)
 (setq diary-list-entries-hook
-      '(include-other-diary-files sort-diary-entries))
-(add-hook 'mark-diary-entries-hook 'mark-included-diary-files)
+      '(diary-include-other-diary-files diary-sort-entries))
+(add-hook 'diary-mark-diary-entries-hook 'diary-mark-included-diary-files)
 
 (require 'appt)
 (setq org-agenda-include-diary t)
@@ -439,6 +431,7 @@ If limit exceeded, string returned is wrapped in #s"
       org-enforce-todo-dependencies nil)
 
 ;; Org-habit options for tracking repeating 'habit' tasks
+(require 'org-habit)
 (setq org-habit-show-habits-only-for-today nil
       org-habit-show-all-today t)
 
@@ -648,18 +641,6 @@ Skips capture tasks."
 (add-hook 'org-clock-out-hook 'jcs:remove-empty-drawer-on-clock-out 'append)
 
 
-;; Timeclock update -- convenience marco for updating timeclock logs in my timeclock.org file
-;; Typically I do this by going "org-clone-subtree-with-time-shift" to make copies of individual
-;; day timeclock entries. Then I need to update the date stamps in the clock tables. I can do that
-;; with this macro, as long as the timeclock org entry is in the right format.
-
-(fset 'jcs:update-timeclock
-      (lambda (&optional arg) "Keyboard macro."
-        (interactive "p")
-        (kmacro-exec-ring-item
-         (quote ([19 93 return 134217826 2 67108896 134217826 134217826 left 134217847 134217830 134217830 19 50 48 49 53 45 return backspace 134217828 134217828 25 134217849 14 14 14 14 16 16 19 93 return 1 1] 0 "%d")) arg)))
-
-
 
 
 ;;-----------------------------------------------------------------------------
@@ -731,6 +712,7 @@ Skips capture tasks."
 ;; Custom link types
 ;;-----------------------------------------------------------------------------
 
+;; Jira links are in the format: [[jira:PROJ-123][Link to Proj-123]]
 (jcs:decrypt-secrets)
 (org-add-link-type "jira" 'org-jira-open)
 (setq org-jira-url org-jira-url)
