@@ -5,13 +5,10 @@
 Contains dozens of ideas stolen from various places around the internet, hundreds of tiny tweaks and fiddles, and a
 few hand-written hunks of elisp of which I am not entirely proud.
 
-Makes heavy use of [[http://github.com/dimitri/el-get][el-get]] to manage and install packages. On first load, el-get *should* bootstrap & install itself.
-
-Very [[http://orgmode.org/][org-mode]] heavy. My org-mode setup is ugly and complicated and personal -- you'll probably want to change a lot of it.
+Makes heavy use of use-package, which will theoretically install any missing packages on startup. In practice, I've actually dumped packaged into this repo in the /elpa directory, so that my whole environment is checked in to a known working state.
 
 *** Disclaimers
-- Requires Emacs 24.3 Only tested on Mac OS X.
-- First load will require an internet connection to download packages (this will take a while and may blow up).
+- Only tested with Emacs 25.3.1 on OS X
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies.
-- secrets.el.gpg is an encrypted store containing passwords, etc. You'll want to replace that with your own.
+- Your mileage, as they say, may vary.
 - A perpetual work in progress.
