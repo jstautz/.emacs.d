@@ -13,13 +13,16 @@
 
 (require 'use-package)
 
+
+;; Eval this section (eventually add to new emacs.d
+
 (use-package cl)
 
 (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
 
-(setq home-dir "/Users/jstautz/"
+(setq home-dir "/Users/jeff.stautz/"
       dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
       emacs-dir "/Applications/Emacs.app/Contents/"
       emacs-bin (concat emacs-dir "MacOS/Emacs")
@@ -34,6 +37,9 @@
 (defun jcs:decrypt-secrets ()
   (interactive)
   (require 'secrets))
+
+;; <-- to here
+
 
 (tool-bar-mode -1)
 
@@ -109,7 +115,7 @@
 (setq trash-directory (concat home-dir ".Trash/"))
 
 (global-unset-key "\C-x\C-q")
-(global-unset-key (kbd "<f2>"))     
+(global-unset-key (kbd "<f2>"))
 (global-unset-key "\C-x.")
 (global-unset-key "\M-`")
 

@@ -136,7 +136,7 @@ You probably want to back up your current config before you clobber it with this
 Once you've backed things up, clone the repo:
 
 #+begin_example
-$> git clone https://github.com/jstautz/.emacs.d ~/.emacs.d
+$> git clone https://github.com/jeff.stautz/.emacs.d ~/.emacs.d
 #+end_example
 
 ** Now run the install.sh script 
@@ -166,8 +166,8 @@ There are several path variables in the config that [[Set a few variables for di
 After you change those, you'll need to scour the config for any other hard-coded paths and change them before you even try to use it. I'm trying to consolidate these paths in one configurable place, but that's not always easy. Maybe in v2.
 
 ** TODO add better installation instructions 
-- Install cask (with with curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python and then export PATH="/Users/loanerb/.cask/bin:$PATH" ?)
-- Assumes /Users/jstautz/.emacs.autosave/ exists
+- Install cask (with with =curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python= and then export PATH="/Users/jeff.stautz/.cask/bin:$PATH" ?)
+- Assumes /Users/jeff.stautz/.emacs.autosave/ exists
 - Install gpg
 - Install aspell
 - Install gzip
@@ -472,7 +472,7 @@ Some of these are obviously going to be different in your setup, so you'll want 
 
 #+name: setup-dirs :comments both
 #+BEGIN_SRC emacs-lisp
-(setq home-dir "/Users/jstautz/"
+(setq home-dir "/Users/jeff.stautz/"
       dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name)))
       emacs-dir "/Applications/Emacs.app/Contents/"
       emacs-bin (concat emacs-dir "MacOS/Emacs")
@@ -667,7 +667,7 @@ When use-package initializes smart-mode-line, I want to set up the theme and wid
       sml/mode-width 40)
 #+END_SRC
 
-smart-mode-line has a useful feature that allows you to replace elements of a path with an abbreviation. So instead of seeing =/Users/jstautz/Documents/Work/filename.txt= in the modeline, I'll see =:Work:filename.txt=. 
+smart-mode-line has a useful feature that allows you to replace elements of a path with an abbreviation. So instead of seeing =/Users/jeff.stautz/Documents/Work/filename.txt= in the modeline, I'll see =:Work:filename.txt=. 
 
 In the screenshot above, you'll notice my .emacs.d/ directory has been shortened to =:ED:=.
 

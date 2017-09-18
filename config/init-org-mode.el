@@ -4,7 +4,6 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 ;; Relevant directories
 (setq org-dir (concat home-dir "org/")
       writing-dir (concat home-dir "Documents/Writing/"))
@@ -122,6 +121,7 @@
       org-agenda-tags-column 80
       org-agenda-start-with-follow-mode nil
       org-agenda-compact-blocks nil)
+
 
 ;; Default agenda views & sorting
 (setq org-agenda-include-diary t
@@ -523,7 +523,7 @@ If limit exceeded, string returned is wrapped in #s"
     (interactive)
     (save-excursion
       (let (filepath filename mybuffer)
-        (setq filepath "/Users/jstautz/org/work.org"
+        (setq filepath "/Users/jeff.stautz/org/work.org"
               filename (file-name-nondirectory filepath)
               mybuffer (find-file filepath))
         (goto-char (point-min))
@@ -670,9 +670,9 @@ Skips capture tasks."
 ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
 ;; Note that because of the way my work.org file is organized, I want top-level targets there
 ;; but 2nd-level targets everywhere else.
-(setq org-refile-targets (quote (("/Users/jstautz/org/work.org" :maxlevel . 1)
-                                 ("/Users/jstautz/org/personal.org" :maxlevel . 2)
-                                 ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2))))
+(setq org-refile-targets (quote (("/Users/jeff.stautz/org/work.org" :maxlevel . 1)
+                                 ("/Users/jeff.stautz/org/personal.org" :maxlevel . 2)
+                                 ("/Users/jeff.stautz/org/someday_maybe.org" :maxlevel . 2))))
 
 
 ;; Archiving options
@@ -794,10 +794,10 @@ Skips capture tasks."
 ;; Notifications -- use terminal-notifier to send org & calendar notifications
 ;;-----------------------------------------------------------------------------
 
-;; Send org notifications to Growl
+;; Send org notifications to terminal-notify
 (setq org-show-notification-handler '(lambda (notification) (terminal-notifier-notify "org-mode notification:" notification)))
 
-;; Send Appt reminders to Growl
+;; Send Appt reminders to terminal-notify
 (progn
   (appt-activate 1)
   (setq appt-display-format 'window
