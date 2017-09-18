@@ -1,5 +1,0 @@
-#name : new datestamped entry
-# --
-* [`(format-time-string "%Y-%m-%d %a" (current-time))`]
-*** $0
-

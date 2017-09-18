@@ -1,6 +1,0 @@
-#name : properties
-#contributor : Jonathan Arkell <jonnay@jonnay.net>
-# --
-$>:PROPERTIES:
-$>$1
-$>:END:$0
