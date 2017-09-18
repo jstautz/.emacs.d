@@ -49,6 +49,7 @@
 (depends-on "skewer-mode")
 (depends-on "smart-mode-line")
 (depends-on "smex")
+(depends-on "undo-tree")
 (depends-on "use-package")
 (depends-on "virtualenvwrapper")
 (depends-on "wc-goal-mode")

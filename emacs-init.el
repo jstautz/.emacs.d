@@ -535,6 +535,15 @@ of windows in the frame simply by calling this command again."
 
 (global-set-key "\C-cm" 'markdown-preview-file)
 
+;; (defun markdown-preview-region ()
+;;   "Save current region to a temp file and run Marked on it"
+;;   (interactive)
+;;   (shell-command
+;;    (format "open -a /Applications/Marked.app %s"
+;;            (shell-quote-argument (buffer-file-name)))))
+
+;; (global-set-key "\C-cm" 'markdown-preview-file)
+
 (use-package fountain-mode)
 
 (use-package wordsmith-mode)
@@ -624,6 +633,8 @@ of windows in the frame simply by calling this command again."
 (setq python-environment-directory "~/.python-environments")
 
 (use-package web-mode)
+
+(use-package restclient)
 
 (use-package rainbow-mode)
 
