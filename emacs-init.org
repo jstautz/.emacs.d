@@ -56,7 +56,7 @@ The document you're reading now is an [[http://org-mode.org][org-mode]] text fil
 
 On startup, emacs pulls out ("tangles") the code snippets in this file and uses them to configure the editor.
 
-** Why would you use literate programming for my Emacs config?
+** Why would you use literate programming for your Emacs config?
 :PROPERTIES:
 :CUSTOM_ID: why_literate
 :END:
@@ -181,7 +181,7 @@ This workaround's required because of the way OS X launches the Emacs app. The o
 #+END_SRC
 
 
-* <<Org-mode>> Org-mode
+* Org-mode
 :PROPERTIES:
 :noweb-ref: Set up org-mode
 :END:
