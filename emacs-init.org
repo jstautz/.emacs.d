@@ -114,8 +114,134 @@ This code is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #+end_example 
+* Structure --- how this works 
+:PROPERTIES:
+:CUSTOM_ID: structure
+:END:
 
-* Environment setup
+Before we get too deep into my settings, I should explain a little about how all this works.
+
+** init.el
+:PROPERTIES:
+:CUSTOM_ID: init.el
+:END:
+
+The init.el file is [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][the first file that Emacs loads on startup]]. My init.el bootstraps the rest of my config by loading it via org-babel.
+
+My init.el currently looks like this:
+
+#+BEGIN_EXAMPLE emacs-lisp
+;; Set up package sources
+(require 'package)
+(dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
+                   ("elpa"  . "http://tromey.com/elpa/")
+		   ("org"   . "http://orgmode.org/elpa/")
+                   ("melpa" . "http://melpa.milkbox.net/packages/")))
+  (add-to-list 'package-archives source t))
+(package-initialize)
+
+;; Assume the current directory is our dot-emacs directory
+(setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
+
+;; If emacs-init.el is *newer* than emacs-init.org, then load the *.el file directly.
+;; Otherwise, tangle the *.org file and load.
+(if (> (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/lisp/emacs-init.el"))
+       (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
+      (load-file (expand-file-name "lisp/emacs-init.elc" dotemacs-dir))
+  (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir) t))
+#+END_EXAMPLE
+
+That's it.
+
+The important part is that last s-expression: 
+
+#+BEGIN_EXAMPLE emacs-lisp
+(org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir) t)
+#+END_EXAMPLE
+
+This line calls org-babel to extract ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then compile it. It then tells Emacs to load all the configurations in that compiled .elc file.
+
+[[http://orgmode.org/worg/org-contrib/babel/][Org-babel is Merlin-level wizardry.]] Eric Schulte, Dan Davison, and everyone who's worked on it all deserve medals. 
+
+Because tangling and loading my .org file takes a few seconds, I've wrapped this call to org-babel in an =if= statement that checks to see if any recent changes have been made to the org file, or if I can load the .elc file directly. 
+
+** emacs-init.org
+:PROPERTIES:
+:CUSTOM_ID: emacs-init.org
+:END:
+
+The =emacs-init.org= file is the meat of my emacs config. It's also the document you're reading right now.
+
+When this document is tangled and loaded by org-babel, =emacs-init.el= is updated with the latest elisp extracted from code blocks in this file.
+
+I try to treat the resulting =emacs-init.el= file like /compiled code/. It's the machine-readable file that I never really look at. Except when debugging.
+
+Any edits or changes, even if they're experimental, are made in the .org file instead of directly in the .el file. This way, I'm ensuring my documentation always stays up to date.
+
+
+* How I Use Emacs
+:PROPERTIES:
+:CUSTOM_ID: how-i-use-emacs
+:END:
+
+#+begin_quote
+This is my rifle. There are many like it, but this one is mine.
+
+--- Major General William H. Rupertus, "The Rifleman's Creed," 1942
+#+end_quote
+
+Okay. You've got a pretty good picture of how my config is structured, how it's loaded via org-babel, and how packages are loaded with Cask, Pallet, and use-package. 
+
+Before we get into the actual configuration, it might help to understand some things I do in Emacs.
+
+My use of Emacs is by no means typical, and my configuration reflects this fact.
+
+** Org-mode
+
+[[file:img/org.png]]
+
+I spend 90% of my time in Emacs inside [[http://orgmode.org/][org-mode]]. 
+
+I've been using it for several years for taking notes, planning, writing, and tracking my to-do lists. It's a brilliant piece of software that's totally changed how I organize my digital life. 
+
+I've got a whole separate section of my Emacs config dedicated to the ins and outs of my org-mode configuration. It's gnarly. It's complicated. It involves a lot of yak-shaving. It's ripe for refactoring. But it /works/ for me. 
+
+** Writing
+
+For the last 10 years, I've done most of my fiction writing, journalling, editing, and revising in plain text within Emacs.
+
+Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
+
+Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
+
+The details of how I use Emacs for fiction writing are documented later in this file. 
+
+** Programming
+
+Unlike many (most?) Emacs users, I'm not a professional software engineer. 
+
+I've done a bunch of development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
+
+[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
+
+When I grow up, maybe I'll be an engineer.
+
+There are a couple of languages I work with regularly:
+
+- I use Emacs lisp quite a bit (of course)
+- I'm learning Python
+- I play around with Javascript
+
+My Emacs settings for software development should be taken with several grains of salt --- these parts of my config aren't very mature and I'm probably doing everything wrong.
+
+** Manipulating files and text of all kinds
+
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
+
+There are large chunks of my config that deal with sharpening various blades of said Swiss Army Knife.
+
+
+* TODO Environment setup
 ** Add /lisp to load-path
 
 Let's tell Emacs where to look for things...
@@ -161,7 +287,7 @@ This is a gross hack to grab the $PATH environment variable from my ~/.bashrc an
 Yeah, you read that elisp right. 
 
 This workaround's required because of the way OS X launches the Emacs app. The only other solution would be to mess around with =launchctl=, and I really don't want to do that right now.
-* Install and configure packages
+* TODO Install and configure packages
 
 #+name: install-packages
 #+BEGIN_SRC emacs-lisp
@@ -171,7 +297,7 @@ This workaround's required because of the way OS X launches the Emacs app. The o
 #+END_SRC
 
 
-* Load custom settings
+* TODO Load custom settings
 
 #+name: custom-settings
 #+BEGIN_SRC emacs-lisp
@@ -181,7 +307,7 @@ This workaround's required because of the way OS X launches the Emacs app. The o
 #+END_SRC
 
 
-* Org-mode
+* TODO Org-mode
 :PROPERTIES:
 :noweb-ref: Set up org-mode
 :END:

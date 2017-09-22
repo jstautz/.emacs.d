@@ -31,5 +31,5 @@
 ;; Otherwise, tangle the *.org file and load.
 (if (> (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/lisp/emacs-init.el"))
        (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
-      (load-file (expand-file-name "lisp/emacs-init.el" dotemacs-dir))
+      (load-file (expand-file-name "lisp/emacs-init.elc" dotemacs-dir))
   (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir) t))
