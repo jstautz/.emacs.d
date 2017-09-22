@@ -24,10 +24,8 @@
   (add-to-list 'package-archives source t))
 (package-initialize)
 
-
 ;; Assume the current directory is our dot-emacs directory
 (setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
-
 
 ;; If emacs-init.el is *newer* than emacs-init.org, then load the *.el file directly.
 ;; Otherwise, tangle the *.org file and load.

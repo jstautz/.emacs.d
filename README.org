@@ -1,14 +1,50 @@
 #+AUTHOR: Jeff Stautz
 
-* My emacs config 
+* Jeff's Emacs config 
 
-Contains dozens of ideas stolen from various places around the internet, hundreds of tiny tweaks and fiddles, and a
-few hand-written hunks of elisp of which I am not entirely proud.
+I'm using a [[http://en.wikipedia.org/wiki/Literate_programming][literate programming]] approach to organize my Emacs configuration. 
 
-Makes heavy use of use-package, which will theoretically install any missing packages on startup. In practice, I've actually dumped packaged into this repo in the /elpa directory, so that my whole environment is checked in to a known working state.
+Instead of peppering my elisp with pithy comments, I've gone the other way: I use org-mode outlines to thoroughly document my thinking, and I sprinkle this explanation with hunks of elisp.
 
-*** Disclaimers
+My init.el uses org-babel to extract these code blocks from my .org documentation files and load my configuration. Neat, huh?
+
+Read [[https://github.com/jstautz/.emacs.d/blob/master/emacs-init.org][my base configuration here]].
+
+I use org-mode a hell of a lot, and my org setup is both idiosyncratic and convoluted. I've pulled the configuration for it into a separate file. 
+
+My config contains dozens of ideas stolen from various places around the internet, hundreds of tiny tweaks and fiddles, and a few hand-written hunks of elisp of which I am not entirely proud.
+
+Note that my config also makes heavy use of use-package, which will theoretically install any missing packages on startup. In practice, I've actually dumped all my packages into this repo (in the /elpa directory), so that my whole environment is checked in to a known working state.
+
+** Disclaimers
+
+Fair warning:
+
+- This is a perpetual work in progress.
+- No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
 - Only tested with Emacs 25.3.1 on OS X
-- No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies.
 - Your mileage, as they say, may vary.
-- A perpetual work in progress.
+- I'm not responsible if any of this blows up on you.
+
+** License
+:PROPERTIES:
+:CUSTOM_ID: license
+:END:
+
+#+begin_example
+Copyright (C)  2017  Jeff Stautz
+
+Permission is granted to copy, distribute and/or modify this document under the
+terms of the GNU Free Documentation License, Version 1.3 or any later version
+published by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts, and no Back-Cover Texts.
+  
+Code in this document is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+  
+This code is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#+end_example 
