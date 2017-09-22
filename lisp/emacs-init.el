@@ -1,3 +1,17 @@
+(dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
+                   ("elpa"  . "http://tromey.com/elpa/")
+		         ("org"   . "http://orgmode.org/elpa/")
+                   ("melpa" . "http://melpa.milkbox.net/packages/")))
+  (add-to-list 'package-archives source t))
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
 ;; Assume current directory is the dot-emacs directory
 (add-to-list 'load-path (concat dotemacs-dir "lisp/"))
 

@@ -4,14 +4,6 @@
 ;;
 ;;------------------------------------------------------------------------------
 
-;; Bootstrap and install everything if it's not already installed
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-;; Load use-package, and then use it to load everything else
-(require 'use-package)
-(setq use-package-always-ensure t)
 
 
 ;; Ace Jump Mode
