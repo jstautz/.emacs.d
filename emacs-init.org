@@ -79,42 +79,6 @@ Using a literate programming approach has a number of advantages that appeal to 
    - I have one file that generates nice-looking documentation and the code itself.
    - Detailed explanations of my setup mean it's easier for others to understand it and benefit from it.
 
-** Disclaimers and Warnings
-:PROPERTIES:
-:CUSTOM_ID: disclaimer
-:END:
-
-Fair warning:
-
-- This is a perpetual work in progress.
-- No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
-- Only tested with Emacs 25.3.1 on OS X
-- Your mileage, as they say, may vary.
-- I'm not responsible if any of this blows up on you.
-
-** License
-:PROPERTIES:
-:CUSTOM_ID: license
-:END:
-
-#+begin_example
-Copyright (C)  2017  Jeff Stautz
-
-Permission is granted to copy, distribute and/or modify this document under the
-terms of the GNU Free Documentation License, Version 1.3 or any later version
-published by the Free Software Foundation; with no Invariant Sections, no
-Front-Cover Texts, and no Back-Cover Texts.
-  
-Code in this document is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option) any
-later version.
-  
-This code is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#+end_example 
-
 * Structure --- how this works 
 :PROPERTIES:
 :CUSTOM_ID: structure
@@ -127,9 +91,9 @@ Before we get too deep into my settings, I should explain a little about how all
 :CUSTOM_ID: init.el
 :END:
 
-The init.el file is [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][the first file that Emacs loads on startup]]. My init.el bootstraps the rest of my config by loading it via org-babel.
+My init.el file is only a half-dozen lines of elisp. Its only real job is to bootstrap the rest of my config by loading it via org-babel.
 
-My init.el currently looks like this:
+It looks like this:
 
 #+BEGIN_EXAMPLE emacs-lisp
 (package-initialize)
@@ -168,7 +132,7 @@ The =emacs-init.org= file is the meat of my emacs config. It's also the document
 
 When this document is tangled and loaded by org-babel, =emacs-init.el= is updated with the latest elisp extracted from code blocks in this file.
 
-I try to treat the resulting =emacs-init.el= file like /compiled code/. It's the machine-readable file that I never really look at. Except when debugging.
+I try to treat the resulting =emacs-init.el= file like /compiled code/. I try not to look at it too often, except when debugging.
 
 Any edits or changes, even if they're experimental, are made in the .org file instead of directly in the .el file. This way, I'm ensuring my documentation always stays up to date.
 
@@ -210,7 +174,7 @@ Before using the package manager, I want to add a few other sources (notably [[h
 :CUSTOM_ID: use-package
 :END:
 
-[[https://github.com/jwiegley/use-package][John Wiegley's =use-package=]] provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
+[[https://github.com/jwiegley/use-package][John Wiegley's use-package]] provides some really nice macros for autoloading and configuring packages. It handles a lot of things for me out of the box, including:
 
 - Grabbing any missing packages from the internet
 - Initializing and autoloading packages
@@ -229,7 +193,7 @@ First, let's grab =use-package= from elpa if it's not already installed.
 
 #+END_SRC
 
-Now let's load =use-package=, and then set it up so that any package we try to load is treated as if we've specified the =:ensure= keyword -- meaning that if the package isn't present on the system, we'll download it from the interwebs.
+Now let's load =use-package=, and then set it up so that any package we try to load is treated as if we've specified the =:ensure= keyword --- meaning that if the package isn't present on the system, we'll download it from the interwebs.
 
 #+name: package-use-package
 #+BEGIN_SRC emacs-lisp
@@ -246,7 +210,7 @@ In the past, I kept this directory in my .gitignore, so that I wasn't saving a t
 
 In reality, this caused more problems for me than it was worth. 
 
-Whenever I wanted to use Emacs on a new machine, my config would pull down copies of packages off the internet just fine -- which is great! -- BUT then I'd spend the next three days trying to sort out dependency issues and breaking changes with the latest versions of several packages.
+Whenever I wanted to use Emacs on a new machine, my config would pull down new copies of packages off the internet --- which is great! --- BUT then I'd spend the next three days trying to sort out dependency issues and breaking changes with the latest versions of several packages.
 
 I found that I'd much rather check *everything* in, so that I've got a "known working state" I can check out at any time.
 
@@ -296,8 +260,6 @@ I've done a bunch of development work in the past, and I enjoy messing around in
 
 [[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
 
-When I grow up, maybe I'll be an engineer.
-
 There are a couple of languages I work with regularly:
 
 - I use Emacs lisp quite a bit (of course)
@@ -308,57 +270,113 @@ My Emacs settings for software development should be taken with several grains o
 
 ** Manipulating files and text of all kinds
 
-Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text transformations. 
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text and file transformations. 
 
 There are large chunks of my config that deal with sharpening various blades of said Swiss Army Knife.
 
+* Prerequisites
+:PROPERTIES:
+:noweb-ref: Prerequisites and setup --- load basic support libraries, set some useful variables
+:CUSTOM_ID: setup
+:END:  
 
-* TODO Environment setup
-** Add /lisp to load-path
+Now let's get into the config itself.
 
-Let's tell Emacs where to look for things...
+This first section contains some libraries and basic settings that the rest of my configuration depends on.
 
-#+name: env-dotemacs-load-path
+** First, let's load Common Lisp libraries
+
+This is generally a good idea. There's a lot of good stuff in the CL package that many other packages need.
+
+#+name: setup-require-cl :comments both
 #+BEGIN_SRC emacs-lisp
-;; Assume current directory is the dot-emacs directory
-(add-to-list 'load-path (concat dotemacs-dir "lisp/"))
+(use-package cl)
 
 #+END_SRC
 
-** Set up variables for other useful directories
-
-Define my home directory, dot emacs directory (where the config lives), emacs binary directory (where Emacs.app lives), and info file directory.
-
-I use these =*-dir= variables all over the place in my config.
-
-Note that these are very specific to my machine and my setup -- it'll probably break on yours.
-
-#+name: env-directories
-#+BEGIN_SRC emacs-lisp
-;; Set some other useful environment vars, specific to my setup
-(setq home-dir "/Users/jeff.stautz/"
-      emacs-dir "/Applications/Emacs.app/Contents/"
-      emacs-bin (concat emacs-dir "MacOS/Emacs")
-      info-dir (concat emacs-dir "Resources/info/"))
-
-#+END_SRC
-
-** Set up $PATH and exec-path
+** Then set our path appropriately.
 
 This is a gross hack to grab the $PATH environment variable from my ~/.bashrc and use it. This way my path is consistent between Emacs.app and my shell elsewhere.
 
-#+name: env-path
+#+name: setup-path :comments both
 #+BEGIN_SRC emacs-lisp
-;; Make my $PATH environment var the same as in bash
 (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
 
 #+END_SRC
 
-Yeah, you read that elisp right. 
+Yeah, you read that elisp right. Icky, but it works. This workaround's required because of the way OS X launches apps. The only other solution would be to mess around with =launchctl=, and I really don't want to do that right now.
+ 
+** Set a few variables for directories
 
-This workaround's required because of the way OS X launches the Emacs app. The only other solution would be to mess around with =launchctl=, and I really don't want to do that right now.
+Define our home directory, dot emacs directory (where the config lives), emacs binary directory (where Emacs.app lives), and info file directory.
+
+I use these =*-dir= variables all over the place in my config.
+
+Some of these are obviously going to be different in your setup, so you'll want to change them accordingly.
+
+#+name: setup-dirs :comments both
+#+BEGIN_SRC emacs-lisp
+  (defvar home-dir     "/Users/jeff.stautz/")
+  (defvar dotemacs-dir (concat home-dir ".emacs.d/"))
+  (defvar lisp-dir     (concat dotemacs-dir "lisp/"))
+  (defvar emacs-dir    "/Applications/Emacs.app/Contents/")
+  (defvar emacs-bin    (concat emacs-dir "MacOS/Emacs"))
+  (defvar info-dir     (concat emacs-dir "Resources/info/"))
+#+END_SRC
+
+** Add lisp directory to load-path
+
+Our load-path defines where Emacs should look for packages, functions, variables, etc. 
+
+We should add the ~/.emacs.d/lisp/ directory to this list.
+
+#+name: setup-load-path
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path lisp-dir)
+
+#+END_SRC
+** Tell 'customize' where to save changes
+
+I don't generally use =M-x customize= --- I prefer to =setq= these variables in my init files manually --- but sometimes I'll fiddle with settings in customize to try things out.
+
+When I do so, I'd like customize to save things in a separate =emacs-custom= file. I treat this file as temporary storage. If I like the changes, I'll pull them out of this file and place them in the appropriate places in my config.
+
+#+name: setup-custom-file
+#+BEGIN_SRC emacs-lisp
+(setq custom-file (concat lisp-dir "custom.el"))
+
+#+END_SRC
+
+** Set garbage collection threshold higher
+
+Props to Le Wang for this one.
+
+[[https://github.com/lewang/flx][According to his documentation in flx]], Emacs will start GC every 0.76MB allocated, which is way too often on modern machines. We want to boost that to 20MB:
+
+#+name: setup-gc-settings
+#+BEGIN_SRC emacs-lisp
+(setq gc-cons-threshold 20000000)
+
+#+END_SRC
+
+** Decrypt secrets.el.gpg
+
+Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
+
+I do this *before* I begin loading packages, so that package configs can access variables stored in the secrets file.
+
+#+name: setup-decrypt-secrets-function
+#+BEGIN_SRC emacs-lisp
+(defun jcs:decrypt-secrets ()
+  (interactive)
+  (require 'secrets))
+
+#+END_SRC
+
+
+
 * TODO Install and configure packages
 
 #+name: install-packages

@@ -10,11 +10,7 @@ My init.el uses org-babel to extract these code blocks from my .org documentatio
 
 Read [[https://github.com/jstautz/.emacs.d/blob/master/emacs-init.org][my base configuration here]].
 
-I use org-mode a hell of a lot, and my org setup is both idiosyncratic and convoluted. I've pulled the configuration for it into a separate file. 
-
-My config contains dozens of ideas stolen from various places around the internet, hundreds of tiny tweaks and fiddles, and a few hand-written hunks of elisp of which I am not entirely proud.
-
-Note that my config also makes heavy use of use-package, which will theoretically install any missing packages on startup. In practice, I've actually dumped all my packages into this repo (in the /elpa directory), so that my whole environment is checked in to a known working state.
+I use org-mode a hell of a lot, and my org setup is a little convoluted. I've pulled the configuration for it into a separate file here.
 
 ** Disclaimers
 

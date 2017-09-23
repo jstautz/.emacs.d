@@ -18,9 +18,6 @@
                (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")
                (browse-kill-ring-default-keybindings)))
 
-;; Load common lisp package
-(use-package cl)
-
 ;; Diminish mode
 (use-package diminish)
 

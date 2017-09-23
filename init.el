@@ -16,12 +16,9 @@
 
 (package-initialize)
 
-;; Assume the current directory is our dot-emacs directory
-(setq dotemacs-dir (file-name-directory (or load-file-name (buffer-file-name))))
-
 ;; If emacs-init.el is *newer* than emacs-init.org, then load the *.el file directly.
 ;; Otherwise, tangle the *.org file and load.
 (if (> (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/lisp/emacs-init.el"))
        (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
-    (load-file (expand-file-name "lisp/emacs-init.elc" dotemacs-dir))
-  (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir) t))
+    (load-file (expand-file-name "lisp/emacs-init.elc" (file-name-directory (or load-file-name (buffer-file-name)))))
+  (org-babel-load-file (expand-file-name "emacs-init.org" (file-name-directory (or load-file-name (buffer-file-name)))) t))

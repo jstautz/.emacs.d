@@ -17,10 +17,6 @@
 (setq ring-bell-function (lambda ()))
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; Go faster
-(setq redisplay-dont-pause t)
-(setq gc-cons-threshold 20000000)
-
 ;; Don't let me quit on accident
 (global-unset-key "\C-x\C-c")
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -174,11 +170,6 @@ of windows in the frame simply by calling this command again."
 
 ;; Diminish some things
 (diminish 'auto-revert-mode)
-
-;; I keep my secret keys in here
-(defun jcs:decrypt-secrets ()
-  (interactive)
-  (require 'secrets))
 
 ;; Send my notifications using terminal-notifier
 (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
