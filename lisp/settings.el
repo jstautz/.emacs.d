@@ -191,4 +191,6 @@ of windows in the frame simply by calling this command again."
                  "-title" title
                  "-message" message
                  "-activate" "org.gnu.Emacs"
-                 "-sender" "org.gnu.Emacs"))
+                 "-sender" "org.gnu.Emacs"
+		 "-timeout" "5"))
+
