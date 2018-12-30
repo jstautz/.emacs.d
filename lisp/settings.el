@@ -7,8 +7,6 @@
 ;; Get rid of all that chrome and fuss
 (tool-bar-mode -1)
 (set-face-background 'fringe (face-background 'default))
-(set-face-foreground 'fringe (face-background 'default))
-(scroll-bar-mode -1)
 
 ;; Don't talk to me
 (setq inhibit-splash-screen 1)
@@ -39,7 +37,7 @@
 ;; Word wrap and center my text nicely
 (setq fill-column 120)
 (setq default-fill-column 120)
-(load-file "~/.emacs.d/lisp/wrap-to-fill.el")
+(load-file "wrap-to-fill.el")
 (visual-line-mode 1)
 (wrap-to-fill-column-mode 1)
 (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
@@ -108,13 +106,10 @@
           (lambda()
             (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
 
-;; Arr, here be my custom file
-(setq custom-file (concat dotemacs-dir "lisp/custom.el"))
-
 ;; I love ibuffer
 (global-set-key "\C-x\C-b" 'ibuffer)
 
-;; I love ispell
+;; I also love ispell
 (setq ispell-program-name "aspell")
 (add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
 (add-hook 'org-mode-hook (lambda () (flyspell-mode 1)))
@@ -123,7 +118,7 @@
 (eval-after-load "flyspell"
   '(define-key flyspell-mode-map (kbd "C-.") nil))
 
-;; Also, I'm Canadian.
+;; And also, I'm Canadian.
 (defvar ispell-local-dictionary-alist
   '(("canadian"
      "[A-Za-z]" "[^A-Za-z]" "[']" nil ("-B") nil iso-8859-1)))
@@ -181,7 +176,5 @@ of windows in the frame simply by calling this command again."
                  terminal-notifier-command
                  "-title" title
                  "-message" message
-                 "-activate" "org.gnu.Emacs"
-                 "-sender" "org.gnu.Emacs"
-		 "-timeout" "5"))
+                 "-activate" "org.gnu.Emacs"))
 

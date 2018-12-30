@@ -652,8 +652,9 @@ Skips capture tasks."
 ;; Note that because of the way my work.org file is organized, I want top-level targets there
 ;; but 2nd-level targets everywhere else.
 (setq org-refile-targets (quote (("/Users/jeff.stautz/org/work.org" :maxlevel . 1)
-                                 ("/Users/jeff.stautz/org/personal.org" :maxlevel . 2)
-                                 ("/Users/jeff.stautz/org/someday_maybe.org" :maxlevel . 2))))
+                                 ("/Users/jeff.stautz/org/personal.org" :maxlevel . 1)
+                                 ("/Users/jeff.stautz/org/someday_maybe.org" :maxlevel . 2)
+				 ("/Users/jeff.stautz/org/work.org" :tag . "1_1"))))
 
 
 ;; Archiving options

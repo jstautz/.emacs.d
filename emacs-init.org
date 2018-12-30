@@ -160,6 +160,7 @@ Before using the package manager, I want to add a few other sources (notably [[h
   
 #+name: package-set-sources
 #+BEGIN_SRC emacs-lisp
+;; set package sources
 (dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
                    ("elpa"  . "http://tromey.com/elpa/")
 		         ("org"   . "http://orgmode.org/elpa/")
@@ -187,6 +188,7 @@ First, let's grab =use-package= from elpa if it's not already installed.
 
 #+name: package-install-use-package
 #+BEGIN_SRC emacs-lisp
+;; install use-package, which my setup relies on
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -213,7 +215,6 @@ In reality, this caused more problems for me than it was worth.
 Whenever I wanted to use Emacs on a new machine, my config would pull down new copies of packages off the internet --- which is great! --- BUT then I'd spend the next three days trying to sort out dependency issues and breaking changes with the latest versions of several packages.
 
 I found that I'd much rather check *everything* in, so that I've got a "known working state" I can check out at any time.
-
 
 * How I Use Emacs
 :PROPERTIES:
@@ -244,7 +245,7 @@ I've got a whole separate section of my Emacs config dedicated to the ins and ou
 
 For the last 12+ years, I've done most of my fiction writing, journalling, editing, and revising in plain text within Emacs.
 
-Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my stories in [[http://markedapp.com/][Marked.app]].
+Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my documents in [[http://markedapp.com/][Marked.app]].
 
 Other times I write using minimal [[http://www.latex-project.org/][LaTeX markup]], which I then run through a perl script to add full LaTeX document headers for exporting.
 
@@ -254,25 +255,26 @@ Details of how I use Emacs for fiction writing are documented later in this file
 
 ** Programming
 
-Unlike many (most?) Emacs users, I'm not a professional software engineer. 
+Unlike many (most?) Emacs users, I don't develop software professionally anymore.
 
-I've done a bunch of development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
+I've done a bunch of software development work in the past, and I enjoy messing around in code occasionally. I dabble. I pretend like I know what I'm doing. But I'm nowhere near professional.
 
-[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at HootSuite]] and they constantly inspire me to learn more, try more, and hack more. 
+[[http://hootsuite.com/careers/][I work with a ton of talented engineers every day at Hootsuite]] and they constantly inspire me to learn more, try more, and hack more. 
 
 There are a couple of languages I work with regularly:
 
 - I use Emacs lisp quite a bit (of course)
 - I occasionally mangle some Python
 - I play around with Javascript
+- I'm learning Go
 
 My Emacs settings for software development should be taken with several grains of salt --- these parts of my config aren't very mature and I'm probably doing everything wrong.
 
 ** Manipulating files and text of all kinds
 
-Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army Knife for text and file transformations. 
+Macros, mutli-line editing, directory editing, remote editing over SSH... Emacs is my Swiss Army knife for text and file transformations. 
 
-There are large chunks of my config that deal with sharpening various blades of said Swiss Army Knife.
+There are large chunks of my config that deal with sharpening various blades of said Swiss Army knife.
 
 * Prerequisites
 :PROPERTIES:
@@ -300,6 +302,7 @@ This is a gross hack to grab the $PATH environment variable from my ~/.bashrc an
 
 #+name: setup-path :comments both
 #+BEGIN_SRC emacs-lisp
+;; ensure OS X keeps my path consistent in Emacs
 (let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
@@ -318,6 +321,7 @@ Some of these are obviously going to be different in your setup, so you'll want 
 
 #+name: setup-dirs :comments both
 #+BEGIN_SRC emacs-lisp
+;; fantastic directories and where to find them
   (defvar home-dir     "/Users/jeff.stautz/")
   (defvar dotemacs-dir (concat home-dir ".emacs.d/"))
   (defvar lisp-dir     (concat dotemacs-dir "lisp/"))
@@ -345,6 +349,7 @@ When I do so, I'd like customize to save things in a separate =emacs-custom= fil
 
 #+name: setup-custom-file
 #+BEGIN_SRC emacs-lisp
+;; Arr, here be my custom file
 (setq custom-file (concat lisp-dir "custom.el"))
 
 #+END_SRC
@@ -357,6 +362,7 @@ Props to Le Wang for this one.
 
 #+name: setup-gc-settings
 #+BEGIN_SRC emacs-lisp
+;; build a giant garbage compactor
 (setq gc-cons-threshold 20000000)
 
 #+END_SRC
@@ -375,20 +381,260 @@ I do this *before* I begin loading packages, so that package configs can access 
 
 #+END_SRC
 
+* Install and configure packages
 
+#+begin_quote
+Brown paper packages tied up with strings
+These are a few of my favorite things
 
-* TODO Install and configure packages
+--- Austrian Mary Poppins
+#+end_quote
 
-#+name: install-packages
+I've settled on a relatively small set of packages for my current Emacs config. 
+
+I'll probably add to this over time, because I just can't help myself.
+
+** Ace-jump mode
+
+It's [[https://www.youtube.com/watch?v=UZkpmegySnc][hard to describe ace-jump-mode unless you see it in action]]. 
+
+Let's say I want to move to the "m" in the word "mentioned" in the line above. I just activate ace-jump-mode (I've bound it to =C-.=), then type "m". At this point, emacs highlights all matches in the buffer, like this:
+
+[[file:img/ace-jump.png]]
+
+Notice each word beginning with "m" now starts with a red letter. I type "b" to jump to the word "mentioned."
+
+#+name: ace-jump
 #+BEGIN_SRC emacs-lisp
-;; Bootstrap & install packages:
-(load-file (concat dotemacs-dir "lisp/packages.el"))
+;; jump around, House of Pain style
+(use-package ace-jump-mode
+             :bind ("C-." . ace-jump-mode))
+
+#+END_SRC
+
+This is a super-fast way to quickly move your cursor around in the buffer -- handy whether you're working in a text file or with code.
+
+** Browse kill ring
+
+=C-y= yanks from the top of the kill ring, and hitting =C-y M-y, M-y, M-y= repeatedly will cycle through previous kills. But what if you want to browse through the whole kill ring and find that text you killed a few hours ago?
+
+Hitting =M-y= activates browse-kill-ring and let you dig through your kill history, select an item, and yank it into the buffer.
+
+#+name: browse-kill-ring
+#+BEGIN_SRC emacs-lisp
+;; show me the graveyard with M-y
+(use-package browse-kill-ring
+             :defer t
+             :init
+             (progn
+               (autoload 'browse-kill-ring-default-keybindings "browse-kill-ring")
+               (browse-kill-ring-default-keybindings)))
+
+#+END_SRC
+
+** Diminish mode
+
+I like keeping my mode-line clean.
+
+Diminish is a package that lets you replace the default major/minor mode indicators in the mode-line with shorter abbreviations (or hide them altogether).
+
+#+name: UI-modeline-diminish
+#+BEGIN_SRC emacs-lisp
+;; use fewer letters
+(use-package diminish)
+
+#+END_SRC
+
+Even better, use-package supports diminsh options as part of the declaration when loading packages.
+
+Diminish also features [[http://www.eskimo.com/~seldon/diminish.el][some of the best code comments in the universe]].
+
+** ido & smex
+
+[[file:img/ido.png]]
+
+[[http://emacswiki.org/emacs/InteractivelyDoThings][ido (short for "*interactively do* things")]] is a fantastic package, and one of the first things I recommend a new Emacs user set up. It's actually a part of Emacs as of v22, but requires a bit of configuration to make it *really* powerful.
+
+[[https://www.youtube.com/watch?v=lsgPNVIMkIE][ido provides autocomplete features for files and buffers]], and it supports things like fuzzy matching and "virtual buffers" for revising recently-closed buffers.
+
+*** ido settings
+
+Let's turn on ido and configure it, shall we? It's got a lot of bells and whistles.
+
+The first things we want to do are to enable flex matching, turn ido on everywhere, ignore case when completing, and set up max prospects and faces. 
+
+#+name: ido-settings-1
+#+BEGIN_SRC emacs-lisp
+;; unlock the magic
+(ido-mode t)
+(setq ido-enable-flex-matching t
+      ido-everywhere t
+      completion-ignore-case t           
+      read-file-name-completion-ignore-case t
+      ido-max-prospects 20
+      ido-use-faces t)
+#+END_SRC
+
+Next, I want to turn off some of the tramp-related and ftp-related options --- these caused stalls for me in the past.
+
+#+name: ido-settings-2
+#+BEGIN_SRC emacs-lisp
+(setq ido-record-ftp-work-directories nil
+      ido-enable-tramp-completion nil
+      ido-is-tramp-root nil)
+#+END_SRC
+
+Now let's add some magic: we'll turn on recentf-mode and allow ido to list my recently-closed buffers as possible matches. This is so damn handy.
+
+#+name: ido-settings-3
+#+BEGIN_SRC emacs-lisp
+(recentf-mode t)
+(setq ido-use-virtual-buffers t)
+#+END_SRC
+
+Let's fix a couple of navigation-related annoyances as well. By default, if no matches are found, ido will kick off a search for the file you might have meant. I found this annoying, so I disable it.
+
+I also like being able to navigate into a directory and hit =.= to get dropped into dired in that directory.
+
+And I want to invoke ido when my cursor is on a filename in the buffer text and have that file suggested as a completion. 
+
+#+name: ido-settings-4
+#+BEGIN_SRC emacs-lisp
+(setq ido-auto-merge-work-directories-length -1
+      ido-show-dot-for-dired t
+      ido-use-filename-at-point 'guess)
+#+END_SRC
+
+I'm not sure why this is disabled by default, but let's enable it:
+
+#+name: ido-settings-5
+#+BEGIN_SRC emacs-lisp
+(put 'ido-exit-minibuffer 'disabled nil)
+
+#+END_SRC
+
+*** ido-completing-read+
+
+[[https://github.com/DarwinAwardWinner/ido-completing-read-plus][ido-completing-read+]] is an additional package that enables ido in even more places. Let's fire it up:
+
+#+name:ido-ubiquitous
+#+BEGIN_SRC emacs-lisp
+;; use ido everywhere
+(use-package ido-completing-read+)
+(ido-ubiquitous-mode 1)
+
+#+END_SRC
+
+With this enabled, you'll be able to do things like hit =C-h f= (describe-function) and see a nice list of possible completions --- it'll even default suggest the function your cursor's sitting on.
+
+*** ido-vertical
+
+By default, ido lists possible completions horizontally, wrapping them if there are more completions than fit on the line. 
+
+I prefer having completion candidates listed vertically and left-aligned --- they're much easier to scan that way.
+
+We'll use [[https://github.com/gempesaw/ido-vertical-mode.el][the ido-vertical-mode package]] to set this up, and define keys for navigating up and down between candidates in the list.
+
+#+name:ido-vertical
+#+BEGIN_SRC emacs-lisp
+;; stack my completions
+(use-package ido-vertical-mode
+             :init
+             (progn (ido-vertical-mode 1)
+                    (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
+
+#+END_SRC
+
+*** smex
+
+[[file:img/smex.png]]
+
+[[https://github.com/nonsequitur/smex][The smex package]] gives you all the autocompletion and fuzzy-matching goodness of ido, but for =M-x=, the infamous =execute-extended-command= function. 
+
+Instead of hunting and scraping to find the function I'm looking for, I use smex + fuzzy matching and feel like an Emacs god.
+
+#+name: smex-settings
+#+BEGIN_SRC emacs-lisp
+;;smexy smex
+(use-package smex)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+#+END_SRC
+
+I can get back to my original =M-x= functionality if I need it by using =C-c C-c M-x=.
+
+#+name: smex-settings-old-mx
+#+BEGIN_SRC emacs-lisp
+;; This is your old M-x.
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+
+#+END_SRC
+** Guide Key
+
+#+ATTR_HTML: :width 600
+[[file:img/guide-key-example.png]]
+
+Guide-key lets you set up useful completion hints for certain key combinations. 
+
+For example, I'm always forgetting certain org-mode shortcuts, so I've set up guide-key so that when I'm working in org, I can type =C-c= and wait a second to see a menu of all possible commands that start with =C-c=. 
+
+It's especially useful when learning a new mode or new set of commands.
+
+I can and should probably tweak this a little more and add additional key sequences to it, but for now this setup meets most of my needs.
+
+#+name: guide-key
+#+BEGIN_SRC emacs-lisp
+;; gimme some hints
+(use-package guide-key)
+(defun guide-key/jcs-hook-function-for-org-mode ()
+  (guide-key/add-local-guide-key-sequence "C-c")
+  (guide-key/add-local-guide-key-sequence "C-c C-x"))
+(add-hook 'org-mode-hook 'guide-key/jcs-hook-function-for-org-mode)
+(setq guide-key/idle-delay 1)
+(setq guide-key/popup-window-position 'bottom)
+(guide-key-mode 1)
+(diminish 'guide-key-mode)
+
+#+END_SRC
+
+** Popwin
+
+[[https://github.com/m2ym/popwin-el][Popwin]] is installed as a dependency of guide-key, and it makes certain kinds of "pop-up" windows within your frame act slightly differently from regular windows --- you're able to dismiss them quickly by typing =0=, and provides some other useful features.
+
+#+name: popwin
+#+BEGIN_SRC emacs-lisp
+;; put those hints in a nice pop-up window
+(use-package popwin)
+(defun popwin-bkr:update-window-reference ()
+  (popwin:update-window-reference 'browse-kill-ring-original-window :safe t))
+(add-hook 'popwin:after-popup-hook 'popwin-bkr:update-window-reference)
+(push "*Kill Ring*" popwin:special-display-config)
+(popwin-mode 1)
+
+#+END_SRC
+** Magit
+
+[[https://magit.vc/][Magit is git made magical.]] 
+
+It wraps git commands in a spiffy interface that's legitimately enjoyable to use. Which is good, because I use it pretty much every day.
+
+#+ATTR_HTML: :width 600
+[[file:img/magit.png]]
+
+I don't use many customized setup options for magit yet. I may in the future.
+
+#+name: coding-magit
+#+BEGIN_SRC emacs-lisp
+;; git on up
+(use-package magit)
+(setq magit-push-always-verify nil)
 
 #+END_SRC
 
 
-* TODO Load custom settings
+* Load custom settings
 
+** Load separate settings file -- need to break this down
 #+name: custom-settings
 #+BEGIN_SRC emacs-lisp
 ;; Set up interface and editor options the way I like 'em:
@@ -397,7 +643,7 @@ I do this *before* I begin loading packages, so that package configs can access 
 #+END_SRC
 
 
-* TODO Org-mode
+* Org-mode
 :PROPERTIES:
 :noweb-ref: Set up org-mode
 :END:
