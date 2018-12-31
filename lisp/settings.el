@@ -37,7 +37,7 @@
 ;; Word wrap and center my text nicely
 (setq fill-column 120)
 (setq default-fill-column 120)
-(load-file "wrap-to-fill.el")
+(load-file "~/.emacs.d/lisp/wrap-to-fill.el")
 (visual-line-mode 1)
 (wrap-to-fill-column-mode 1)
 (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
