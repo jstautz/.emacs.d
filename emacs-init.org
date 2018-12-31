@@ -438,7 +438,7 @@ I like keeping my mode-line clean.
 
 Diminish is a package that lets you replace the default major/minor mode indicators in the mode-line with shorter abbreviations (or hide them altogether).
 
-#+name: UI-modeline-diminish
+#+name: diminish
 #+BEGIN_SRC emacs-lisp
 ;; use fewer letters
 (use-package diminish)
@@ -623,7 +623,7 @@ It wraps git commands in a spiffy interface that's legitimately enjoyable to use
 
 I don't use many customized setup options for magit yet. I may in the future.
 
-#+name: coding-magit
+#+name: magit
 #+BEGIN_SRC emacs-lisp
 ;; git on up
 (use-package magit)
@@ -631,8 +631,659 @@ I don't use many customized setup options for magit yet. I may in the future.
 
 #+END_SRC
 
+* General Editor Settings
+** Interface tweaks
 
-* Load custom settings
+I know, I know. Emacs doesn't have much of an interface to begin with. 
+
+Even so, there are a couple of changes I like to make in order to make things a little cleaner.
+
+*** Remove distracting UI elements
+
+Emacs comes with a fat ugly toolbar turned on by default. Turning it off is one of the first things I do.
+
+#+name: UI-toolbar
+#+BEGIN_SRC emacs-lisp
+;; Get rid of all that chrome and fuss
+(tool-bar-mode -1)
+#+END_SRC
+
+I don't really use the side fringe at all, so I set it to blend in with my background face. ("face" in Emacs basically means "text style.")
+
+#+name: UI-fringe
+#+BEGIN_SRC emacs-lisp
+(set-face-background 'fringe (face-background 'default))
+(set-face-foreground 'fringe (face-background 'default))
+#+END_SRC
+
+Scroll bars are also pretty useless in the age of scroll wheels and trackpads, so I turn that off as well.
+
+#+name: UI-fringe
+#+BEGIN_SRC emacs-lisp
+(scroll-bar-mode -1)
+
+#+END_SRC
+
+*** Hide welcome messages
+
+We're all professionals, here. We know what we're doing. 
+
+Let's ditch the splash screen, the startup message, and the default text on the scratch buffer:
+
+#+name: UI-splash
+#+BEGIN_SRC emacs-lisp
+;; Don't talk to me
+(setq inhibit-splash-screen 1)               
+(setq initial-scratch-message "")
+(setq inhibit-startup-message t)
+#+END_SRC
+
+*** Kill some UI annoyances
+
+I hate the audible alert bell.
+
+Let's set the ring-bell function to an empty function instead of the deafult (which is named, appropriately, =ding=).
+
+#+name: UI-bells
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function (lambda ()))
+#+END_SRC
+
+Another obnoxious default to change: the requirement that you actually type the letters "y" "e" and "s" at a yes/no prompt. 
+
+This s-exp lets you just type "y" or "n" to answer these prompts.
+
+#+name: UI-yorn
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+
+#+END_SRC
+
+*** Confirm before quitting Emacs
+
+I want to make sure I don't accidentally kill Emacs. Ever. 
+
+I do this by changing two things:
+
+1) Unset =C-x C-c= so I don't hit it accidentally, and
+2) Prompt me to confirm that I actually want to quit.
+
+If I want to quit Emacs (gasp!) I now need to do it *very* deliberately via =M-x save-buffers-kill-emacs= and then confirm.
+
+Good thing I rarely quit Emacs.
+
+#+name: UI-quit-emacs
+#+BEGIN_SRC emacs-lisp
+(global-unset-key "\C-x\C-c")
+(setq confirm-kill-emacs 'y-or-n-p)
+
+#+END_SRC
+*** Themes
+
+I want to trust all themes --- mostly so the mode-line setup below doesn't spit warnings at me on startup.
+
+#+name: UI-trust-themes
+#+BEGIN_SRC emacs-lisp
+;; Trust me, I'm an interior decorator
+(setq custom-safe-themes t)
+
+#+END_SRC
+
+*** Show line and column numbers
+
+A basic feature of any decent text editor: show me what line number I'm on.
+
+The column number display isn't as immediately useful, but it does come in handy.
+
+#+name: UI-linum
+#+BEGIN_SRC emacs-lisp
+;; whose line is it, anyway?
+(line-number-mode 1)                         
+(column-number-mode 1)
+
+#+END_SRC
+** Backups & Trash settings
+
+Emacs has some pretty useful features for auto-saving backups and integrating with OS X's Trash / filesystem.
+
+*** Set backup directory
+
+One problem with the default auto-save in Emacs is that it peppers your working directories with duplicates of your files, e.g. =#init.el#= =init.el~=.
+
+Let's tell Emacs to put all these auto-saves and backups into a more useful location:
+
+#+name: backup-dir
+#+BEGIN_SRC emacs-lisp
+;; Don't crap up my working directory with backups
+(defvar backup-dir "~/.emacs.backup/")
+(defvar autosave-dir "~/.emacs.autosave/")
+(setq backup-directory-alist `((".*" . ,backup-dir)))
+(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+
+#+END_SRC
+
+*** Backups + version control
+
+You have to explicitly tell Emacs to keep saving backups of files if they're under version control. 
+
+#+name: backup-vc
+#+BEGIN_SRC emacs-lisp
+;; I'm paranoid
+(setq vc-make-backup-files t)
+
+#+END_SRC
+
+*** ~/.Trash integration
+
+Instead of just blowing files away, I want all file-deletion events in Emacs to do a =mv file.txt ~/.Trash= rather than a simple =rm file.txt=. This is just another layer of protecting myself from myself.
+
+#+name: backup-trashes
+#+BEGIN_SRC emacs-lisp
+;; Super paranoid
+(setq delete-by-moving-to-trash t)
+(setq trash-directory (concat "~/.Trash/"))
+
+#+END_SRC
+
+** Basic Keyboard settings
+*** Unset some default keybindings
+
+Let's unset a couple of keybindings:
+- Read-only-toggle is bound by to =C-x C-q= by default. It's a useless command that I activate by accident way too often.
+- I also fat-finger =F2= way too often. I may eventually use this key for something, but not yet.
+- =C-x .= is bound to =set-fill-prefix=, which I rarely need.
+- Command-tilde (=M-`=) is the OS X keybinding to flip between windows in an app. I use it a lot, and don't want to enter tmm-menubar if I hit it when I'm in Emacs.
+
+#+name: keybindings-unsets
+#+BEGIN_SRC emacs-lisp
+;; Unset some defaults I don't like
+(global-unset-key "\C-x\C-q")
+(global-unset-key (kbd "<f2>"))     
+(global-unset-key "\C-x.")
+(global-unset-key "\M-`")
+
+#+END_SRC
+
+*** Save and Undo
+
+Now let's set a couple of bindings based on my muscle memory:
+
+- Rebind =M-s= to save-buffer --- I've been conditioned to hit =Command-S= compulsively, so let's make this save the buffer rather than center the line.
+
+#+name: keybindings-save
+#+BEGIN_SRC emacs-lisp
+;; Forgive my muscle memory
+(global-set-key (kbd "M-s") 'save-buffer)
+#+END_SRC
+
+- =C-z= is bound to iconify-frame by default, which I never use. Set it to undo instead.
+
+#+name: keybindings-save
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-z") 'undo)
+
+#+END_SRC
+
+*** Mac keyboard settings
+
+I use Emacs on OS X and get my builds from http://emacsformacosx.com/. There are a couple of things I need to configure to make Emacs.app play nicely on a Mac.
+
+First, I want to treat Command *and* Option keys as Meta in Emacs. I know, this is weird. I may eventually change one of these to Super or Hyper. But for now, I like having large target areas for hitting Meta, since I use it so often.
+
+#+name: UI-mac-settings-meta
+#+BEGIN_SRC emacs-lisp
+;; I'm a Mac
+(setq ns-alternate-modifier (quote meta))
+(setq ns-command-modifier (quote meta))
+#+END_SRC
+
+*** Use Mac clipboard for copying/killing
+
+Copy and paste should use the OS clipboard.
+
+#+name: mac-settings-clipboard
+#+BEGIN_SRC emacs-lisp
+(setq x-select-enable-clipboard t)
+
+#+END_SRC
+
+*** Mouse settings for OS X
+
+Emulate a three-button mouse for copy/paste/select:
+
+#+name: UI-mac-settings-clipboard
+#+BEGIN_SRC emacs-lisp
+(setq mac-emulate-three-button-mouse t)
+
+#+END_SRC
+
+
+** Cursor and Scrolling
+*** Highlight cursor location
+
+I realize a lot of people hate blinking cursors, but I like them because:
+
+- I can quickly find my cursor on a large screen
+- The persistent blinking indicates Emacs is waiting for my input --- it's pushing me to write, to get shit done. 
+
+#+name: UI-cursor
+#+BEGIN_SRC emacs-lisp
+;; show me where I am
+(setq blink-cursor-mode t)
+#+END_SRC
+
+Another helpful indicator: I like having my current line highlighted. =grey93= is nice and subtle against a white background.
+
+#+name: UI-highlight-line
+#+BEGIN_SRC emacs-lisp
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "grey93")
+
+#+END_SRC
+
+If you're using a dark theme, you should probably change this.
+
+*** Cursor scroll settings
+
+Let's make buffer scrolling / paging a bit more sane.
+
+By default, Emacs will recenter on the cursor when you scroll above / below the current viewable area. This leads to some disorienting jumping around.
+
+Setting =scroll-conservatively= to a value > 100 means automatic scrolling will never center on the cursor.
+
+#+name: UI-scroll-conserv
+#+BEGIN_SRC emacs-lisp
+;; Don't scroll like a maniac, pls
+(setq scroll-conservatively 1000)
+#+END_SRC
+
+The =scroll-margin= variable controls how close to the bottom/top edge of the frame I can get before the viewable area begins to scroll. I like to get right up to the bottom edge before scrolling.
+
+#+name: UI-scroll-margin
+#+BEGIN_SRC emacs-lisp
+(setq scroll-margin 0)
+#+END_SRC
+
+I don't want to jump around at all when scrolling up or down.
+
+And when I *do* page up or down, I want my cursor to be in the same position relative to the top and bottom of the frame.
+
+This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't have to hunt for my cursor. I should still be looking at it.
+
+#+name: UI-scroll-agg
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-up-aggressively nil
+	scroll-down-aggressively nil
+	scroll-preserve-screen-position t)
+
+#+END_SRC
+
+*** Scrolling when on fringe
+
+Scolling via mouse wheel / trackpad works great, except if my mouse is on the fringe (which I set to be extra-wide), or on the mode-line. Let's bind margin and mode-line scroll events appropriately:
+
+#+name: keybindings-scroll
+#+BEGIN_SRC emacs-lisp
+;; Respect the power of my mouse wheel, margins!
+(global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<left-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<right-margin><wheel-up>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-down>") 'mwheel-scroll)
+(global-set-key (kbd "<mode-line><wheel-up>") 'mwheel-scroll)
+
+#+END_SRC
+
+*** Scroll view without moving cursor
+
+Use =M-n= and =M-p= to scroll the window view up or down... without moving the point. This is handy for quickly peeking beyond the bounds of the screen without losing my place.
+
+#+name: keybindings-scroll-view
+#+BEGIN_SRC emacs-lisp
+;; Scroll around the cursor
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
+
+#+END_SRC
+
+*** Selecting and deleting text
+
+When I select text between point and mark, I want to see this selection highlighted with transient-mark mode. I find it difficult to use Emacs effectively without having transient-mark-mode turned on.
+
+Delete-selection-mode is also important to me --- it allows overwriting selected text to work the way I expect.
+
+#+name:cursor-transient
+#+BEGIN_SRC emacs-lisp
+;; Select text in a non-psychopathic way
+(transient-mark-mode t)
+(delete-selection-mode t)
+
+#+END_SRC
+
+*** Rectangle selection
+
+CUA mode has [[https://www.youtube.com/watch?v=k-6BVjlBSVo][a really nice facility for editing rectangular regions]]. 
+
+I dislike using CUA-mode's default keybindings, but I do like the rectangle editing features. So I turn off the CUA-keys, then turn on CUA.
+
+#+name:cursor-transient
+#+BEGIN_SRC emacs-lisp
+;; Enable rectangle editing, but not all the other CUA hoo-hah
+(setq cua-enable-cua-keys nil)               
+(cua-mode t)
+
+#+END_SRC
+** Desktop & Bookmark Settings
+
+Emacs Desktop allows you to save your current workspace (frame dimensions, window configuration, open buffers, command and file history, and a bunch of other settings).
+
+#+name: desktop-settings
+#+BEGIN_SRC emacs-lisp
+;; Save my place
+(desktop-save-mode 1)
+(setq desktop-globals-to-save
+      (append '((extended-command-history . 30)
+                (file-name-history        . 100)
+                (grep-history             . 30)
+                (compile-history          . 30)
+                (minibuffer-history       . 50)
+                (query-replace-history    . 60)
+                (read-expression-history  . 60)
+                (regexp-history           . 60)
+                (regexp-search-ring       . 20)
+                (search-ring              . 20)
+                (shell-command-history    . 50)
+                tags-file-name
+                register-alist)))
+#+END_SRC
+
+Don't warn me about desktop locks.
+
+#+name: desktop-lock-warn
+#+BEGIN_SRC emacs-lisp
+(setq desktop-load-locked-desktop t)
+(desktop-read)
+#+END_SRC
+
+Define my bookmarks file and save all my settings inside it.
+
+#+name: desktop-settings
+#+BEGIN_SRC emacs-lisp
+(setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
+
+#+END_SRC
+
+
+** Window Navigation
+
+*** Move to other window
+
+I use =M-o= to move between windows. The default =C-x o= keybinding is a bit clunky.
+
+#+name: window-other-window
+#+BEGIN_SRC emacs-lisp
+;; because I don't use set-face and C-x o is just too much
+(global-set-key (kbd "M-o") 'other-window)
+
+#+END_SRC
+
+*** Previous buffer when splitting window 
+
+Whenever I split my frame into multiple windows (e.g. with =C-x 2= or =C-x 3=), Emacs will open the current buffer in both windows. This isn't always useful.
+
+Usually what I actually want is to show the previous buffer in that new window. [[http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury][I stole this nice snippet from /r/emacs user chldury]]:
+
+#+name: window-split
+#+BEGIN_SRC emacs-lisp
+;; don't show me the same buffer twice when I split
+(defun vsplit-last-buffer ()
+  (interactive)
+  (split-window-vertically)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+(defun hsplit-last-buffer ()
+  (interactive)
+   (split-window-horizontally)
+  (other-window 1 nil)
+  (switch-to-next-buffer)
+  )
+
+(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+
+#+END_SRC
+
+*** Zoom between split window and single window
+
+[[http://ignaciopp.wordpress.com/2009/05/23/emacs-manage-windows-split/][This function from Ignacio Paz Posse]] has totally replaced [[https://www.emacswiki.org/emacs/WinnerMode][winner-mode]] for me. 
+
+It allows me to move from a split-window view (e.g. two buffers side by side) and "zoom" into one of those buffers, taking it full-frame... and allows me to quickly "zoom" back to the same split-window view.
+
+#+name: window-zoom
+#+BEGIN_SRC emacs-lisp
+;; Let me jump between a split frame and single-window view
+(defun toggle-windows-split()
+  "Switch back and forth between one window and whatever split of
+windows we might have in the frame. The idea is to maximize the
+current buffer, while being able to go back to the previous split
+of windows in the frame simply by calling this command again."
+  (interactive)
+  (if (not(window-minibuffer-p (selected-window)))
+      (progn
+        (if (< 1 (count-windows))
+            (progn
+              (window-configuration-to-register ?u)
+              (delete-other-windows))
+          (jump-to-register ?u)))))
+
+(define-key global-map (kbd "C-`") 'toggle-windows-split)
+(define-key global-map (kbd "C-~") 'toggle-windows-split)
+
+#+END_SRC
+
+This is really only useful when jumping between a set of split windows and a single-window view. If I did more jumping between different split-window setups, I'll go back to winner-mode.
+
+*** Shrink/expand windows
+
+Sometimes I want to adjust the size of a window in my split-frame configuration. For example, I may not want my split at 50%, I may want 75% of my frame filled with a view into my source code and 25% showing a REPL. 
+
+I can use the mouse to drag the window boundaries, sure... but it's sometimes faster to do it with my hands on the keyboard:
+ 
+#+name: window-shifting
+#+BEGIN_SRC emacs-lisp
+;; let me resize windows mouse-free
+(define-key global-map (kbd "C-M-<left>") 'shrink-window-horizontally)
+(define-key global-map (kbd "C-M-<right>") 'enlarge-window-horizontally)
+(define-key global-map (kbd "C-M-<up>") 'enlarge-window)
+(define-key global-map (kbd "C-M-<down>") 'shrink-window)
+
+#+END_SRC
+
+** File & Buffer Navigation & Manipulation
+*** Buffer lists
+
+I really like ibuffer for listing all open buffers. I've bound it to =C-x C-b=. 
+
+#+name: ibuffer
+#+BEGIN_SRC emacs-lisp
+;; I heart ibuffer
+(global-set-key "\C-x\C-b" 'ibuffer)
+
+#+END_SRC
+
+*** Edit filenames in dired
+
+Dired is awesome for viewing and manipulating files in a directory. wdired makes it even more awesome --- it lets you edit filenames in a dired buffer (editing them just like any text file), then save your changes to bulk-rename files and more.
+
+I like having wdired bound to the 'r' key inside dired.
+
+(note that I'm eval-ing this *only after* loading dired, otherwise Emacs chokes on an undefined dired-mode-map var)
+
+#+name: wdired
+#+BEGIN_SRC emacs-lisp
+;; bulk-edit files in dired
+(eval-after-load 'dired
+  '(define-key dired-mode-map "r"
+     'wdired-change-to-wdired-mode))
+
+#+END_SRC
+
+*** Open Finder window or file from dired
+
+Sometimes when I'm looking at a directory, I want to flip over to see it in the Finder. Or if I'm in dired and my pointer's on a .doc file or something, I'll want to open it using the default OS X application. This elisp snippet was stolen from [[http://jblevins.org/log/dired-open][Jason Blevins]].
+
+I've bound this to 'z' within dired.
+
+#+name: dired-open
+#+BEGIN_SRC emacs-lisp
+;; open outside Emacs (blasphemy!)
+(eval-after-load "dired"
+  '(progn
+     (define-key dired-mode-map (kbd "z")
+       (lambda () (interactive)
+         (let ((fn (dired-get-file-for-visit)))
+           (start-process "default-app" nil "open" fn))))))
+
+#+END_SRC
+
+
+*** Make =C-<= and =C->= work nicely in dired-mode
+
+Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the cursor to the beginning/end of the filenames in dired buffers. Handy!
+
+#+name: dired-c-a
+#+BEGIN_SRC emacs-lisp
+;; dired needs a ceiling and a floor
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (dired-next-line 4))
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map
+    (vector 'remap 'beginning-of-buffer) 'dired-back-to-top))
+
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (dired-next-line -1))
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map
+    (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom))
+
+#+END_SRC
+
+*** Rename and delete files
+
+Renaming and deleting files should be easier to do while you're viewing them.
+
+Since =C-x k= kills a buffer, it makes sense to bind =C-x C-k= to deleting the current file (with confirmation, of course).
+
+And =C-x C-w= is bound to write-file... but a more useful feature would be to simple rename the current buffer and file. This is bound to =C-x C-r=.
+
+#+name: rename-and-delete-files
+#+BEGIN_SRC emacs-lisp
+;; rename a file in place
+(defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
+(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+
+;; nuke this file (scream emoji)
+(defun delete-current-buffer-file ()
+  "Removes file connected to current buffer and kills buffer."
+  (interactive)
+  (let ((filename (buffer-file-name))
+        (buffer (current-buffer))
+        (name (buffer-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (ido-kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename t)
+        (kill-buffer buffer)
+        (message "File '%s' successfully removed" filename)))))
+(global-set-key (kbd "C-x C-k") 'delete-current-buffer-file)
+#+END_SRC
+
+*** Drag and drop file support
+
+When I drag and drop a file onto Emacs.app, visit that file rather than just appending it to the currently open buffer (which is a horrible default).
+
+#+name: Filenav-drag-n-drop
+#+BEGIN_SRC emacs-lisp
+;; don't do dumb things
+(define-key global-map [ns-drag-file] 'ns-find-file) 
+
+#+END_SRC
+
+*** Make M-x locate use OS X's Spotlight
+
+Leverage OS X's mdfind util for crazy-fast file locating. Try it with =M-x locate=.
+
+#+name: locate-spotlight
+#+BEGIN_SRC emacs-lisp
+;; search with a spotlight
+(setq locate-make-command-line (lambda (s) `("mdfind" "-name" ,s)))
+
+#+END_SRC
+
+*** Re-open file as root
+
+[[http://t.co/KiAWcJoo][Thanks to @christopherdone for this one]]. I occasionally need to edit a file as root. This is possible to do within my running Emacs instance with [[Tramp][tramp]], but I usually forget exactly how to do it. 
+
+This function encapsulates this inside an easier-to-remember function name. If I type =M-x sudo=, I'll get =tramp-sudo-reopen= in my autocomplete list.
+
+#+name: open-as-root
+#+BEGIN_SRC emacs-lisp
+;; I've got the power
+(defun tramp-sudo-reopen ()
+  "Re-open the current with tramp."
+  (interactive)
+  (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
+        (line (line-number-at-pos))
+        (column (current-column)))
+    (kill-buffer)
+    (find-file file-name)
+    (goto-line line)
+    (goto-char (+ (point) column))))
+
+#+END_SRC
+** Alerts and Notifications
+
+I use [[https://github.com/julienXX/terminal-notifier][terminal-notifier]] to send alerts to the OS X Notification Center from other applications. I adapted [[https://gist.github.com/justinhj/eb2d354d06631076566f#file-gistfile1-el][this gist from justinhj]] to send events from emacs to the Notification Center.
+
+Note that this depends on having terminal-notifier installed. If you use homebrew, just use =brew install terminal-notifier=.
+
+#+name: UI-notifications
+#+BEGIN_SRC emacs-lisp
+;; terminal-notifier-notify is my messenger god
+(defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
+
+(defun terminal-notifier-notify (title message)
+  "Show a message with `terminal-notifier-command`."
+  (start-process "terminal-notifier"
+                 "*terminal-notifier*"
+                 terminal-notifier-command
+                 "-title" title
+                 "-message" message
+                 "-activate" "org.gnu.Emacs"))
+
+#+END_SRC
 
 ** Load separate settings file -- need to break this down
 #+name: custom-settings
@@ -641,6 +1292,190 @@ I don't use many customized setup options for magit yet. I may in the future.
 (load-file (concat dotemacs-dir "lisp/settings.el"))
 
 #+END_SRC
+* Writing Fiction
+** Auto-fill & Word Wrap
+
+By default, Emacs doesn't automatically wrap words onto the next line. (I know! What decade are we in?)
+
+There are two options to change this. 
+
+In the first option, =auto-fill-mode= will automatically insert linebreaks at a certain column number, preventing any lines from being longer than your screen's viewable area. Setting the =fill-column= variable defines the column number at which Emacs will auto-insert a linebreak.
+
+In the second option, =visual-line-mode=, no linebreaks are inserted in your text (it's all actually one line in the text file), but it's *visually* wrapped onto multiple lines. Cursor movement, end-of-line, and beginning-of-line commands all work within the wrapped line. 
+
+The second option is more like a "modern" word processor, but still has its quirks.
+
+*** Auto-fill-mode
+
+I typically run Emacs.app in full screen, and a 120-character fill-column feels pretty good to me. Especially when I'm writing or editing fiction.
+
+#+name: auto-fill-options
+#+BEGIN_SRC emacs-lisp
+;; just my size
+(setq fill-column 120)
+(setq default-fill-column 120)
+
+#+END_SRC
+
+*** Visual-line mode and wrap-to-fill-column
+
+Previously I kept auto-fill-mode turned on. The hard linebreaks didn't bother me, and when diffing files in my git repo of creative writing, I could view changes on individual lines.
+
+However... it's still kind of a pain in the ass.
+
+Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the *full width of the frame.* I usually have my frame full-screen and like working in a narrower band within this frame, my text surrounded by whitespace.
+
+I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
+
+#+name: wrap-fill-options
+#+BEGIN_SRC emacs-lisp
+;; float my text in the middle, all pretty-like
+(load-file "~/.emacs.d/lisp/wrap-to-fill.el")
+(visual-line-mode 1)
+(wrap-to-fill-column-mode 1)
+(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+
+#+END_SRC
+
+And we'll use diminish to keep those always-on modes from cluttering up our pretty mode-line.
+
+#+name: wrap-fill-diminish
+#+BEGIN_SRC emacs-lisp
+;; hide that nonsense from the mode-line
+(diminish 'visual-line-mode)
+(diminish 'wrap-to-fill-column-mode)
+
+#+END_SRC
+
+
+*** Unfill-paragraph
+
+I sometimes want to "unfill" a paragraph --- that is, take a block of text that's had hard linebreaks inserted into it, and turn it into a single line of text. 
+
+I borrowed this snippet from [[https://raw.github.com/qdot/conf_emacs/master/emacs_conf.org][Kyle Machulis]].
+
+#+name: writing-unfill-paragraph
+#+BEGIN_SRC emacs-lisp
+;; fables of the reconstruction
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and mashes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+#+END_SRC
+
+This is especially relevant now that I've ditched auto-fill, relying on visual-line-mode rather than hard line breaks. I find myself revising old pieces of writing and wanting to update them to work better with visual-line-mode, and this function helps.
+
+(Note: I should really rework this function so it operates on the entire buffer.)
+
+
+** Tabs, spaces, EOL characters
+
+I am firmly in the "spaces" camp on the whole "tabs v. spaces" debate. I also like my tabs to insert 4 spaces.
+
+#+name: writing-tabs
+#+BEGIN_SRC emacs-lisp
+;; herein I set down fundamental laws of nature
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+#+END_SRC
+
+And don't even get me started on one space vs. two after sentences. Because Jesus, people.
+
+#+name: writing-spaces
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+  
+Also, lines should end in plain old LFs, as god intended.
+
+#+name: UI-mac-settings-eol
+#+BEGIN_SRC emacs-lisp
+(setq eol-mnemonic-mac "(Mac)")
+
+#+END_SRC
+** Spell-check settings
+
+[[file:img/flyspell-popup.png]]
+
+I like using aspell for spell checking in Emacs.
+
+Note that aspell may not be installed by default. If you're on a Mac, the easiest way to do that is with homebrew: =brew install aspell=. This should install aspell along with the english-language dictionaries you need.
+
+#+name: spell-check-aspell
+#+BEGIN_SRC emacs-lisp
+;; I love ispell
+(setq ispell-program-name "aspell")
+
+#+END_SRC
+
+Aspell doesn't recognize the Canadian dictionary by default. 
+
+This is, quite frankly, insulting. It's a borderline act of war. 
+
+So let's teach Emacs about Canada before it starts an international incident, eh?
+
+#+name: spell-check-canadian
+#+BEGIN_SRC emacs-lisp
+;; sorry, I'm Canadian
+(defvar ispell-local-dictionary-alist
+  '(("canadian"
+     "[A-Za-z]" "[^A-Za-z]" "[']" nil ("-B") nil iso-8859-1)))
+(setq ispell-local-dictionary "canadian")
+
+#+END_SRC
+
+Now that we've got ispell working, it's easy to activate spell-checking as you type with flyspell. Just hit =M-x flyspell-mode= and you've got those nifty red underlines highlighting all your mistakes.
+
+Let's activate flyspell-mode by default for text-mode and org-mode buffers:
+
+#+name: flyspell-defaults
+#+BEGIN_SRC emacs-lisp
+;; fly, you fools
+(add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
+(add-hook 'org-mode-hook (lambda () (flyspell-mode 1)))
+#+END_SRC
+
+Of course, highlighting the words isn't enough. I'd like a quick way to fix them. And I don't like fly spell's default way of doing this. Let's bind =C-;= to =ispell-word= when we're in flyspell mode and the pointer's on a misspelled word.
+
+#+name: ispell-word-at-point
+#+BEGIN_SRC emacs-lisp
+(eval-after-load "flyspell"
+  '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
+(eval-after-load "minor-mode"
+  '(define-key flyspell-mode-map (kbd "C-c $") nil))
+
+#+END_SRC
+
+And there are a few sections of org-mode files that we should ignore ([[https://github.com/grettke/home/blob/master/ALEC.org#L4546][stolen from Grant Rettke]]).
+
+Never spell check inside org-mode source blocks:
+
+#+name: ispell-skip-src
+#+begin_src emacs-lisp
+;; rocks ispell just shouldn't look under:
+(add-to-list 'ispell-skip-region-alist '("^#\\+begin_src ". "#\\+end_src$"))
+(add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC ". "#\\+END_SRC$"))
+#+end_src
+
+Or inside org-mode example blocks:
+
+#+name: ispell-skip-example
+#+begin_src emacs-lisp
+(add-to-list 'ispell-skip-region-alist '("^#\\+begin_example ". "#\\+end_example$"))
+(add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE ". "#\\+END_EXAMPLE$"))
+#+end_src
+
+Or inside org-mode Properties blocks:
+
+#+name: ispell-skip-properties
+#+begin_src emacs-lisp
+(add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
+
+#+end_src
+
 
 
 * Org-mode
