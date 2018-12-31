@@ -243,7 +243,7 @@ I've got a whole separate section of my Emacs config dedicated to the ins and ou
 
 ** Writing
 
-For the last 12+ years, I've done most of my fiction writing, journalling, editing, and revising in plain text within Emacs.
+For the last 12+ years, I've done most of my fiction writing, journaling, editing, and revising in plain text within Emacs.
 
 Sometimes I work in [[https://daringfireball.net/projects/markdown/][Markdown syntax]] and view the formatted version of my documents in [[http://markedapp.com/][Marked.app]].
 
@@ -1293,6 +1293,11 @@ Note that this depends on having terminal-notifier installed. If you use homebre
 
 #+END_SRC
 * Writing Fiction
+
+I spend a bunch of my time in Emacs writing fiction. Some of it has [[https://web.archive.org/web/20120502210836/http://prismmagazine.ca/2011/10/10/jeff-stautz-on-asymptote-his-national-magazine-award-winning-short-story/][won awards.]] 
+
+I'm pretty sure my small amounts of writing success can be attributed to my Emacs config. 
+
 ** Auto-fill & Word Wrap
 
 By default, Emacs doesn't automatically wrap words onto the next line. (I know! What decade are we in?)
@@ -1477,6 +1482,61 @@ Or inside org-mode Properties blocks:
 #+end_src
 
 
+
+** Narrow-to-region
+
+When I'm writing or working, I find it useful to be able to focus on a narrow region of text. The =narrow-to-region= command, when invoked on a selected region of text, will hide everything else in the buffer except for that text. 
+
+It's as if you're editing a file containing *only* that information --- you can't see anything else, can't scroll beyond it, etc. In addition, most editing commands will only apply to the narrowed region of the buffer. 
+
+It's pretty damn handy. It's also disbled by default, so let's turn it on.
+
+#+name: writing-narrow
+#+BEGIN_SRC emacs-lisp
+;;;; Remove some guard rails
+(put 'narrow-to-region 'disabled nil)
+#+END_SRC
+** Upcase / downcase
+
+Upcase-region and downcase-region are disabled by default. Let's turn them on. 
+
+#+name: writing-upcase
+#+BEGIN_SRC emacs-lisp
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+#+END_SRC
+
+** Marked.app integration
+
+When I'm writing in Markdown, I'll want to preview what I'm writing in Brett Terpstra's good-ol' Marked.app. 
+
+I stole this from https://github.com/mattsears/emacs:
+
+#+name: writing-marked-app
+#+BEGIN_SRC emacs-lisp
+;; open Marked and show me what we got
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked.app %s"
+           (shell-quote-argument (buffer-file-name)))))
+(global-set-key "\C-cm" 'markdown-preview-file)
+
+#+END_SRC
+
+I've also added a [[https://github.com/jstautz/writing-tools/blob/master/manuscript.css][css file to Marked.app]] in order to format my Markdown to look more like a standard "manuscript format."
+
+** Fiction templates
+
+I do most of my writing in Emacs org-mode, and I've created [[https://raw.githubusercontent.com/jstautz/writing-tools/master/fiction_template.org][a specific org-mode template for writing short fiction]].
+
+It contains LaTeX headers and front-matter that will produce a correctly-formatted manuscript suitable for submission, complete with appropriate headers, double spacing, page numbers, etc.
+
+It's also got a separate subtree marked as =:noexport:= for holding all my notes about the story and characters, links to research, and raw journal entries -- none of which are included when exporting the manuscript.
+
+Note that this template relies on some non-standard LaTeX packages that I've got [[https://github.com/jstautz/writing-tools][squirrelled away in this repo]] so they're easy for me to find again in the event that my LaTeX environment gets wiped.
 
 * Org-mode
 :PROPERTIES:
