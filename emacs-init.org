@@ -354,22 +354,9 @@ When I do so, I'd like customize to save things in a separate =emacs-custom= fil
 
 #+END_SRC
 
-** Set garbage collection threshold higher
-
-Props to Le Wang for this one.
-
-[[https://github.com/lewang/flx][According to his documentation in flx]], Emacs will start GC every 0.76MB allocated, which is way too often on modern machines. We want to boost that to 20MB:
-
-#+name: setup-gc-settings
-#+BEGIN_SRC emacs-lisp
-;; build a giant garbage compactor
-(setq gc-cons-threshold 20000000)
-
-#+END_SRC
-
 ** Decrypt secrets.el.gpg
 
-Passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
+My passwords, private URLs, and personal info are encrypted and stored in the secrets.el.gpg file. Emacs decrypts this using the keys in my .gnupg keyring.
 
 I do this *before* I begin loading packages, so that package configs can access variables stored in the secrets file.
 
@@ -1284,6 +1271,19 @@ Note that this depends on having terminal-notifier installed. If you use homebre
                  "-activate" "org.gnu.Emacs"))
 
 #+END_SRC
+** Set garbage collection threshold higher
+
+Props to Le Wang for this one.
+
+[[https://github.com/lewang/flx][According to his documentation in flx]], Emacs will start GC every 0.76MB allocated, which is way too often on modern machines. We want to boost that to 20MB:
+
+#+name: setup-gc-settings
+#+BEGIN_SRC emacs-lisp
+;; build a giant garbage compactor
+(setq gc-cons-threshold 20000000)
+
+#+END_SRC
+
 
 ** Load separate settings file -- need to break this down
 #+name: custom-settings
