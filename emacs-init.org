@@ -618,6 +618,17 @@ I don't use many customized setup options for magit yet. I may in the future.
 
 #+END_SRC
 
+** Markdown
+
+Most of the time, I'm writing things (fiction or non-fiction) in org-mode. The rare times when I'm not, I'm using straight-up Markdown.
+
+#+name: writing-markdown
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+           :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")
+
+#+END_SRC
+
 * General Editor Settings
 ** Interface tweaks
 
