@@ -1261,6 +1261,19 @@ This function encapsulates this inside an easier-to-remember function name. If I
     (goto-char (+ (point) column))))
 
 #+END_SRC
+*** Hide auto-revert-mode
+
+I like having auto-revert-mode on in certain files that I know are going to change a lot from processes outside Emacs.
+
+I don't want to see =auto-revert= in the modeline.
+
+#+name: diminish-auto-revert
+#+BEGIN_SRC emacs-lisp
+;; Hide your shame
+(diminish 'auto-revert-mode)
+#+END_SRC
+
+
 ** Alerts and Notifications
 
 I use [[https://github.com/julienXX/terminal-notifier][terminal-notifier]] to send alerts to the OS X Notification Center from other applications. I adapted [[https://gist.github.com/justinhj/eb2d354d06631076566f#file-gistfile1-el][this gist from justinhj]] to send events from emacs to the Notification Center.
@@ -1296,13 +1309,6 @@ Props to Le Wang for this one.
 #+END_SRC
 
 
-** Load separate settings file -- need to break this down
-#+name: custom-settings
-#+BEGIN_SRC emacs-lisp
-;; Set up interface and editor options the way I like 'em:
-(load-file (concat dotemacs-dir "lisp/settings.el"))
-
-#+END_SRC
 * Writing Fiction
 
 I spend a bunch of my time in Emacs writing fiction. Some of it has [[https://web.archive.org/web/20120502210836/http://prismmagazine.ca/2011/10/10/jeff-stautz-on-asymptote-his-national-magazine-award-winning-short-story/][won awards.]] 
@@ -1548,6 +1554,139 @@ It contains LaTeX headers and front-matter that will produce a correctly-formatt
 It's also got a separate subtree marked as =:noexport:= for holding all my notes about the story and characters, links to research, and raw journal entries -- none of which are included when exporting the manuscript.
 
 Note that this template relies on some non-standard LaTeX packages that I've got [[https://github.com/jstautz/writing-tools][squirrelled away in this repo]] so they're easy for me to find again in the event that my LaTeX environment gets wiped.
+* Writing Code
+** Return + indent
+
+I like it when my return key preserves indentation:
+
+#+name: coding-return-indent
+#+BEGIN_SRC emacs-lisp
+;; do the right thing
+(global-set-key (kbd "RET") 'newline-and-indent)
+
+#+END_SRC
+** Tags
+
+A smarter find-tag that automagically reruns etags when it can't find a requested item and then makes a new try to locate it.
+
+I stole this from Jonas.Jarnestrom<at>ki.ericsson.se.
+
+#+name: coding-reload-tags
+#+BEGIN_SRC emacs-lisp
+;; refresh and find tags
+(defadvice find-tag (around refresh-etags activate)
+  "Rerun etags and reload tags if tag not found and redo find-tag.
+   If buffer is modified, ask about save before running etags."
+  (let ((extension (file-name-extension (buffer-file-name))))
+    (condition-case err
+        ad-do-it
+      (error (and (buffer-modified-p)
+                  (not (ding))
+                  (y-or-n-p "Buffer is modified, save it? ")
+                  (save-buffer))
+             (er-refresh-etags extension)
+             ad-do-it))))
+
+(defun er-refresh-etags (&optional extension)
+  "Run etags on all peer files in current dir and reload them silently."
+  (interactive)
+  (shell-command (format "etags *.%s" (or extension "el")))
+  (let ((tags-revert-without-query t))  ; don't query, revert silently
+    (visit-tags-table default-directory nil)))
+
+#+END_SRC
+
+...And if my etags file gets rebuilt at any point, don't pester me about it, just use the updated file:
+
+#+name: coding-rebuild-tags
+#+BEGIN_SRC emacs-lisp
+(setq tags-revert-without-query t)
+
+#+END_SRC
+
+When navigating via tags and I pop back to my original location, I want to make sure the cursor is centered on the screen and easy to spot. I do this by modifying the =pop-tag-mark= function like this:
+
+#+name: coding-pop-tag
+#+BEGIN_SRC emacs-lisp
+;; let me jump back, please
+(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+  "After popping back to where find-tag was invoked,
+   center screen on cursor"
+  (let ((current-prefix-arg '(4)))
+  (call-interactively 'recenter-top-bottom)))
+
+#+END_SRC
+
+** Emacs Lisp
+*** Bind ESC to top-level command
+
+I hate having to repeatedly hit escape to bounce out of recursive edits when I drop into the debugger.
+
+#+name: coding-escape-top-level
+#+BEGIN_SRC emacs-lisp
+;; Escape is my eject button
+(global-set-key (kbd "<C-escape>") 'top-level)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(add-hook 'org-mode-hook
+          (lambda()
+            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+
+#+END_SRC
+
+*** eval and replace
+
+When I'm working with elisp, it's sometimes useful to quickly evaluate an s-expression and immediately replace it with the result.
+
+#+name: coding-eval-replace
+#+BEGIN_SRC emacs-lisp
+;; presto change-o
+(defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (prin1 (eval (read (current-kill 0)))
+           (current-buffer)))
+  (global-set-key (kbd "C-c e") 'eval-and-replace)
+
+#+END_SRC
+
+*** auto-recompile elisp
+
+If I'm working on an elisp file that has a corresponding compiled version (*.elc), I want to re-compile whenever I save the buffer.
+
+#+name: coding-auto-recompile
+#+BEGIN_SRC emacs-lisp
+;; auto-recompile on save
+(defun byte-compile-current-buffer ()
+  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+  (interactive)
+  (when (and (eq major-mode 'emacs-lisp-mode)
+             (file-exists-p (byte-compile-dest-file buffer-file-name)))
+    (byte-compile-file buffer-file-name)))
+(add-hook 'after-save-hook 'byte-compile-current-buffer)
+
+#+END_SRC
+
+
+** Tramp
+
+#+name: coding-tramp
+#+BEGIN_SRC emacs-lisp
+;; obvious default is obvious
+(setq tramp-default-method "ssh")
+
+#+END_SRC
+
+** Diff
+
+Add some flags to the default diff command so it works with .org files and others.
+
+#+name: coding-diff
+#+BEGIN_SRC emacs-lisp
+(setq diff-switches "-a -c")
+
+#+END_SRC
+
 
 * Org-mode
 :PROPERTIES:
