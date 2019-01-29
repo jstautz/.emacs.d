@@ -34,9 +34,6 @@
 ;; Arr, here be my custom file
 (setq custom-file (concat lisp-dir "custom.el"))
 
-;; build a giant garbage compactor
-(setq gc-cons-threshold 20000000)
-
 (defun jcs:decrypt-secrets ()
   (interactive)
   (require 'secrets))
@@ -118,6 +115,9 @@
 ;; git on up
 (use-package magit)
 (setq magit-push-always-verify nil)
+
+(use-package markdown-mode
+           :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")
 
 ;; Get rid of all that chrome and fuss
 (tool-bar-mode -1)
@@ -366,6 +366,9 @@ of windows in the frame simply by calling this command again."
     (goto-line line)
     (goto-char (+ (point) column))))
 
+;; Hide your shame
+(diminish 'auto-revert-mode)
+
 ;; terminal-notifier-notify is my messenger god
 (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
 
@@ -378,8 +381,8 @@ of windows in the frame simply by calling this command again."
                  "-message" message
                  "-activate" "org.gnu.Emacs"))
 
-;; Set up interface and editor options the way I like 'em:
-(load-file (concat dotemacs-dir "lisp/settings.el"))
+;; build a giant garbage compactor
+(setq gc-cons-threshold 20000000)
 
 ;; just my size
 (setq fill-column 120)
@@ -438,4 +441,83 @@ of windows in the frame simply by calling this command again."
 
 (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
 
+;;;; Remove some guard rails
+(put 'narrow-to-region 'disabled nil)
+
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+;; open Marked and show me what we got
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked.app %s"
+           (shell-quote-argument (buffer-file-name)))))
+(global-set-key "\C-cm" 'markdown-preview-file)
+
+;; do the right thing
+(global-set-key (kbd "RET") 'newline-and-indent)
+
+;; refresh and find tags
+(defadvice find-tag (around refresh-etags activate)
+  "Rerun etags and reload tags if tag not found and redo find-tag.
+   If buffer is modified, ask about save before running etags."
+  (let ((extension (file-name-extension (buffer-file-name))))
+    (condition-case err
+        ad-do-it
+      (error (and (buffer-modified-p)
+                  (not (ding))
+                  (y-or-n-p "Buffer is modified, save it? ")
+                  (save-buffer))
+             (er-refresh-etags extension)
+             ad-do-it))))
+
+(defun er-refresh-etags (&optional extension)
+  "Run etags on all peer files in current dir and reload them silently."
+  (interactive)
+  (shell-command (format "etags *.%s" (or extension "el")))
+  (let ((tags-revert-without-query t))  ; don't query, revert silently
+    (visit-tags-table default-directory nil)))
+
+(setq tags-revert-without-query t)
+
+;; let me jump back, please
+(defadvice pop-tag-mark (after my-pop-tag-mark-advice activate)
+  "After popping back to where find-tag was invoked,
+   center screen on cursor"
+  (let ((current-prefix-arg '(4)))
+  (call-interactively 'recenter-top-bottom)))
+
+;; Escape is my eject button
+(global-set-key (kbd "<C-escape>") 'top-level)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(add-hook 'org-mode-hook
+          (lambda()
+            (define-key org-mode-map (kbd "<escape>") 'keyboard-escape-quit)))
+
+;; presto change-o
+(defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (prin1 (eval (read (current-kill 0)))
+           (current-buffer)))
+  (global-set-key (kbd "C-c e") 'eval-and-replace)
+
+;; auto-recompile on save
+(defun byte-compile-current-buffer ()
+  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+  (interactive)
+  (when (and (eq major-mode 'emacs-lisp-mode)
+             (file-exists-p (byte-compile-dest-file buffer-file-name)))
+    (byte-compile-file buffer-file-name)))
+(add-hook 'after-save-hook 'byte-compile-current-buffer)
+
+;; obvious default is obvious
+(setq tramp-default-method "ssh")
+
+(setq diff-switches "-a -c")
+
 (load-file "~/.emacs.d/lisp/init-org-mode.el")
+;;(org-babel-load-file (expand-file-name "org-mode-init.org" (file-name-directory (or load-file-name (buffer-file-name)))) t)

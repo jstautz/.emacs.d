@@ -823,7 +823,24 @@ Skips capture tasks."
  '((ditaa . t)))
 (setq org-ditaa-jar-path (concat home-dir "bin/ditaa.jar"))
 
+;;-----------------------------------------------------------------------------
+;; Reformat org-mode list for pasting into a Word or Google doc
+;;-----------------------------------------------------------------------------
+
+;; an ugly brute-force function for pasting org lists into GDocs, need to refactor
+(defun jcs:format-bullets (start end)
+  "Reformat org-mode bulleted list in region, removing bullets and preserving indentation so that it can be pasted into a Google or MS Word doc"
+  (interactive "r")
+  (replace-regexp "^- " "" nil start end)
+  (replace-regexp "^  - " "	" nil start end)
+  (replace-regexp "^    - "	"		" nil start end)
+  (replace-regexp "^      - " "			" nil start end)
+  (replace-regexp "^        - "	"				" nil start end)
+  (replace-regexp "^          - " "					" nil start end)
+  (replace-regexp "^            - "	"						" nil start end))
 
 (provide 'init-org-mode)
 
 (diminish 'org-indent-mode)
+
+

@@ -1698,5 +1698,5 @@ Add some flags to the default diff command so it works with .org files and other
 #+name: hacks-org-setup
 #+BEGIN_SRC emacs-lisp
 (load-file "~/.emacs.d/lisp/init-org-mode.el")
-
+;;(org-babel-load-file (expand-file-name "org-mode-init.org" (file-name-directory (or load-file-name (buffer-file-name)))) t)
 #+END_SRC
