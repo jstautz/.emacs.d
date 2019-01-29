@@ -465,7 +465,8 @@ The first things we want to do are to enable flex matching, turn ido on everywhe
       completion-ignore-case t           
       read-file-name-completion-ignore-case t
       ido-max-prospects 20
-      ido-use-faces t)
+      ido-use-faces t
+      ido-case-fold t)
 #+END_SRC
 
 Next, I want to turn off some of the tramp-related and ftp-related options --- these caused stalls for me in the past.
