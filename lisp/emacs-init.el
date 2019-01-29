@@ -518,6 +518,3 @@ of windows in the frame simply by calling this command again."
 (setq tramp-default-method "ssh")
 
 (setq diff-switches "-a -c")
-
-(load-file "~/.emacs.d/lisp/init-org-mode.el")
-;;(org-babel-load-file (expand-file-name "org-mode-init.org" (file-name-directory (or load-file-name (buffer-file-name)))) t)

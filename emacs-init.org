@@ -107,17 +107,23 @@ It looks like this:
        (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/emacs-init.org")))
       (load-file (expand-file-name "lisp/emacs-init.elc" dotemacs-dir))
   (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir) t))
+
+;; Do the same with my org-mode config -- tangle and load.
+(if (> (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/lisp/org-mode-init.el"))
+       (string-to-int (shell-command-to-string "stat -f \"%m\" ~/.emacs.d/org-mode-init.org")))
+    (load-file (expand-file-name "lisp/org-mode-init.elc" (file-name-directory (or load-file-name (buffer-file-name)))))
+  (org-babel-load-file (expand-file-name "org-mode-init.org" (file-name-directory (or load-file-name (buffer-file-name)))) t))
 #+END_EXAMPLE
 
-That's it.
-
-The important part is that last s-expression: 
+The important part is the s-expressions: 
 
 #+BEGIN_EXAMPLE emacs-lisp
 (org-babel-load-file (expand-file-name "emacs-init.org" dotemacs-dir) t)
 #+END_EXAMPLE
 
 This line calls org-babel to extract ("tangle") the code blocks from the =emacs-init.org= file into a file called =emacs-init.el=, then compile it. It then tells Emacs to load all the configurations in that compiled .elc file.
+
+Then we do the same to my org-mode-specific config file.
 
 [[http://orgmode.org/worg/org-contrib/babel/][Org-babel is Merlin-level wizardry.]] Eric Schulte, Dan Davison, and everyone who's worked on it all deserve medals. 
 
@@ -1693,10 +1699,5 @@ Add some flags to the default diff command so it works with .org files and other
 :noweb-ref: Set up org-mode
 :END:
 
-** Load org-mode setup (still need to get this into separate org doc)
+** (Org-mode loaded separately)
 
-#+name: hacks-org-setup
-#+BEGIN_SRC emacs-lisp
-(load-file "~/.emacs.d/lisp/init-org-mode.el")
-;;(org-babel-load-file (expand-file-name "org-mode-init.org" (file-name-directory (or load-file-name (buffer-file-name)))) t)
-#+END_SRC
