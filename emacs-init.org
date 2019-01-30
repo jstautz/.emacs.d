@@ -848,7 +848,7 @@ Copy and paste should use the OS clipboard.
 
 #+name: mac-settings-clipboard
 #+BEGIN_SRC emacs-lisp
-(setq x-select-enable-clipboard t)
+(setq select-enable-clipboard t)
 
 #+END_SRC
 
@@ -1162,7 +1162,7 @@ Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the
 ;; dired needs a ceiling and a floor
 (defun dired-back-to-top ()
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (dired-next-line 4))
 
 (eval-after-load 'dired
@@ -1171,7 +1171,7 @@ Thanks to Magnar Sveen for this one. This snippet makes =C-<= and =C->= send the
 
 (defun dired-jump-to-bottom ()
   (interactive)
-  (end-of-buffer)
+  (goto-char (point-max))
   (dired-next-line -1))
 
 (eval-after-load 'dired
@@ -1342,7 +1342,6 @@ I typically run Emacs.app in full screen, and a 120-character fill-column feels 
 #+BEGIN_SRC emacs-lisp
 ;; just my size
 (setq fill-column 120)
-(setq default-fill-column 120)
 
 #+END_SRC
 
