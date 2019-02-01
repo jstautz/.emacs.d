@@ -191,8 +191,8 @@
 (setq scroll-margin 0)
 
 (setq scroll-up-aggressively nil
-  scroll-down-aggressively nil
-  scroll-preserve-screen-position t)
+      scroll-down-aggressively nil
+      scroll-preserve-screen-position t)
 
 ;; Respect the power of my mouse wheel, margins!
 (global-set-key (kbd "<left-margin><wheel-down>") 'mwheel-scroll)
@@ -387,6 +387,7 @@ of windows in the frame simply by calling this command again."
 
 ;; just my size
 (setq fill-column 120)
+(setq default-fill-column 120)
 
 ;; float my text in the middle, all pretty-like
 (load-file "~/.emacs.d/lisp/wrap-to-fill.el")

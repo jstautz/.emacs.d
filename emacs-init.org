@@ -1342,6 +1342,7 @@ I typically run Emacs.app in full screen, and a 120-character fill-column feels 
 #+BEGIN_SRC emacs-lisp
 ;; just my size
 (setq fill-column 120)
+(setq default-fill-column 120)
 
 #+END_SRC
 
