@@ -519,3 +519,5 @@ of windows in the frame simply by calling this command again."
 (setq tramp-default-method "ssh")
 
 (setq diff-switches "-a -c")
+
+(org-babel-load-file (concat user-emacs-directory "org-mode-init.org"))
