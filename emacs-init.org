@@ -702,7 +702,9 @@ Good thing I rarely quit Emacs.
 #+END_SRC
 *** Themes
 
-I want to trust all themes --- mostly so the mode-line setup below doesn't spit warnings at me on startup.
+I don't currently use themes.
+
+In the past, however, I used them... and the warnings got annoying. I like setting the default to trust all themes.
 
 #+name: UI-trust-themes
 #+BEGIN_SRC emacs-lisp
@@ -895,8 +897,8 @@ This just makes sense: When I page up or down with =M-v= or =C-v= I shouldn't ha
 #+name: UI-scroll-agg
 #+BEGIN_SRC emacs-lisp
   (setq scroll-up-aggressively nil
-	scroll-down-aggressively nil
-	scroll-preserve-screen-position t)
+        scroll-down-aggressively nil
+        scroll-preserve-screen-position t)
 
 #+END_SRC
 
@@ -1297,7 +1299,7 @@ Props to Le Wang for this one.
 
 I spend a bunch of my time in Emacs writing fiction. Some of it has [[https://web.archive.org/web/20120502210836/http://prismmagazine.ca/2011/10/10/jeff-stautz-on-asymptote-his-national-magazine-award-winning-short-story/][won awards.]] 
 
-I'm pretty sure my small amounts of writing success can be attributed to my Emacs config. 
+I'm pretty sure my *small* amounts of writing success can be 100% attributed to my Emacs config. 
 
 ** Auto-fill & Word Wrap
 
