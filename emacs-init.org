@@ -91,7 +91,7 @@ Before we get too deep into my settings, I should explain a little about how all
 :CUSTOM_ID: init.el
 :END:
 
-My init.el file is only a half-dozen lines of elisp. Its only real job is to bootstrap the rest of my config by loading it via org-babel.
+My init.el file contains only two lines of elisp. Its only real job is to bootstrap the rest of my config by loading it via org-babel.
 
 It looks like this:
 
@@ -355,7 +355,7 @@ I do this *before* I begin loading packages, so that package configs can access 
 * Install and configure packages
 
 #+begin_quote
-Brown paper packages tied up with strings
+Brown paper packages tied up with strings / 
 These are a few of my favorite things
 
 --- Austrian Mary Poppins
