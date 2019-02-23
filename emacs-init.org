@@ -1450,8 +1450,13 @@ Of course, highlighting the words isn't enough. I'd like a quick way to fix them
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "flyspell"
   '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
-(eval-after-load "minor-mode"
-  '(define-key flyspell-mode-map (kbd "C-c $") nil))
+#+END_SRC
+
+Also, the default keybinding to start an ispell session from within flyspell is =C-c $=, which conflicts with org-mode's =org-archive-subtree= default keybinding. So... let's fix that, shall we?
+
+#+name: ispell-fix-org-conflict
+#+BEGIN_SRC emacs-lisp
+(define-key flyspell-mode-map (kbd "C-c $") nil)
 
 #+END_SRC
 
@@ -1461,7 +1466,7 @@ Never spell check inside org-mode source blocks:
 
 #+name: ispell-skip-src
 #+begin_src emacs-lisp
-;; rocks ispell just shouldn't look under:
+;; there are rocks ispell just shouldn't look under:
 (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src ". "#\\+end_src$"))
 (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC ". "#\\+END_SRC$"))
 #+end_src
@@ -1481,8 +1486,6 @@ Or inside org-mode Properties blocks:
 (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
 
 #+end_src
-
-
 
 ** Narrow-to-region
 

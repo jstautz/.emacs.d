@@ -430,10 +430,10 @@ of windows in the frame simply by calling this command again."
 
 (eval-after-load "flyspell"
   '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
-(eval-after-load "minor-mode"
-  '(define-key flyspell-mode-map (kbd "C-c $") nil))
 
-;; rocks ispell just shouldn't look under:
+(define-key flyspell-mode-map (kbd "C-c $") nil)
+
+;; there are rocks ispell just shouldn't look under:
 (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src ". "#\\+end_src$"))
 (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC ". "#\\+END_SRC$"))
 
