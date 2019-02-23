@@ -1331,12 +1331,12 @@ However... it's still kind of a pain in the ass.
 
 Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the *full width of the frame.* I usually have my frame full-screen and like working in a narrower band within this frame, my text surrounded by whitespace.
 
-I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- I've pulled it out in my .emacs.d directory). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
+I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- [[https://github.com/jstautz/.emacs.d/blob/master/lisp/wrap-to-fill.el][I've pulled it out into my .emacs.d directory]]). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
 
 #+name: wrap-fill-options
 #+BEGIN_SRC emacs-lisp
 ;; float my text in the middle, all pretty-like
-(load-file "~/.emacs.d/lisp/wrap-to-fill.el")
+(load-file (concat lisp-dir "wrap-to-fill.el")
 (visual-line-mode 1)
 (wrap-to-fill-column-mode 1)
 (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
