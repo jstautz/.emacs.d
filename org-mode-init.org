@@ -12,10 +12,49 @@
 #+TOC: headlines 2
 
 * Introduction
-
+** What this is
+** What's org-mode?
+** Special thanks
 Inspired by http://doc.norang.ca/org-mode.html
 
-* 
+* Principles
+** GTD Basics
+** OKRs and Goals
+** Habits
+** Focus (Kanban)
+** Reviews
+* File structure and style
+** File structure explanation
+** Style settings
+* Tasks and states
+** Task basics
+** Settings for task states
+** Kanban queues and WIP limits
+** State transitions
+* My org-mode files
+** ~/org directory
+** File types to handle
+** Work / Personal / Inbox
+
+* Capturing
+** Capture methods
+** Mobile Org
+** Refiling + ido completions
+
+* Note taking and planning
+** Key bindings
+** editing preferences
+
+* Tags
+** Basic tag settings
+** Quick tag selection
+** Effort and Energy level
+** Priority
+
+* Agenda
+** Basic Settings
+** Advanced settings
+** Calendar integrations and reminders
 
 * Raw elisp WIP, to be extracted into org file
 

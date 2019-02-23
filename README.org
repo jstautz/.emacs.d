@@ -10,7 +10,7 @@ My init.el uses org-babel to extract these code blocks from my .org documentatio
 
 Read [[https://github.com/jstautz/.emacs.d/blob/master/emacs-init.org][my base configuration here]].
 
-I use org-mode a hell of a lot, and my org setup is a little convoluted. I've pulled the configuration for it into a separate file here.
+I use org-mode a hell of a lot, and my org setup is a little convoluted. I've pulled the configuration for it into [[https://github.com/jstautz/.emacs.d/blob/master/org-mode-init.org][a separate file here]].
 
 ** Disclaimers
 
