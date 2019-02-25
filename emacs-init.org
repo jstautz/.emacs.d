@@ -828,7 +828,6 @@ Copy and paste should use the OS clipboard.
 #+name: mac-settings-clipboard
 #+BEGIN_SRC emacs-lisp
 (setq select-enable-clipboard t)
-
 #+END_SRC
 
 *** Mouse settings for OS X
@@ -1338,7 +1337,7 @@ I've since discovered wrap-to-fill-column-mode (was previously packaged with nxh
 #+name: wrap-fill-options
 #+BEGIN_SRC emacs-lisp
 ;; float my text in the middle, all pretty-like
-(load-file (concat lisp-dir "wrap-to-fill.el")
+(load-file (concat lisp-dir "wrap-to-fill.el"))
 (visual-line-mode 1)
 (wrap-to-fill-column-mode 1)
 (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))

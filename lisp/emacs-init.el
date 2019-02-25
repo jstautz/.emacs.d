@@ -390,7 +390,7 @@ of windows in the frame simply by calling this command again."
 (setq default-fill-column 120)
 
 ;; float my text in the middle, all pretty-like
-(load-file (concat lisp-dir "wrap-to-fill.el")
+(load-file (concat lisp-dir "wrap-to-fill.el"))
 (visual-line-mode 1)
 (wrap-to-fill-column-mode 1)
 (add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
