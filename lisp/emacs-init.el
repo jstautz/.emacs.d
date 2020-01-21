@@ -457,6 +457,9 @@ of windows in the frame simply by calling this command again."
            (shell-quote-argument (buffer-file-name)))))
 (global-set-key "\C-cm" 'markdown-preview-file)
 
+;; Let me scroll my PDFs forever
+(setq doc-view-continuous t)
+
 ;; do the right thing
 (global-set-key (kbd "RET") 'newline-and-indent)
 

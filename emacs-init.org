@@ -1542,6 +1542,26 @@ It contains LaTeX headers and front-matter that will produce a correctly-formatt
 It's also got a separate subtree marked as =:noexport:= for holding all my notes about the story and characters, links to research, and raw journal entries -- none of which are included when exporting the manuscript.
 
 Note that this template relies on some non-standard LaTeX packages that I've got [[https://github.com/jstautz/writing-tools][squirrelled away in this repo]] so they're easy for me to find again in the event that my LaTeX environment gets wiped.
+
+** Emacs DocView settings
+
+As I'm writing in org-mode, I'll often want to open another window in emacs that contains either:
+
+- The final PDF file of my manuscript
+- A PDF of handwritten notes about the story
+
+DocView's a useful tool for doing this. I can work on my story, export it, and see the changes in my PDF at the same time.
+
+One thing that annoys me about DocView is that as I'm paging through my document using =space= and =delete= to move up and down, sometimes I'll lose the ability to move onto the next page of the PDF. I'll get stuck on one page.
+
+I'm still trying to debug this, but I'm hoping the setting below fixes it:
+
+#+name: writing-doc-view
+#+BEGIN_SRC emacs-lisp
+;; Let me scroll my PDFs forever
+(setq doc-view-continuous t)
+
+#+END_SRC
 * Writing Code
 ** Return + indent
 
