@@ -518,6 +518,15 @@ of windows in the frame simply by calling this command again."
     (byte-compile-file buffer-file-name)))
 (add-hook 'after-save-hook 'byte-compile-current-buffer)
 
+;; Web-mode
+(use-package web-mode)
+
+;; PHP
+(use-package php-mode)
+
+;; Restclient
+(use-package restclient)
+
 ;; obvious default is obvious
 (setq tramp-default-method "ssh")
 

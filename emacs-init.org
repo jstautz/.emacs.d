@@ -1674,6 +1674,30 @@ If I'm working on an elisp file that has a corresponding compiled version (*.elc
 (add-hook 'after-save-hook 'byte-compile-current-buffer)
 
 #+END_SRC
+** Web Development
+
+#+name: coding-web-mode
+#+BEGIN_SRC emacs-lisp
+;; Web-mode
+(use-package web-mode)
+
+#+END_SRC
+
+
+#+name: coding-php
+#+BEGIN_SRC emacs-lisp
+;; PHP
+(use-package php-mode)
+
+#+END_SRC
+
+#+name: coding-php
+#+BEGIN_SRC emacs-lisp
+;; Restclient
+(use-package restclient)
+
+#+END_SRC
+
 
 
 ** Tramp
