@@ -95,7 +95,8 @@
   ;;-----------------------------------------------------------------------------
   (setq org-agenda-files '("~/org/inbox.org"
                            "~/org/personal.org"
-                           "~/org/work.org"))
+                           "~/org/work.org"
+                           "~/org/goals.org"))
 
   ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
   ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
@@ -243,6 +244,13 @@
                               '(todo-state-down priority-down effort-up category-keep))))
                  ))
                ("r" "@errands" tags-todo "@errands")
+               ("g" "goals"
+                ((tags "goal_week"
+                       ((org-agenda-overriding-header "This week's goals")))
+                 (tags "goal_month"
+                       ((org-agenda-overriding-header "This month's goals")))
+                 (tags "goal_year"
+                       ((org-agenda-overriding-header "This year's goals")))))
                ("w" "@work + agenda"
                 ((agenda "")
                  (tags-todo "@work-REFILE/!STARTED" 
@@ -436,7 +444,7 @@
     ;; jcs:getcals --- Sync my Google Calendars to emacs diary
     ;;-----------------------------------------------------------------------------
     (require 'icalendar)
-  
+
     (defun getcal (url)
       "Download ics file and add to diary"
       (let ((tmpfile (url-file-local-copy url)))
@@ -444,7 +452,7 @@
         (kill-buffer (car (last (split-string tmpfile "/"))))
         )
       )
-  
+
     ;; Grab google calendars from secrets.el.gpg
     (defun jcs:getcals ()
       (interactive)
@@ -454,8 +462,8 @@
         (flush-lines "^[& ]")
         (dolist (url google-calendars) (getcal url))
         (kill-buffer "calendar.diary"))
-  
-  
+
+
     ;;-----------------------------------------------------------------------------
     ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
     ;; projects.org (OR create a new item and clock into it)
@@ -485,7 +493,7 @@
             (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
             (goto-char (point-max))
             (org-clock-in)))))
-  
+
     (defun jcs:clock-out (&optional theString theCategory)
       (org-clock-out))
 
