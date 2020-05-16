@@ -612,7 +612,15 @@ Most of the time, I'm writing things (fiction or non-fiction) in org-mode. The r
            :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")
 
 #+END_SRC
+** htmlize
 
+Not sure if I'll really keep this around, but htmlize is used by org-mode to export an emacs buffer as HTML. It's probably useful in other contexts as well. 
+
+#+name: packages-htmlize
+#+BEGIN_SRC emacs-lisp
+(use-package htmlize)
+
+#+END_SRC
 * General Editor Settings
 ** Interface tweaks
 
@@ -1562,6 +1570,7 @@ I'm still trying to debug this, but I'm hoping the setting below fixes it:
 (setq doc-view-continuous t)
 
 #+END_SRC
+
 * Writing Code
 ** Return + indent
 
