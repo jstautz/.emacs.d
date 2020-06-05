@@ -511,7 +511,7 @@ Inspired by http://doc.norang.ca/org-mode.html
       ;; jcs:getcals --- Sync my Google Calendars to emacs diary
       ;;-----------------------------------------------------------------------------
       (require 'icalendar)
-  
+
       (defun getcal (url)
         "Download ics file and add to diary"
         (let ((tmpfile (url-file-local-copy url)))
@@ -519,7 +519,7 @@ Inspired by http://doc.norang.ca/org-mode.html
           (kill-buffer (car (last (split-string tmpfile "/"))))
           )
         )
-  
+
       ;; Grab google calendars from secrets.el.gpg
       (defun jcs:getcals ()
         (interactive)
@@ -529,8 +529,8 @@ Inspired by http://doc.norang.ca/org-mode.html
           (flush-lines "^[& ]")
           (dolist (url google-calendars) (getcal url))
           (kill-buffer "calendar.diary"))
-  
-  
+
+
       ;;-----------------------------------------------------------------------------
       ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
       ;; projects.org (OR create a new item and clock into it)
@@ -560,7 +560,7 @@ Inspired by http://doc.norang.ca/org-mode.html
               (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
               (goto-char (point-max))
               (org-clock-in)))))
-  
+
       (defun jcs:clock-out (&optional theString theCategory)
         (org-clock-out))
 
@@ -834,6 +834,21 @@ Inspired by http://doc.norang.ca/org-mode.html
 
     (setq org-src-fontify-natively t)
 
+    ;;-----------------------------------------------------------------------------
+    ;; Org-pomodoro setup
+    ;;-----------------------------------------------------------------------------
+
+    (setq org-pomodoorg-pomodoro-manual-break t
+          org-pomodoro-finished-sound "/Users/jeff.stautz/.emacs.d/resources/alarm_clock.aif"
+          org-pomodoro-overtime-sound org-pomodoro-finished-sound
+          org-pomodoro-short-break-sound org-pomodoro-finished-sound
+          org-pomodoro-long-break-sound org-pomodoro-finished-sound
+          org-pomodoro-ticking-sound-p t
+          org-pomodoro-ticking-sound "/Users/jeff.stautz/.emacs.d/resources/ticks.aif"
+          org-pomodoro-ticking-sound-states '(:pomodoro)
+          org-pomodoro-ticking-frequency 120
+          org-pomodoro-short-break-length 5
+          org-pomodoro-length 25)
 
     ;;-----------------------------------------------------------------------------
     ;; Ditaa setup

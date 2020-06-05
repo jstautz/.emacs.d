@@ -767,6 +767,21 @@
 
   (setq org-src-fontify-natively t)
 
+  ;;-----------------------------------------------------------------------------
+  ;; Org-pomodoro setup
+  ;;-----------------------------------------------------------------------------
+
+  (setq org-pomodoorg-pomodoro-manual-break t
+        org-pomodoro-finished-sound "/Users/jeff.stautz/.emacs.d/resources/alarm_clock.aif"
+        org-pomodoro-overtime-sound org-pomodoro-finished-sound
+        org-pomodoro-short-break-sound org-pomodoro-finished-sound
+        org-pomodoro-long-break-sound org-pomodoro-finished-sound
+        org-pomodoro-ticking-sound-p t
+        org-pomodoro-ticking-sound "/Users/jeff.stautz/.emacs.d/resources/ticks.aif"
+        org-pomodoro-ticking-sound-states '(:pomodoro)
+        org-pomodoro-ticking-frequency 120
+        org-pomodoro-short-break-length 5
+        org-pomodoro-length 25)
 
   ;;-----------------------------------------------------------------------------
   ;; Ditaa setup
