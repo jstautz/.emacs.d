@@ -742,6 +742,8 @@
     (defun my-appt-disp-window (min-to-app new-time msg)
       (terminal-notifier-notify "Reminder" (format "%s" msg))))
 
+  ;; Also trying jweigley's alert package (dependency of org-pomodoro)
+  (setq alert-default-style 'notifier)
 
   ;;-----------------------------------------------------------------------------
   ;; org-mobile settings -- for export/sync to iOS app
@@ -771,7 +773,8 @@
   ;; Org-pomodoro setup
   ;;-----------------------------------------------------------------------------
 
-  (setq org-pomodoorg-pomodoro-manual-break t
+  (setq org-pomodoro-manual-break t
+        org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-finished-sound "/Users/jeff.stautz/.emacs.d/resources/alarm_clock.aif"
         org-pomodoro-overtime-sound org-pomodoro-finished-sound
         org-pomodoro-short-break-sound org-pomodoro-finished-sound
@@ -780,8 +783,46 @@
         org-pomodoro-ticking-sound "/Users/jeff.stautz/.emacs.d/resources/ticks.aif"
         org-pomodoro-ticking-sound-states '(:pomodoro)
         org-pomodoro-ticking-frequency 120
-        org-pomodoro-short-break-length 5
-        org-pomodoro-length 25)
+        org-pomodoro-short-break-length 6
+        org-pomodoro-length 24)
+
+  (defun jcs:org-pomodoro-variable-start (&optional arg)
+    "Start a pomodoro with a variable timer. Pomodoro will end after specified time, defaults to 25 minutes."
+    (interactive "MPomodoro duration (default 24): ")
+    (setq org-pomodoro-length 24)
+    (if (>= (string-to-number arg) 1)
+        (setq org-pomodoro-length (string-to-number arg)))
+    (org-pomodoro))
+
+  (defun jcs:raise-emacs ()
+    "Raise Emacs"
+    (ns-do-applescript "tell application \"Emacs\" to activate"))
+
+  (defun jcs:org-pomodoro-maybe-extend ()
+    "Query the user to extend the pomodoro with additional time, delaying the break."
+    (interactive)
+    (if (y-or-n-p "Extend current Pomodoro? ")
+        (progn
+          (setq org-pomodoro-length (string-to-number (read-string "Extend Pomodoro duration: ")))
+          (org-pomodoro-start)))
+    (org-pomodoro))
+
+  (defun jcs:org-pomodoro-breadcrumbs ()
+    (progn
+      (switch-to-buffer (get-buffer-create "*Pomodoro Notes*"))
+      (org-mode)
+      (goto-char (point-min))
+      (insert "* ")
+      (org-insert-time-stamp (current-time) t t)
+      (insert "\n\n\n----------Breadcrumbs----------\n\n<One sentence describing what I was just doing.>\n\nA list of pointers to things I need to remember when I get back:\n\n- <First thing I shouldn’t forget\n- Second thing I shouldn’t forget>\n\nYou do not have to make full sentences, just jotting down individual words that make sense to you is enough. They merely function as pointers back to your memory.\n\n----------Priming for Next Session----------\n\n<One sentence describing what you think you will be doing when you come back from your break.>\n\nNow visualize what doing this will entail:\n\n- Are there any decisions that you need to make before you can continue?\n- Are there any questions that need answering before you can continue?\n- Do you need any specific resources before you can continue?\n\n<One question that needs answering shortly after you come back from your break.>\n\n")))
+
+  (add-hook 'org-pomodoro-finished-hook 'jcs:org-pomodoro-breadcrumbs)
+
+  (add-hook 'org-pomodoro-overtime-hook 'jcs:org-pomodoro-maybe-extend)
+
+
+  (define-key global-map "\C-cp" 'jcs:org-pomodoro-variable-start)
+  (add-to-list 'org-speed-commands-user (cons "p" 'jcs:org-pomodoro-variable-start))
 
   ;;-----------------------------------------------------------------------------
   ;; Ditaa setup

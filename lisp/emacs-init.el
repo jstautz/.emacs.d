@@ -120,6 +120,8 @@
 (use-package markdown-mode
            :mode "\\.\\(md\\|mdown\\|markdown\\)\\'")
 
+(use-package htmlize)
+
 ;; Get rid of all that chrome and fuss
 (tool-bar-mode -1)
 
