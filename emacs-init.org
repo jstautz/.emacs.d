@@ -1627,6 +1627,24 @@ When navigating via tags and I pop back to my original location, I want to make 
   (call-interactively 'recenter-top-bottom)))
 
 #+END_SRC
+** TODO Code Navigation 
+ 
+TODO here: investigate and set up dumb-jump 
+
+- https://github.com/jacktasia/dumb-jump
+- (uses xref?) https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html
+- (install ag?) https://github.com/ggreer/the_silver_searcher#installing
+- (set up using use-package) https://github.com/jwiegley/use-package
+- https://kozikow.wordpress.com/2016/05/21/nice-new-emacs-package-dumb-jump-el/
+- https://www.reddit.com/r/emacs/comments/hzxvke/how_do_people_have_dumbjump_setup/
+- https://irreal.org/blog/?p=6218
+
+#+name: coding-dumb-jump
+#+BEGIN_SRC emacs-lisp
+ ;; (use-package dumb-jump
+ ;;   :init
+ ;;   (
+#+END_SRC
 
 ** Emacs Lisp
 *** Bind ESC to top-level command

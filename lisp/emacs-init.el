@@ -496,6 +496,10 @@ of windows in the frame simply by calling this command again."
   (let ((current-prefix-arg '(4)))
   (call-interactively 'recenter-top-bottom)))
 
+;; (use-package dumb-jump
+;;   :init
+;;   (
+
 ;; Escape is my eject button
 (global-set-key (kbd "<C-escape>") 'top-level)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
