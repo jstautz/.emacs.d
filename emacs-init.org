@@ -1005,6 +1005,11 @@ I use =M-o= to move between windows. The default =C-x o= keybinding is a bit clu
 (global-set-key (kbd "M-o") 'other-window)
 
 #+END_SRC
+*** TODO add section for moving between frames
+
+  M-` (other-frame 1)
+
+  M-~ (other-frame -1)
 
 *** Previous buffer when splitting window 
 
