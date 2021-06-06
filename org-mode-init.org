@@ -346,55 +346,17 @@ Inspired by http://doc.norang.ca/org-mode.html
                                (org-agenda-sorting-strategy
                                 '(todo-state-down priority-down effort-up category-keep))))
                    ))
-                 ("p" "Public @work todos"
-                  ((tags-todo "@work-REFILE-noexport/!TODO"
-                              ((org-agenda-overriding-header (jcs:wip-text "@work" "TODO" 20))
-                               (org-agenda-todo-ignore-scheduled 'future)
-                               (org-agenda-sorting-strategy
-                                '(todo-state-down priority-down effort-up category-keep))))
-                   (tags-todo "@work-REFILE-noexport/!WAITING"
-                              ((org-agenda-overriding-header (jcs:wip-text "@work" "WAITING" 1))
-                               (org-agenda-todo-ignore-scheduled 'future)
-                               (org-agenda-sorting-strategy
-                                '(todo-state-down priority-down effort-up category-keep))))
-                   (tags-todo "@work-REFILE-noexport/!NEXT"
-                              ((org-agenda-overriding-header (jcs:wip-text "@work" "NEXT" 5))
-                               (org-agenda-todo-ignore-scheduled 'future)
-                               (org-agenda-sorting-strategy
-                                '(todo-state-down priority-down effort-up category-keep))))
-                   (tags-todo "@work-REFILE-noexport/!STARTED" 
-                              ((org-agenda-overriding-header (jcs:wip-text "@work" "STARTED" 1))
-                               (org-agenda-todo-ignore-scheduled 'future)
-                               (org-agenda-sorting-strategy
-                                '(todo-state-down priority-down effort-up category-keep))))               
-                   (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
-                                 (format-time-string "[%Y-%m-%d]") "\"+CLOSED<=\""
-                                 (format-time-string "[%Y-%m-%d]" (time-add (current-time) (days-to-time 1))) "\"")
-                         ((org-agenda-overriding-header "Completed Today")))
-                   (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
-                                 (format-time-string "[%Y-%m-%d]"
-                                                     (time-subtract (current-time) (days-to-time 1)))
-                                 "\"+CLOSED<=\""
-                                 (format-time-string "[%Y-%m-%d]") "\"")
-                         ((org-agenda-overriding-header "Completed Yesterday")))
-                   (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
-                                 (format-time-string "[%Y-%m-%d]"
-                                                     (time-subtract (current-time) (days-to-time 2)))
-                                 "\"+CLOSED<=\""
-                                 (format-time-string "[%Y-%m-%d]"
-                                                     (time-subtract (current-time) (days-to-time 1))) "\"")
-                         ((org-agenda-overriding-header "Completed Two Days Ago")))
-                   (tags (concat "@work-REFILE-noexport+TODO=\"DONE\"+CLOSED>=\""
-                                 (format-time-string "[%Y-%m-%d]"
-                                                     (time-subtract (current-time) (days-to-time 3)))
-                                 "\"+CLOSED<=\""
-                                 (format-time-string "[%Y-%m-%d]"
-                                                     (time-subtract (current-time) (days-to-time 2))) "\"")
-                         ((org-agenda-overriding-header "Completed Three Days Ago"))))
-                   nil
-                   ("~/Desktop/work.html"))
+                 ("D" "Daily review"
+                  agenda ""
+                  ((org-agenda-span 'day)
+                   (org-agenda-start-on-weekday 0)
+                   (org-agenda-start-with-log-mode t)
+                   (org-agenda-use-time-grid nil)
+                   (org-agenda-toggle-diary nil)
+                   (org-agenda-skip-function
+                    '(org-agenda-skip-entry-if 'nottodo 'done))
+                   ))
                  ))
-
     ;; A couple of helper functions for org agendas from Bernt Hansen
     ;;   http://doc.norang.ca/org-mode.html
     (defun jcs:is-project-p ()
