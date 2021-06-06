@@ -1256,9 +1256,20 @@ I don't want to see =auto-revert= in the modeline.
 #+BEGIN_SRC emacs-lisp
 ;; Hide your shame
 (diminish 'auto-revert-mode)
+
 #+END_SRC
+*** Increase file size warning threshold
 
+By default, Emacs will warn-slash-prompt you if you try to open a file that's larger than 10MB, asking if you *really* want to open it.
 
+I usually do.
+
+I've increased this threshold to 100MB. Because if the file's REALLY big, I want to give myself a chance to bail.
+
+#+name: increase-warning-threshold
+#+BEGIN_SRC emacs-lisp
+(setq large-file-warning-threshold 100000000)
+#+END_SRC
 ** Alerts and Notifications
 
 I use [[https://github.com/julienXX/terminal-notifier][terminal-notifier]] to send alerts to the OS X Notification Center from other applications. I adapted [[https://gist.github.com/justinhj/eb2d354d06631076566f#file-gistfile1-el][this gist from justinhj]] to send events from emacs to the Notification Center.

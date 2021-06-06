@@ -370,6 +370,8 @@ of windows in the frame simply by calling this command again."
 ;; Hide your shame
 (diminish 'auto-revert-mode)
 
+(setq large-file-warning-threshold 100000000)
+
 ;; terminal-notifier-notify is my messenger god
 (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
 
