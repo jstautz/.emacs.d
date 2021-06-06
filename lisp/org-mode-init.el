@@ -32,6 +32,10 @@
   ;; I never want to accidentally turn on timestamp overlays.
   (org-defkey org-mode-map "\C-c\C-x\C-t" nil)
 
+  (org-defkey org-mode-map "\C-a" 'org-beginning-of-line)
+  (org-defkey org-mode-map "\C-e" 'org-end-of-line)
+  (org-defkey org-mode-map "\C-k" 'org-kill-line)
+
 
   ;; Org indent (separate package, managed in Cask) -- diminish it.
   ;;(diminish 'org-indent-mode)
@@ -89,6 +93,7 @@
     (org-reveal)
     (org-remove-occur-highlights))
 
+  (add-to-list 'org-speed-commands-user (cons "S" 'jcs:widen))
 
   ;;-----------------------------------------------------------------------------
   ;; Agenda setup
