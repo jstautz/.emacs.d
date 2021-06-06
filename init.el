@@ -10,6 +10,6 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(package-initialize)
+;(package-initialize)
 
 (org-babel-load-file (concat user-emacs-directory "emacs-init.org"))
