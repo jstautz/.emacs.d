@@ -1,8 +1,8 @@
 ;; set package sources
 (dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
                    ("elpa"  . "http://tromey.com/elpa/")
-		         ("org"   . "http://orgmode.org/elpa/")
-                   ("melpa" . "http://melpa.milkbox.net/packages/")))
+                   ("org"   . "http://orgmode.org/elpa/")
+                   ("melpa" . "http://melpa.org/packages/")))
   (add-to-list 'package-archives source t))
 (package-initialize)
 
@@ -392,15 +392,18 @@ of windows in the frame simply by calling this command again."
 (setq default-fill-column 120)
 
 ;; float my text in the middle, all pretty-like
-(load-file (concat lisp-dir "wrap-to-fill.el"))
+(use-package visual-fill-column
+  :init
+  (setq visual-fill-column-width 120)
+  (setq visual-fill-column-center-text t))
+
 (visual-line-mode 1)
-(wrap-to-fill-column-mode 1)
-(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+
+(add-hook 'text-mode-hook #'visual-fill-column-mode)
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 ;; hide that nonsense from the mode-line
 (diminish 'visual-line-mode)
-(diminish 'wrap-to-fill-column-mode)
 
 ;; fables of the reconstruction
 (defun unfill-paragraph ()

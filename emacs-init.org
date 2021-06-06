@@ -144,13 +144,13 @@ Before using the package manager, I want to add a few other sources (notably [[h
   
 #+name: package-set-sources
 #+BEGIN_SRC emacs-lisp
-;; set package sources
-(dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
-                   ("elpa"  . "http://tromey.com/elpa/")
-		         ("org"   . "http://orgmode.org/elpa/")
-                   ("melpa" . "http://melpa.milkbox.net/packages/")))
-  (add-to-list 'package-archives source t))
-(package-initialize)
+  ;; set package sources
+  (dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
+                     ("elpa"  . "http://tromey.com/elpa/")
+                     ("org"   . "http://orgmode.org/elpa/")
+                     ("melpa" . "http://melpa.org/packages/")))
+    (add-to-list 'package-archives source t))
+  (package-initialize)
 
 #+END_SRC
 
@@ -1332,7 +1332,7 @@ I typically run Emacs.app in full screen, and a 120-character fill-column feels 
 
 #+END_SRC
 
-*** Visual-line mode and wrap-to-fill-column
+*** Visual-line mode and visual-fill-column mode (previously wrap-to-fill-column)
 
 Previously I kept auto-fill-mode turned on. The hard linebreaks didn't bother me, and when diffing files in my git repo of creative writing, I could view changes on individual lines.
 
@@ -1340,15 +1340,19 @@ However... it's still kind of a pain in the ass.
 
 Visual-line-mode would be a fantastic alternative, and it works great... except that it wraps to the *full width of the frame.* I usually have my frame full-screen and like working in a narrower band within this frame, my text surrounded by whitespace.
 
-I've since discovered wrap-to-fill-column-mode (was previously packaged with nxhtml-mode --- [[https://github.com/jstautz/.emacs.d/blob/master/lisp/wrap-to-fill.el][I've pulled it out into my .emacs.d directory]]). This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
+I've since discovered visual-fill-column-mode. This allows me to use visual-line-mode for word wrapping, yet keeps the lines to a reasonable length. It also centers the text nicely in my window.
 
 #+name: wrap-fill-options
 #+BEGIN_SRC emacs-lisp
 ;; float my text in the middle, all pretty-like
-(load-file (concat lisp-dir "wrap-to-fill.el"))
+(use-package visual-fill-column
+  :init
+  (setq visual-fill-column-width 120)
+  (setq visual-fill-column-center-text t))
+
 (visual-line-mode 1)
-(wrap-to-fill-column-mode 1)
-(add-hook 'text-mode-hook '(lambda() (wrap-to-fill-column-mode 1)))
+
+(add-hook 'text-mode-hook #'visual-fill-column-mode)
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 #+END_SRC
@@ -1359,10 +1363,8 @@ And we'll use diminish to keep those always-on modes from cluttering up our pret
 #+BEGIN_SRC emacs-lisp
 ;; hide that nonsense from the mode-line
 (diminish 'visual-line-mode)
-(diminish 'wrap-to-fill-column-mode)
 
 #+END_SRC
-
 
 *** Unfill-paragraph
 
