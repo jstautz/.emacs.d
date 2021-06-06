@@ -14,10 +14,8 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(use-package cl)
-
 ;; ensure OS X keeps my path consistent in Emacs
-(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+(let ((jcs:shell-path (shell-command-to-string ". ~/.zshrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
 

@@ -270,24 +270,14 @@ Now let's get into the config itself.
 
 This first section contains some libraries and basic settings that the rest of my configuration depends on.
 
-** First, let's load Common Lisp libraries
-
-This is generally a good idea. There's a lot of good stuff in the CL package that many other packages need.
-
-#+name: setup-require-cl :comments both
-#+BEGIN_SRC emacs-lisp
-(use-package cl)
-
-#+END_SRC
-
-** Then set our path appropriately.
+** First, let's set our path appropriately.
 
 This is a gross hack to grab the $PATH environment variable from my ~/.bashrc and use it. This way my path is consistent between Emacs.app and my shell elsewhere.
 
 #+name: setup-path :comments both
 #+BEGIN_SRC emacs-lisp
 ;; ensure OS X keeps my path consistent in Emacs
-(let ((jcs:shell-path (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+(let ((jcs:shell-path (shell-command-to-string ". ~/.zshrc; echo -n $PATH")))
   (setenv "PATH" jcs:shell-path)
   (setq exec-path (split-string jcs:shell-path ":")))
 
