@@ -1459,7 +1459,8 @@ Also, the default keybinding to start an ispell session from within flyspell is 
 
 #+name: ispell-fix-org-conflict
 #+BEGIN_SRC emacs-lisp
-(define-key flyspell-mode-map (kbd "C-c $") nil)
+(eval-after-load "flyspell"
+ '(define-key flyspell-mode-map (kbd "C-c $") nil))
 
 #+END_SRC
 

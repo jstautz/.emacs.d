@@ -434,7 +434,8 @@ of windows in the frame simply by calling this command again."
 (eval-after-load "flyspell"
   '(define-key flyspell-mode-map (kbd "C-;") #'ispell-word))
 
-(define-key flyspell-mode-map (kbd "C-c $") nil)
+(eval-after-load "flyspell"
+ '(define-key flyspell-mode-map (kbd "C-c $") nil))
 
 ;; there are rocks ispell just shouldn't look under:
 (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src ". "#\\+end_src$"))
