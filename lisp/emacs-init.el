@@ -387,19 +387,24 @@ of windows in the frame simply by calling this command again."
 ;; build a giant garbage compactor
 (setq gc-cons-threshold 20000000)
 
+;; Pretty pictures
+(set-fontset-font t 'symbol "Apple Color Emoji")
+(set-fontset-font t 'symbol "Noto Color Emoji" nil 'append)
+(set-fontset-font t 'symbol "Segoe UI Emoji" nil 'append)
+(set-fontset-font t 'symbol "Symbola" nil 'append)
+
 ;; just my size
-(setq fill-column 120)
-(setq default-fill-column 120)
+(set-default 'fill-column 120)
 
 ;; float my text in the middle, all pretty-like
 (use-package visual-fill-column
   :init
   (setq visual-fill-column-width 120)
-  (setq visual-fill-column-center-text t))
+  (setq-default visual-fill-column-center-text t))
 
 (visual-line-mode 1)
 
-(add-hook 'text-mode-hook #'visual-fill-column-mode)
+(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 ;; hide that nonsense from the mode-line

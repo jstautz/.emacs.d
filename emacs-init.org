@@ -1330,8 +1330,7 @@ I typically run Emacs.app in full screen, and a 120-character fill-column feels 
 #+name: auto-fill-options
 #+BEGIN_SRC emacs-lisp
 ;; just my size
-(setq fill-column 120)
-(setq default-fill-column 120)
+(set-default 'fill-column 120)
 
 #+END_SRC
 
@@ -1351,11 +1350,11 @@ I've since discovered visual-fill-column-mode. This allows me to use visual-line
 (use-package visual-fill-column
   :init
   (setq visual-fill-column-width 120)
-  (setq visual-fill-column-center-text t))
+  (setq-default visual-fill-column-center-text t))
 
 (visual-line-mode 1)
 
-(add-hook 'text-mode-hook #'visual-fill-column-mode)
+(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 #+END_SRC
