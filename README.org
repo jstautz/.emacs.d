@@ -18,7 +18,7 @@ Fair warning:
 
 - This is a perpetual work in progress.
 - No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
-- Only tested with Emacs 25.3.1 on OS X
+- Only tested with Emacs 27.2 on OS X
 - Your mileage, as they say, may vary.
 - I'm not responsible if any of this blows up on you.
 
@@ -28,7 +28,7 @@ Fair warning:
 :END:
 
 #+begin_example
-Copyright (C)  2019  Jeff Stautz
+Copyright (C)  2018-2022  Jeff Stautz
 
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
