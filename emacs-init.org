@@ -1305,6 +1305,20 @@ Props to Le Wang for this one.
 #+END_SRC
 
 
+** Emoji support
+
+A tiny unicode picture's sometimes worth a thousand words.
+
+#+name: UI-emoji
+#+BEGIN_SRC emacs-lisp
+;; Pretty pictures
+(set-fontset-font t 'symbol "Apple Color Emoji")
+(set-fontset-font t 'symbol "Noto Color Emoji" nil 'append)
+(set-fontset-font t 'symbol "Segoe UI Emoji" nil 'append)
+(set-fontset-font t 'symbol "Symbola" nil 'append)
+
+#+END_SRC
+
 * Writing Fiction
 
 I spend a bunch of my time in Emacs writing fiction. Some of it has [[https://web.archive.org/web/20120502210836/http://prismmagazine.ca/2011/10/10/jeff-stautz-on-asymptote-his-national-magazine-award-winning-short-story/][won awards.]] 
