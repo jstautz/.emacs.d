@@ -93,7 +93,7 @@
       (org-reveal)
       (org-remove-occur-highlights))
 
-    (add-to-list 'org-speed-commands-user (cons "S" 'jcs:widen))
+;;    (add-to-list 'org-speed-commands-user (cons "S" 'jcs:widen))
 
     ;;-----------------------------------------------------------------------------
     ;; Agenda setup
@@ -124,7 +124,7 @@
           org-agenda-skip-deadline-if-done t
           org-agenda-skip-scheduled-if-done t
           org-agenda-skip-unavailable-files t
-          org-agenda-sorting-strategy (quote ((agenda time-up priority-down) (todo priority-down) (tags priority-down)))
+          org-agenda-sorting-strategy (quote ((agenda todo-state-down time-up priority-down) (todo todo-state-down priority-down) (tags todo-state-down priority-down)))
           org-agenda-span (quote day)) 
 
     ;; Agenda TODO options
@@ -178,7 +178,7 @@
         ("w" "Weekly Goals"
          tags "goal_week"
          ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nMake results a weekly habit.\nThis is the core of accountability.\n\nWeekly Goals\n------------")))
- 
+
         ("e" "To Estimates"
          tags-todo "-goal_week-goal_month-goal_quarter-goal_year+Effort=\"\"|-goal_week-goal_month-goal_quarter-goal_year-lowenergy-focused-mediumenergy"
          ((org-agenda-overriding-header "To Estimate\n------------")))
@@ -187,7 +187,10 @@
          tags-todo "-goal_week-goal_month-goal_quarter-goal_year-PRIORITY=\"A\""
          ((org-agenda-overriding-header "Non-MIT tasks\n------------")))
 
-       
+        ("T" "TODAY A or B Priority tasks"
+         tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
+         ((org-agenda-overriding-header "Today's tasks\n------------")))
+
         )
       )
 
@@ -416,14 +419,15 @@
 
     ;; I want my clock to display in the frame title.
     ;; This is a quick hack to see if productivity apps recognize this.
-    (add-hook 'org-clock-in-hook 'jcs:clock-in-frame)
-    (add-hook 'org-clock-out-hook 'jcs:clock-out-frame)
+    ;; TODO: Do I actually want/need this?
+    ;; (add-hook 'org-clock-in-hook 'jcs:clock-in-frame)
+    ;; (add-hook 'org-clock-out-hook 'jcs:clock-out-frame)
 
-    (defun jcs:clock-in-frame ()
-          (setq frame-title-format '("" "[" org-clock-current-task "]")))
+    ;; (defun jcs:clock-in-frame ()
+    ;;   (setq frame-title-format '("" "[" org-clock-current-task "]")))
 
-      (defun jcs:clock-out-frame ()
-        (setq frame-title-format '("" "%b")))
+    ;; (defun jcs:clock-out-frame ()
+    ;;   (setq frame-title-format '("" "%b")))
 
 
     ;; Set the default task while at work -- This is the "General organization" task in work.org
@@ -471,7 +475,7 @@
         (interactive)
         (save-excursion
           (let (filepath filename mybuffer)
-            (setq filepath "/Users/jeff.stautz/org/work.org"
+            (setq filepath "/Users/jstautz/org/work.org"
                   filename (file-name-nondirectory filepath)
                   mybuffer (find-file filepath))
             (goto-char (point-min))
@@ -602,8 +606,8 @@
     ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
     ;; Note that because of the way my work.org file is organized, I want top-level targets there
     ;; but 2nd-level targets everywhere else.
-    (setq org-refile-targets (quote (("/Users/jeff.stautz/org/todo.org" :maxlevel . 2)
-                                     ("/Users/jeff.stautz/org/someday_maybe.org" :maxlevel . 2))))
+    (setq org-refile-targets (quote (("/Users/jstautz/org/todo.org" :maxlevel . 2)
+                                     ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2))))
 
 
     ;; Archiving options
@@ -665,7 +669,7 @@
     ;; Jira links are in the format: [[jira:PROJ-123][Link to Proj-123]]
     (jcs:decrypt-secrets)
     (org-add-link-type "jira" 'org-jira-open)
-    (setq org-jira-url org-jira-url)
+;;    (setq org-jira-url org-jira-url)
 
     (defun org-jira-open (issue)
       "Visit details page for JIRA issue on HootSuite's Jira site
@@ -770,12 +774,12 @@
 
     (setq org-pomodoro-manual-break t
           org-pomodoro-keep-killed-pomodoro-time t
-          org-pomodoro-finished-sound "/Users/jeff.stautz/.emacs.d/resources/alarm_clock.aif"
+          org-pomodoro-finished-sound "/Users/jstautz/.emacs.d/resources/alarm_clock.aif"
           org-pomodoro-overtime-sound org-pomodoro-finished-sound
           org-pomodoro-short-break-sound org-pomodoro-finished-sound
           org-pomodoro-long-break-sound org-pomodoro-finished-sound
           org-pomodoro-ticking-sound-p t
-          org-pomodoro-ticking-sound "/Users/jeff.stautz/.emacs.d/resources/ticks.aif"
+          org-pomodoro-ticking-sound "/Users/jstautz/.emacs.d/resources/ticks.aif"
           org-pomodoro-ticking-sound-states '(:pomodoro)
           org-pomodoro-ticking-frequency 120
           org-pomodoro-short-break-length 6
@@ -817,7 +821,7 @@
 
 
     (define-key global-map "\C-cp" 'jcs:org-pomodoro-variable-start)
-    (add-to-list 'org-speed-commands-user (cons "p" 'jcs:org-pomodoro-variable-start))
+;;    (add-to-list 'org-speed-commands-user (cons "p" 'jcs:org-pomodoro-variable-start))
 
     ;;-----------------------------------------------------------------------------
     ;; Ditaa setup

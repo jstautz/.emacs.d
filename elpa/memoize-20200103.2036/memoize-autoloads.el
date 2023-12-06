@@ -1,9 +1,19 @@
-;;; memoize-autoloads.el --- automatically extracted autoloads
+;;; memoize-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
-;;;### (autoloads nil nil ("memoize.el") (24280 37885 306622 46000))
+;;;### (autoloads nil "memoize" "memoize.el" (0 0 0 0))
+;;; Generated autoloads from memoize.el
+
+(register-definition-prefixes "memoize" '("defmemoize" "memoize"))
+
+;;;***
+
+;;;### (autoloads nil nil ("memoize-pkg.el") (0 0 0 0))
 
 ;;;***
 
@@ -11,5 +21,6 @@
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; memoize-autoloads.el ends here

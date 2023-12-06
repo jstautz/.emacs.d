@@ -1,16 +1,16 @@
-;;; ace-jump-mode-autoloads.el --- automatically extracted autoloads
+;;; ace-jump-mode-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
-;;;### (autoloads nil "ace-jump-mode" "ace-jump-mode.el" (24280 38331
-;;;;;;  813480 86000))
+;;;### (autoloads nil "ace-jump-mode" "ace-jump-mode.el" (0 0 0 0))
 ;;; Generated autoloads from ace-jump-mode.el
 
 (autoload 'ace-jump-mode-pop-mark "ace-jump-mode" "\
-Pop up a postion from `ace-jump-mode-mark-ring', and jump back to that position
-
-\(fn)" t nil)
+Pop up a postion from `ace-jump-mode-mark-ring', and jump back to that position" t nil)
 
 (autoload 'ace-jump-char-mode "ace-jump-mode" "\
 AceJump char mode
@@ -27,9 +27,7 @@ buffer.
 
 (autoload 'ace-jump-line-mode "ace-jump-mode" "\
 AceJump line mode.
-Marked each no empty line and move there
-
-\(fn)" t nil)
+Marked each no empty line and move there" t nil)
 
 (autoload 'ace-jump-mode "ace-jump-mode" "\
 AceJump mode is a minor mode for you to quick jump to a
@@ -53,11 +51,18 @@ You can constrol whether use the case sensitive via
 
 \(fn &optional PREFIX)" t nil)
 
+(register-definition-prefixes "ace-jump-mode" '("ace-jump-" "aj-"))
+
+;;;***
+
+;;;### (autoloads nil nil ("ace-jump-mode-pkg.el") (0 0 0 0))
+
 ;;;***
 
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; ace-jump-mode-autoloads.el ends here

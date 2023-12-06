@@ -1,7 +1,6 @@
 ;; set package sources
 (dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
                    ("elpa"  . "http://tromey.com/elpa/")
-                   ("org"   . "http://orgmode.org/elpa/")
                    ("melpa" . "http://melpa.org/packages/")))
   (add-to-list 'package-archives source t))
 (package-initialize)
@@ -20,7 +19,7 @@
   (setq exec-path (split-string jcs:shell-path ":")))
 
 ;; fantastic directories and where to find them
-  (defvar home-dir     "/Users/jeff.stautz/")
+  (defvar home-dir     "/Users/jstautz/")
   (defvar dotemacs-dir (concat home-dir ".emacs.d/"))
   (defvar lisp-dir     (concat dotemacs-dir "lisp/"))
   (defvar emacs-dir    "/Applications/Emacs.app/Contents/")

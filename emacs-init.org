@@ -17,7 +17,6 @@ People talk about getting used to a new editor, but over time, it is precisely t
 :PROPERTIES:
 :CUSTOM_ID: introduction
 :END:
-
 ** What is this?
 :PROPERTIES:
 :CUSTOM_ID: what_is_this
@@ -91,6 +90,7 @@ Before we get too deep into my settings, I should explain a little about how all
 :CUSTOM_ID: init.el
 :END:
 
+
 My init.el file contains only two lines of elisp. Its only real job is to bootstrap the rest of my config by loading it via org-babel.
 
 It looks like this:
@@ -147,7 +147,6 @@ Before using the package manager, I want to add a few other sources (notably [[h
   ;; set package sources
   (dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
                      ("elpa"  . "http://tromey.com/elpa/")
-                     ("org"   . "http://orgmode.org/elpa/")
                      ("melpa" . "http://melpa.org/packages/")))
     (add-to-list 'package-archives source t))
   (package-initialize)
@@ -294,7 +293,7 @@ Some of these are obviously going to be different in your setup, so you'll want 
 #+name: setup-dirs :comments both
 #+BEGIN_SRC emacs-lisp
 ;; fantastic directories and where to find them
-  (defvar home-dir     "/Users/jeff.stautz/")
+  (defvar home-dir     "/Users/jstautz/")
   (defvar dotemacs-dir (concat home-dir ".emacs.d/"))
   (defvar lisp-dir     (concat dotemacs-dir "lisp/"))
   (defvar emacs-dir    "/Applications/Emacs.app/Contents/")
@@ -1019,22 +1018,22 @@ Usually what I actually want is to show the previous buffer in that new window. 
 
 #+name: window-split
 #+BEGIN_SRC emacs-lisp
-;; don't show me the same buffer twice when I split
-(defun vsplit-last-buffer ()
-  (interactive)
-  (split-window-vertically)
-  (other-window 1 nil)
-  (switch-to-next-buffer)
-  )
-(defun hsplit-last-buffer ()
-  (interactive)
-   (split-window-horizontally)
-  (other-window 1 nil)
-  (switch-to-next-buffer)
-  )
+  ;; don't show me the same buffer twice when I split
+  (defun vsplit-last-buffer ()
+    (interactive)
+    (split-window-vertically)
+    (other-window 1 nil)
+    (switch-to-next-buffer)
+    )
+  (defun hsplit-last-buffer ()
+    (interactive)
+     (split-window-horizontally)
+    (other-window 1 nil)
+    (switch-to-next-buffer)
+    )
 
-(global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
-(global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
+  (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
+  (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
 
 #+END_SRC
 

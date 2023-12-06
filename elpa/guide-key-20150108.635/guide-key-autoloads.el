@@ -1,10 +1,12 @@
-;;; guide-key-autoloads.el --- automatically extracted autoloads
+;;; guide-key-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
-;;;### (autoloads nil "guide-key" "guide-key.el" (24280 38112 186666
-;;;;;;  829000))
+;;;### (autoloads nil "guide-key" "guide-key.el" (0 0 0 0))
 ;;; Generated autoloads from guide-key.el
 
 (defvar guide-key-mode nil "\
@@ -27,11 +29,18 @@ positive, otherwise disable.
 
 \(fn &optional ARG)" t nil)
 
+(register-definition-prefixes "guide-key" '("guide-key/"))
+
+;;;***
+
+;;;### (autoloads nil nil ("guide-key-pkg.el") (0 0 0 0))
+
 ;;;***
 
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; guide-key-autoloads.el ends here
