@@ -65,170 +65,178 @@ Inspired by http://doc.norang.ca/org-mode.html
 
 #+name: org-mode-lisp-wip
 #+BEGIN_SRC emacs-lisp
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ;;
-        ;; My Org-mode configs
-        ;;
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;
+  ;; My Org-mode configs
+  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-        ;; Relevant directories
-        (setq org-dir (concat home-dir "org/")
-              writing-dir (concat home-dir "Documents/Writing/"))
+  ;; Relevant directories
+  (setq org-dir (concat home-dir "org/")
+        writing-dir (concat home-dir "Documents/Writing/"))
 
-        ;; Standard org-mode setup
-        (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-        (add-hook 'org-mode-hook 'turn-on-font-lock)
-        (add-hook 'org-mode-hook #'(lambda()
-                                    (local-unset-key (kbd "C-c SPC"))))
+  ;; Standard org-mode setup
+  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+  (add-hook 'org-mode-hook 'turn-on-font-lock)
+  (add-hook 'org-mode-hook #'(lambda()
+                              (local-unset-key (kbd "C-c SPC"))))
 
+  ;; Use org-contrib library
+  (use-package org-contrib)
 
-        ;;-----------------------------------------------------------------------------
-        ;; Org interface tweaks
-        ;;-----------------------------------------------------------------------------
+  ;;-----------------------------------------------------------------------------
+  ;; Org interface tweaks
+  ;;-----------------------------------------------------------------------------
 
-        ;; Keybindings
-        (define-key global-map "\C-cl" 'org-store-link)
-        (define-key global-map "\C-ca" 'org-agenda)
-        (global-set-key (kbd "<f5>") 'org-narrow-to-subtree)
-        (global-set-key (kbd "<M-f5>") 'jcs:org-todo-tree)
-        (global-set-key (kbd "<S-f5>") 'jcs:widen)
-        (global-set-key (kbd "<f6>") 'org-clock-goto)
-        ;; Because typos. When switching between laptop keyboard and USB keyboard
-        (global-set-key (kbd "<C-S-f5>") 'jcs:widen)
+  ;; Keybindings
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+  (global-set-key (kbd "<f5>") 'org-narrow-to-subtree)
+  (global-set-key (kbd "<M-f5>") 'jcs:org-todo-tree)
+  (global-set-key (kbd "<S-f5>") 'jcs:widen)
+  (global-set-key (kbd "<f6>") 'org-clock-goto)
+  ;; Because typos. When switching between laptop keyboard and USB keyboard
+  (global-set-key (kbd "<C-S-f5>") 'jcs:widen)
 
-        ;; I never want to accidentally turn on timestamp overlays.
-        (org-defkey org-mode-map "\C-c\C-x\C-t" nil)
+  ;; I never want to accidentally turn on timestamp overlays.
+  (org-defkey org-mode-map "\C-c\C-x\C-t" nil)
 
-        (org-defkey org-mode-map "\C-a" 'org-beginning-of-line)
-        (org-defkey org-mode-map "\C-e" 'org-end-of-line)
-        (org-defkey org-mode-map "\C-k" 'org-kill-line)
+  (org-defkey org-mode-map "\C-a" 'org-beginning-of-line)
+  (org-defkey org-mode-map "\C-e" 'org-end-of-line)
+  (org-defkey org-mode-map "\C-k" 'org-kill-line)
 
-        ;; Outline structure/style
-        (setq org-startup-indented t
-              org-odd-levels-only nil
-              org-hide-leading-stars nil
-              org-level-color-stars-only t
-              org-fontify-done-headline t
-              org-blank-before-new-entry (quote ((heading) (plain-list-item)))
-              org-tags-column 80
-              org-cycle-separator-lines 0)
+  ;; Outline structure/style
+  (setq org-startup-indented t
+        org-odd-levels-only nil
+        org-hide-leading-stars nil
+        org-level-color-stars-only t
+        org-fontify-done-headline t
+        org-blank-before-new-entry (quote ((heading) (plain-list-item)))
+        org-tags-column 80
+        org-cycle-separator-lines 0)
 
-        ;; Editing/Movement tweaks -- turn on speed commands, fast tags, and ido
-        (setq org-use-speed-commands t
-              org-completion-use-ido t
-              org-fast-tag-selection-single-key t)
+  ;; Editing/Movement tweaks -- turn on speed commands, fast tags, and ido
+  (setq org-use-speed-commands t
+        org-completion-use-ido t
+        org-fast-tag-selection-single-key t)
 
-        ;; Editing/Movement tweaks -- handling line navigation, links, code blocks
-        (setq org-special-ctrl-a/e t
-              org-M-RET-may-split-line t
-              org-return-follows-link t
-              org-babel-no-eval-on-ctrl-c-ctrl-c t
-              org-confirm-shell-link-function (quote y-or-n-p)
-              org-catch-invisible-edits 'smart)
+  ;; Editing/Movement tweaks -- handling line navigation, links, code blocks
+  (setq org-special-ctrl-a/e t
+        org-M-RET-may-split-line t
+        org-return-follows-link t
+        org-babel-no-eval-on-ctrl-c-ctrl-c t
+        org-confirm-shell-link-function (quote y-or-n-p)
+        org-catch-invisible-edits 'smart)
 
-        ;; Let org know how to open links to certain file types if not in Emacs
-        (setq org-file-apps (quote ((auto-mode . emacs)
-                                    ("\\.x?html?\\'" . default)
-                                    ("\\.pdf\\'" . default)
-                                    ("\\.celtx\\'" . system)
-                                    ("\\.doc\\'" . system)
-                                    ("\\.xls\\'" . system)
-                                    ("\\.fdr\\'" . system)
-                                    ("\\.dvi\\'" . system))))
+  ;; Let org know how to open links to certain file types if not in Emacs
+  (setq org-file-apps (quote ((auto-mode . emacs)
+                              ("\\.x?html?\\'" . default)
+                              ("\\.pdf\\'" . default)
+                              ("\\.celtx\\'" . system)
+                              ("\\.doc\\'" . system)
+                              ("\\.xls\\'" . system)
+                              ("\\.fdr\\'" . system)
+                              ("\\.dvi\\'" . system))))
 
-        ;; Show some context when digging into tags-trees / searches
-        (setq org-show-following-heading (quote ((default)))
-              org-show-hierarchy-above (quote ((default . t) (tags-tree)))
-              org-show-siblings (quote ((default) (isearch t))))
+  ;; Show some context when digging into tags-trees / searches
+  (setq org-show-following-heading (quote ((default)))
+        org-show-hierarchy-above (quote ((default . t) (tags-tree)))
+        org-show-siblings (quote ((default) (isearch t))))
 
-        ;; Add tags when attaching, so's I can find attachments later
-        (setq org-attach-auto-tag "attachment")
+  ;; Add tags when attaching, so's I can find attachments later
+  ;; TODO am I actually using this? May not be important if I'm using specific project directories vs org's internal structure
+  (setq org-attach-auto-tag "attachment")
 
-        ;; A couple custom navigation functions
-        (defun jcs:org-todo-tree ()
-          (interactive)
-          (org-narrow-to-subtree)
-          (org-show-todo-tree nil))
+  ;; Also, inherit attachment directory properties -- so all tasks in a project know where to look for attachments
+  (setq org-attach-use-inheritance 1)
 
-        (defun jcs:widen ()
-          (interactive)
-          (widen)
-          (org-reveal)
-          (org-remove-occur-highlights))
-
-        (add-to-list 'org-speed-commands (cons "S" 'jcs:widen))
-
-        ;;-----------------------------------------------------------------------------
-        ;; Agenda setup
-        ;;-----------------------------------------------------------------------------
-        (setq org-agenda-files '("~/org/inbox.org"
-                                 "~/org/todo.org"))
-
-        ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
-        ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
-
-        ;; Search on other files, too
-        (setq org-agenda-text-search-extra-files '("~/org/goals.org"
-                                                   "~/org/someday_maybe.org"
-                                                   "~/org/notes/gift_ideas.org"
-                                                   "~/org/notes/tech_log.txt"
-                                                   "~/org/notes/reference.org"))
-
-        ;; Agenda interface tweaks
-        (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
-        (setq org-agenda-dim-blocked-tasks t
-              org-agenda-tags-column 80
-              org-agenda-start-with-follow-mode nil
-              org-agenda-compact-blocks nil)
+  ;; Speaking of attachments, let's set the default method to "move"
+  (setq org-attach-method 'mv)
 
 
-        ;; Default agenda views & sorting
-        (setq org-agenda-include-diary t
-              org-agenda-skip-deadline-if-done t
-              org-agenda-skip-scheduled-if-done t
-              org-agenda-skip-unavailable-files t
-              org-agenda-sorting-strategy (quote ((agenda todo-state-down time-up priority-down) (todo todo-state-down priority-down) (tags todo-state-down priority-down)))
-              org-agenda-span (quote day))
+  ;; A couple custom navigation functions
+  (defun jcs:org-todo-tree ()
+    (interactive)
+    (org-narrow-to-subtree)
+    (org-show-todo-tree nil))
 
-        ;; Agenda TODO options
-        (setq org-agenda-tags-todo-honor-ignore-options nil
-              org-agenda-todo-ignore-scheduled (quote future)
-              org-agenda-todo-list-sublevels t)
+  (defun jcs:widen ()
+    (interactive)
+    (widen)
+    (org-reveal)
+    (org-remove-occur-highlights))
 
-        ;; Options for clock reports in agenda
-        (setq org-agenda-start-with-clockreport-mode nil
-              org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
+  (add-to-list 'org-speed-commands (cons "S" 'jcs:widen))
 
-        ;; Definition of a "stuck project" for agenda
-        (setq org-stuck-projects (quote ("+LEVEL=1-REFILE-UNFILED-HABITS/-DONE"
-          ("TODO" "NEXT" "STARTED") ("NOTES") "")))
+  ;;-----------------------------------------------------------------------------
+  ;; Agenda setup
+  ;;-----------------------------------------------------------------------------
+  (setq org-agenda-files '("~/org/inbox.org"
+                           "~/org/todo.org"))
 
-        ;; Custom function to return agenda header strings based on WIP limit
-        (defun jcs:wip-text (tags todo limit)
-          "Return string to indicate whether WIP limit is exceeded for a particular
-        tag/todo keyword/limit. For use in agenda-overriding-header functions.
-        If limit exceeded, string returned is wrapped in #s"
-          (cond
-           ((equal "TODO" todo)
-            (setq org-wip-header-text "Queue"))
-           ((equal "STARTED" todo)
-            (setq org-wip-header-text "Doing"))
-           ((equal "NEXT" todo)
-            (setq org-wip-header-text "To Do Today"))
-           ((equal "WAITING" "WAITING")
-            (setq org-wip-header-text "Impeded / Waiting Response"))
-           (t
-            (setq org-wip-header-text "Queue"))
-           )
-          (if (<= (length (org-map-entries t (concat tags "/+" todo) 'agenda)) limit)
-              org-wip-header-text
-            (concat "### " org-wip-header-text  " -- over WIP limit (" (int-to-string limit) ") ###")))
+  ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
+  ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
+
+  ;; Search on other files, too
+  (setq org-agenda-text-search-extra-files '("~/org/goals.org"
+                                             "~/org/someday_maybe.org"
+                                             "~/org/notes/gift_ideas.org"
+                                             "~/org/notes/tech_log.txt"
+                                             "~/org/notes/reference.org"))
+
+  ;; Agenda interface tweaks
+  (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+  (setq org-agenda-dim-blocked-tasks t
+        org-agenda-tags-column 80
+        org-agenda-start-with-follow-mode nil
+        org-agenda-compact-blocks nil)
 
 
+  ;; Default agenda views & sorting
+  (setq org-agenda-include-diary t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-unavailable-files t
+        org-agenda-sorting-strategy (quote ((agenda todo-state-down time-up priority-down) (todo todo-state-down priority-down) (tags todo-state-down priority-down)))
+        org-agenda-span (quote day))
 
-        ;; My custom Agenda commands
+  ;; Agenda TODO options
+  (setq org-agenda-tags-todo-honor-ignore-options nil
+        org-agenda-todo-ignore-scheduled (quote future)
+        org-agenda-todo-list-sublevels t)
 
-    (setq org-agenda-custom-commands
+  ;; Options for clock reports in agenda
+  (setq org-agenda-start-with-clockreport-mode nil
+        org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
+
+  ;; Definition of a "stuck project" for agenda
+  (setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS/-DONE"
+    ("NEXT" "STARTED") ("NOTES") "")))
+
+  ;; Custom function to return agenda header strings based on WIP limit
+  (defun jcs:wip-text (tags todo limit)
+    "Return string to indicate whether WIP limit is exceeded for a particular
+  tag/todo keyword/limit. For use in agenda-overriding-header functions.
+  If limit exceeded, string returned is wrapped in #s"
+    (cond
+     ((equal "TODO" todo)
+      (setq org-wip-header-text "Queue"))
+     ((equal "STARTED" todo)
+      (setq org-wip-header-text "Doing"))
+     ((equal "NEXT" todo)
+      (setq org-wip-header-text "Next Actions"))
+     ((equal "WAITING" "WAITING")
+      (setq org-wip-header-text "Impeded / Waiting Response"))
+     (t
+      (setq org-wip-header-text "Queue"))
+     )
+    (if (<= (length (org-map-entries t (concat tags "/+" todo) 'agenda)) limit)
+        org-wip-header-text
+      (concat "### " org-wip-header-text  " -- over WIP limit (" (int-to-string limit) ") ###")))
+
+
+  ;; My custom Agenda commands
+  (setq org-agenda-custom-commands
           '(("y" "Yearly OKRs"
              tags "goal_year" 
              ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nYearly OKRs\n------------")))
@@ -242,7 +250,7 @@ Inspired by http://doc.norang.ca/org-mode.html
              tags "goal_week"
              ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nMake results a weekly habit.\nThis is the core of accountability.\n\nWeekly Goals\n------------")))
 
-            ("e" "To Estimates"
+            ("e" "To Estimate"
              tags-todo "-goal_week-goal_month-goal_quarter-goal_year+Effort=\"\"|-goal_week-goal_month-goal_quarter-goal_year-lowenergy-focused-mediumenergy"
              ((org-agenda-overriding-header "To Estimate\n------------")))
 
@@ -254,8 +262,7 @@ Inspired by http://doc.norang.ca/org-mode.html
              tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
              ((org-agenda-overriding-header "Today's tasks\n------------")))
 
-            )
-          )
+          ))
 
 
 
@@ -459,6 +466,24 @@ Inspired by http://doc.norang.ca/org-mode.html
         ;; Options for setting IDs on TODO items when exporting
         (setq org-id-include-domain nil
               org-id-method (quote uuidgen))
+
+        ;;-----------------------------------------------------------------------------
+        ;; TODO dependencies with org-depend
+        ;;-----------------------------------------------------------------------------
+
+        (require 'org-depend)
+
+        ;; When TODO state is changed to NEXT and this is a next action,
+        ;; add a TRIGGER property so that any sibling TODOs are promoted to NEXT actions
+        ;; when this one gets completed.
+
+        (defun jcs:org-set-next-action-trigger ()
+          (interactive)
+          (when (equal (org-get-todo-state) "NEXT")
+            (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
+
+        (add-hook 'org-after-todo-state-change-hook 'jcs:org-set-next-action-trigger)
+
 
 
         ;;-----------------------------------------------------------------------------
@@ -670,7 +695,8 @@ Inspired by http://doc.norang.ca/org-mode.html
         ;; Note that because of the way my work.org file is organized, I want top-level targets there
         ;; but 2nd-level targets everywhere else.
         (setq org-refile-targets (quote (("/Users/jstautz/org/todo.org" :maxlevel . 2)
-                                         ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2))))
+                                         ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2)
+                                         ("/Users/jstautz/org/to-read.org" :maxlevel . 2))))
 
 
         ;; Archiving options
