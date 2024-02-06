@@ -221,13 +221,13 @@
 	    (:url . "https://elpa.nongnu.org/nongnu/cdlatex.html")
 	    (:commit . "33770dec73138909714711b05a63e79da5a19ccd"))])
  (cider .
-	[(1 12 0)
+	[(1 13 0)
 	 ((emacs
 	   (26))
 	  (clojure-mode
 	   (5 18 1))
 	  (parseedn
-	   (1 2 0))
+	   (1 2 1))
 	  (queue
 	   (0 2))
 	  (spinner
@@ -249,7 +249,7 @@
 	   ("Artur Malabarba" . "bruce.connor.am@gmail.com")
 	   ("Hugo Duncan" . "hugo@hugoduncan.org")
 	   ("Steve Purcell" . "steve@sanityinc.com"))
-	  (:commit . "2bafc1ec67308de500ce7ce8ac8f79eae449dee8"))])
+	  (:commit . "9f7e55b08af9256213d90ce2d6492e98db854f2a"))])
  (clojure-mode .
 	       [(5 18 1)
 		((emacs
@@ -429,7 +429,7 @@
 		 ("Arne Jørgensen" . "arne@arnested.dk"))
 		(:commit . "ed90b0c4d808365e9ae9f16cc8a96eff17815621"))])
  (eat .
-      [(0 9 3)
+      [(0 9 4)
        ((emacs
 	 (26 1))
 	(compat
@@ -440,9 +440,9 @@
 	(:maintainer "Akib Azmain Turja" . "akib@disroot.org")
 	(:authors
 	 ("Akib Azmain Turja" . "akib@disroot.org"))
-	(:commit . "c890bb240b64f8157b70cd1c2f42170d2d5bc77d"))])
+	(:commit . "c91451f2d17453c19d3fa76faa4945cbe54e14ce"))])
  (edit-indirect .
-		[(0 1 10)
+		[(0 1 13)
 		 ((emacs
 		   (24 3)))
 		 "Edit regions in separate buffers" tar
@@ -450,7 +450,7 @@
 		  (:maintainer "Fanael Linithien" . "fanael4@gmail.com")
 		  (:authors
 		   ("Fanael Linithien" . "fanael4@gmail.com"))
-		  (:commit . "f80f63822ffae78de38dbe72cacaeb1aaa96c732"))])
+		  (:commit . "82a28d8a85277cfe453af464603ea330eae41c05"))])
  (editorconfig .
 	       [(0 10 1)
 		((emacs
@@ -523,6 +523,21 @@
 	      (:authors
 	       ("Connor Smith" . "wconnorsmith@gmail.com"))
 	      (:commit . "2671071a4a57eaee7cc8c27b9e4b6fc60fd2ccd3"))])
+ (evil-escape .
+	      [(3 16)
+	       ((emacs
+		 (24))
+		(evil
+		 (1 0 9))
+		(cl-lib
+		 (0 5)))
+	       "Escape from anything with a customizable key sequence" tar
+	       ((:url . "https://github.com/emacsorphanage/evil-escape")
+		(:keywords "convenience" "editing" "evil")
+		(:maintainer "Sylvain Benner" . "sylvain.benner@gmail.com")
+		(:authors
+		 ("Sylvain Benner" . "sylvain.benner@gmail.com"))
+		(:commit . "3c335a5709b1abb08687960038746b36add465f9"))])
  (evil-exchange .
 		[(0 41)
 		 ((evil
@@ -777,7 +792,7 @@
 		("Akib Azmain Turja" . "akib@disroot.org"))
 	       (:commit . "ce2ea016a67b200862788e81f0ff1f8f7e4e0454"))])
  (geiser .
-	 [(0 29 1)
+	 [(0 30)
 	  ((emacs
 	    (27 1))
 	   (project
@@ -785,10 +800,10 @@
 	  "GNU Emacs and Scheme talk to each other" tar
 	  ((:url . "https://gitlab.com/emacs-geiser/")
 	   (:keywords "languages" "scheme" "geiser")
-	   (:maintainer "Jose Antonio Ortega Ruiz" . "jao@gnu.org")
+	   (:maintainer "Jose Antonio Ortega Ruiz" . "(jao@gnu.org)")
 	   (:authors
-	    ("Jose Antonio Ortega Ruiz" . "jao@gnu.org"))
-	   (:commit . "d743a8cd1df4101a6dc2226ccfc3b4883ec761c5"))])
+	    ("Jose Antonio Ortega Ruiz" . "(jao@gnu.org)"))
+	   (:commit . "f343592a52da0f947989d07c208a51ad6c972a5e"))])
  (geiser-chez .
 	      [(0 18)
 	       ((emacs
@@ -1842,7 +1857,7 @@
 	       ("David Christiansen" . "david@davidchristiansen.dk"))
 	      (:keywords "convenience"))])
  (racket-mode .
-	      [(1 0 20231214 115957)
+	      [(1 0 20240129 111238)
 	       ((emacs
 		 (25 1)))
 	       "Racket editing, REPL, and more" tar
@@ -2001,14 +2016,15 @@
 	      ("Chen Bin" . "chenbin.sh@gmail.com"))
 	     (:commit . "4e71f5b9199a0ad10017104a6b2bf5ef5f207dfc"))])
  (slime .
-	[(2 26 1)
-	 ((cl-lib
-	   (0 5))
+	[(2 29 1)
+	 ((emacs
+	   (24 3))
 	  (macrostep
 	   (0 9)))
 	 "Superior Lisp Interaction Mode for Emacs" tar
 	 ((:url . "https://github.com/slime/slime")
-	  (:keywords "languages" "lisp" "slime"))])
+	  (:keywords "languages" "lisp" "slime")
+	  (:commit . "3c343756704bdde829d07cd758473ddfcef95898"))])
  (sly .
       [(1 0 43)
        ((emacs
@@ -2088,16 +2104,16 @@
 		     ("John Olsson" . "john@cryon.se"))
 		    (:commit . "2d5acd143a153e16372d59000e57d76291ab81dd"))])
  (subed .
-	[(1 2 8)
+	[(1 2 11)
 	 ((emacs
 	   (25 1)))
 	 "A major mode for editing subtitles" tar
 	 ((:url . "https://github.com/sachac/subed")
 	  (:keywords "convenience" "files" "hypermedia" "multimedia")
 	  (:maintainer "Sacha Chua" . "sacha@sachachua.com")
-	  (:commit . "a5668700a5bab2d7426667c515582e7dade46919"))])
+	  (:commit . "e73c0a38039eb32fd43911023ff35007e324c733"))])
  (sweeprolog .
-	     [(0 27 2)
+	     [(0 27 3)
 	      ((emacs
 		(27 1))
 	       (compat
@@ -2108,7 +2124,7 @@
 	       (:maintainer "Eshel Yaron" . "~eshel/dev@lists.sr.ht")
 	       (:authors
 		("Eshel Yaron" . "me@eshelyaron.com"))
-	       (:commit . "e98cf4feb6dab3b01b650b95830ea57b176613e4"))])
+	       (:commit . "52f506b3a3dd7e7003a44ad3ae5257b3d22025d2"))])
  (swift-mode .
 	     [(9 1 0)
 	      ((emacs
@@ -2306,14 +2322,14 @@
 			("Joost Kremers" . "joostkremers@fastmail.fm"))
 		       (:commit . "695a59789209c42fa08a5bce92963ee32f4455be"))])
  (web-mode .
-	   [(17 3 15)
+	   [(17 3 17)
 	    ((emacs
 	      (23 1)))
 	    "major mode for editing web templates" tar
 	    ((:url . "https://web-mode.org")
 	     (:keywords "languages")
 	     (:maintainer "François-Xavier Bois" . "fxbois@gmail.com")
-	     (:commit . "848fce94de202541cd3fcd35e9c9d22783e9e828"))])
+	     (:commit . "82847071ce93293bdb7945db08d970f13fd883cf"))])
  (webpaste .
 	   [(3 2 2)
 	    ((emacs
@@ -2417,14 +2433,14 @@
 	      (:authors
 	       ("Le Wang")))])
  (xah-fly-keys .
-	       [(24 19 20231212124900)
+	       [(24 20 20240120121202)
 		((emacs
 		  (27)))
 		"ergonomic modal keybinding minor mode." tar
 		((:url . "http://xahlee.info/emacs/misc/xah-fly-keys.html")
 		 (:keywords "convenience" "vi" "vim" "ergoemacs" "keybinding")
 		 (:maintainer "Xah Lee" . "xah@xahlee.org")
-		 (:commit . "d2f2608a9e283ca45053258086662a1bdd42be65"))])
+		 (:commit . "0e5aa069fe7fc32c40c5ebd7272e31d70ebeb4dc"))])
  (xkcd .
        [(1 1)
 	((json

@@ -755,21 +755,23 @@ If limit exceeded, string returned is wrapped in #s"
       ;; org-mobile settings -- for export/sync to iOS app
       ;;-----------------------------------------------------------------------------
 
-      (setq org-mobile-files '(org-agenda-files
-                               org-agenda-text-search-extra-files)
-            org-mobile-inbox-for-pull (concat org-dir "inbox.org")
-            org-mobile-directory (concat home-dir "Dropbox/Apps/MobileOrg")
-            org-mobile-use-encryption t)
+      ;; TODO clean up -- I'm not longer using org-mobile
 
-      ;; decrypt using keys in my secrets.el file
-      (add-hook 'org-mobile-pre-push-hook 'jcs:decrypt-secrets)
-      (add-hook 'org-mobile-pre-pull-hook 'jcs:decrypt-secrets)
+      ;; (setq org-mobile-files '(org-agenda-files
+      ;;                          org-agenda-text-search-extra-files)
+      ;;       org-mobile-inbox-for-pull (concat org-dir "inbox.org")
+      ;;       org-mobile-directory (concat home-dir "Dropbox/Apps/MobileOrg")
+      ;;       org-mobile-use-encryption t)
 
-      ;; I don't care about possible leakage in autosave files
-      (setq org-crypt-disable-auto-save nil)
+      ;; ;; decrypt using keys in my secrets.el file
+      ;; (add-hook 'org-mobile-pre-push-hook 'jcs:decrypt-secrets)
+      ;; (add-hook 'org-mobile-pre-pull-hook 'jcs:decrypt-secrets)
+
+      ;; ;; I don't care about possible leakage in autosave files
+      ;; (setq org-crypt-disable-auto-save nil)
 
 
-      ;;-----------------------------------------------------------------------------
+      ;; -----------------------------------------------------------------------------
       ;; Fontify source blocks in org-mode (babel)
       ;;-----------------------------------------------------------------------------
 
@@ -849,7 +851,7 @@ If limit exceeded, string returned is wrapped in #s"
       ;;-----------------------------------------------------------------------------
 
 
-      (setq org-default-notes-file (concat writing-dir "01-composting/journal.txt"))
+      (setq org-default-notes-file (concat writing-dir "01 - Composting/journals/journal.txt"))
       (global-set-key (kbd "C-c c") #'org-capture)
 
   (setq org-capture-templates
@@ -857,3 +859,43 @@ If limit exceeded, string returned is wrapped in #s"
            "* TODO %?\n  %i\n  %a")
           ("j" "Journal" entry (file+datetree org-default-notes-file)
            "* %T %^{PROMPT} %^g\n\n%i %?\n")))
+
+      ;;-----------------------------------------------------------------------------
+      ;; Working but really shitty elisp to export org-mode bullet list to google docs
+      ;;-----------------------------------------------------------------------------
+
+(defun jcs:edit-list-for-pasting (start end)
+  "Takes an org-mode plain list with - bullets and creates a tab-indented version suitable for pasting into a word processor or Google Docs."
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region (- start 1) end)
+      (goto-char (point-min))
+      (while (search-forward "\n- " nil t)
+        (replace-match "\n"))
+
+      (goto-char (point-min))
+      (while (search-forward "\n  - " nil t)
+        (replace-match "\n\t"))
+
+      (goto-char (point-min))
+      (while (search-forward "\n    - " nil t)
+        (replace-match "\n\t\t"))
+
+      (goto-char (point-min))
+      (while (search-forward "\n      - " nil t)
+        (replace-match "\n\t\t\t"))
+
+      (goto-char (point-min))
+      (while (search-forward "\n        - " nil t)
+        (replace-match "\n\t\t\t\t"))
+
+      (goto-char (point-min))
+      (while (search-forward "\n          - " nil t)
+        (replace-match "\n\t\t\t\t\t"))
+
+      (goto-char (point-min))
+      (while (search-forward "\n            - " nil t)
+        (replace-match "\n\t\t\t\t\t\t"))
+
+        (copy-region-as-kill (point-min) (point-max)))))
