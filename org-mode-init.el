@@ -915,7 +915,7 @@
           '(("t" "Todo" entry (file (concat org-dir "inbox.org"))
              "* TODO %?\n  %i\n  %a")
             ("j" "Journal" entry (file+datetree org-default-notes-file)
-             "* %T %^{PROMPT} %^g\n\n%i %?\n")))
+             "* %T %^{PROMPT} %^g\n\n%i%?")))
 
         ;;-----------------------------------------------------------------------------
         ;; Working but really shitty elisp to export org-mode bullet list to google docs
