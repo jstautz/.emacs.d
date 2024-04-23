@@ -220,59 +220,6 @@ Inspired by http://doc.norang.ca/org-mode.html
     (setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS-goal_month-goal_quarter-goal_year/-DONE"
       ("NEXT" "STARTED") ("NOTES") "")))
 
-    ;; Custom function to return agenda header strings based on WIP limit
-    (defun jcs:wip-text (tags todo limit)
-      "Return string to indicate whether WIP limit is exceeded for a particular
-    tag/todo keyword/limit. For use in agenda-overriding-header functions.
-    If limit exceeded, string returned is wrapped in #s"
-      (cond
-       ((equal "TODO" todo)
-        (setq org-wip-header-text "Queue"))
-       ((equal "STARTED" todo)
-        (setq org-wip-header-text "Doing"))
-       ((equal "NEXT" todo)
-        (setq org-wip-header-text "Next Actions"))
-       ((equal "WAITING" "WAITING")
-        (setq org-wip-header-text "Impeded / Waiting Response"))
-       (t
-        (setq org-wip-header-text "Queue"))
-       )
-      (if (<= (length (org-map-entries t (concat tags "/+" todo) 'agenda)) limit)
-          org-wip-header-text
-        (concat "### " org-wip-header-text  " -- over WIP limit (" (int-to-string limit) ") ###")))
-
-
-    ;; My custom Agenda commands 2023 (to be revisited)
-    ;; (setq org-agenda-custom-commands
-    ;;         '(("y" "Yearly OKRs"
-    ;;            tags "goal_year" 
-    ;;            ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nYearly OKRs\n------------")))
-    ;;           ("q" "Quarterly OKRs"
-    ;;            tags "goal_quarter"
-    ;;            ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nQuarterly OKRs\n------------")))
-    ;;           ("m" "Monthly Goals"
-    ;;            tags "goal_month"
-    ;;            ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nMonthly Goals\n------------")))
-    ;;           ("w" "Weekly Goals"
-    ;;            ((agenda "")
-    ;;             (tags "goal_week"))
-    ;;            ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n\nWeekly Goals\n------------")))
-
-    ;;           ("e" "To Estimate"
-    ;;            tags-todo "-goal_week-goal_month-goal_quarter-goal_year+Effort=\"\"|-goal_week-goal_month-goal_quarter-goal_year-lowenergy-focused-mediumenergy"
-    ;;            ((org-agenda-overriding-header "To Estimate\n------------")))
-
-    ;;           ("o" "Other (non-MIT) tasks"
-    ;;            tags-todo "-goal_week-goal_month-goal_quarter-goal_year-PRIORITY=\"A\""
-    ;;            ((org-agenda-overriding-header "Non-MIT tasks\n------------")))
-
-    ;;           ("T" "TODAY A or B Priority tasks"
-    ;;            tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
-    ;;            ((org-agenda-overriding-header "Today's tasks\n------------")))
-
-    ;;         ))
-
-
   ;; Agenda helper vars / functions -- Work in Progress
 
   (defvar jcs:org-agenda-block--purpose-header
