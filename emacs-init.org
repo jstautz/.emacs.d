@@ -3,7 +3,7 @@
 #+EMAIL: jeff@jeffstautz.com
 #+LANGUAGE:  en
 #+OPTIONS: toc:nil num:nil ^:nil H:4
-#+PROPERTY: header-args :tangle "lisp/emacs-init.el"
+#+PROPERTY: header-args :tangle "emacs-init.el"
 
 #+begin_quote
 People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen --- the editor should get used to us.

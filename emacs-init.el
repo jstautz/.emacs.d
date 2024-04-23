@@ -1,7 +1,6 @@
 ;; set package sources
 (dolist (source '( ("gnu"   . "http://elpa.gnu.org/packages/")
                    ("elpa"  . "http://tromey.com/elpa/")
-                   ("org"   . "http://orgmode.org/elpa/")
                    ("melpa" . "http://melpa.org/packages/")))
   (add-to-list 'package-archives source t))
 (package-initialize)
