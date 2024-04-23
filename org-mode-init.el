@@ -61,6 +61,12 @@
         org-confirm-shell-link-function (quote y-or-n-p)
         org-catch-invisible-edits 'smart)
 
+  ;; workaround for org-ctags obnoxious behavior
+  (with-eval-after-load 'org-ctags (setq org-open-link-functions nil))
+
+  ;; Hide emphasis markers like *this* and /that/ to just show typeface changes
+  (setq org-hide-emphasis-markers t)
+
   ;; Let org know how to open links to certain file types if not in Emacs
   (setq org-file-apps (quote ((auto-mode . emacs)
                               ("\\.x?html?\\'" . default)
@@ -904,7 +910,7 @@
 
 
         ;;-----------------------------------------------------------------------------
-        ;; Setting up org capture. Now that DayOne isn't working, I'll need this
+        ;; Setting up org capture. 
         ;;-----------------------------------------------------------------------------
 
 
