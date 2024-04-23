@@ -113,9 +113,9 @@
   ;; Search on other files, too
   (setq org-agenda-text-search-extra-files '("~/org/goals.org"
                                              "~/org/someday_maybe.org"
-                                             "~/org/notes/gift_ideas.org"
-                                             "~/org/notes/tech_log.txt"
-                                             "~/org/notes/read_listen_watch.org"))
+                                             "~/org/gift_ideas.org"
+                                             "~/org/tech_log.txt"
+                                             "~/org/read_listen_watch.org"))
 
   ;; Agenda interface tweaks
   (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
