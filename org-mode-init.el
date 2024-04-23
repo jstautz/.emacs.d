@@ -864,11 +864,26 @@
         (setq org-default-notes-file (concat writing-dir "01 - Composting/journals/journal.txt"))
         (global-set-key (kbd "C-c c") #'org-capture)
 
-    (setq org-capture-templates
-          '(("t" "Todo" entry (file (concat org-dir "inbox.org"))
-             "* TODO %?\n  %i\n  %a")
-            ("j" "Journal" entry (file+datetree org-default-notes-file)
-             "* %T %^{PROMPT} %^g\n\n%i%?")))
+        ;; NOTE: Org-capture templates moved to secrets.el.gpg -- new templates contain sensitive info.
+
+        ;;-----------------------------------------------------------------------------
+        ;; Handler for obsidian: links
+        ;;-----------------------------------------------------------------------------
+
+        ;; obsidan link handling for obsidian:// links
+        (defun org-obsidian-link-open (slash-message-id)
+          "Handler for org-link-set-parameters that opens a obsidian:// link in obsidian"
+          ;; remove any / at the start of slash-message-id to create real note-id
+          (let ((message-id
+                 (replace-regexp-in-string (rx bos (* "/"))
+                                           ""
+                                           slash-message-id)))
+            (do-applescript
+             (concat "tell application \"Obsidian\" to open location \"obsidian://"
+                     message-id
+                     "\" activate"))))
+         ;; on obsdian://aoeu link, this will call handler with //aoeu
+         (org-link-set-parameters "obsidian" :follow #'org-obsidian-link-open)
 
         ;;-----------------------------------------------------------------------------
         ;; Working but really shitty elisp to export org-mode bullet list to google docs
