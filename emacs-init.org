@@ -980,7 +980,6 @@ Don't warn me about desktop locks.
 #+name: desktop-lock-warn
 #+BEGIN_SRC emacs-lisp
 (setq desktop-load-locked-desktop t)
-(desktop-read)
 #+END_SRC
 
 Define my bookmarks file and save all my settings inside it.

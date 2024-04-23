@@ -231,7 +231,6 @@
                 register-alist)))
 
 (setq desktop-load-locked-desktop t)
-(desktop-read)
 
 (setq bookmark-default-file (concat dotemacs-dir "bookmarks"))
 
