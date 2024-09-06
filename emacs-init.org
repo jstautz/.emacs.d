@@ -333,10 +333,11 @@ I do this *before* I begin loading packages, so that package configs can access 
 
 #+name: setup-decrypt-secrets-function
 #+BEGIN_SRC emacs-lisp
-(defun jcs:decrypt-secrets ()
-  (interactive)
-  (require 'secrets))
+  (defun jcs:decrypt-secrets ()
+    (interactive)
+    (require 'secrets))
 
+  (jcs:decrypt-secrets)
 #+END_SRC
 
 * Install and configure packages
@@ -707,6 +708,17 @@ In the past, however, I used them... and the warnings got annoying. I like setti
 (setq custom-safe-themes t)
 
 #+END_SRC
+*** Set font size
+
+I have a high resolution screen and I want a large-ish default font.
+
+#+name: UI-font-size
+#+BEGIN_SRC emacs-lisp
+;; Enhance!
+(set-frame-font "Menlo 18")
+
+#+END_SRC
+
 
 *** Show line and column numbers
 
@@ -1813,6 +1825,7 @@ In the interests of fully explaining my setup, I've put it in [[https://github.c
 
 
 * Finish setup
+
 ** Load desktop file
 
 Now that everything's loaded, load the desktop file:

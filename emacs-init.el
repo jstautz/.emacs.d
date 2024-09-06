@@ -35,6 +35,8 @@
   (interactive)
   (require 'secrets))
 
+(jcs:decrypt-secrets)
+
 ;; jump around, House of Pain style
 (use-package ace-jump-mode
              :bind ("C-." . ace-jump-mode))
@@ -141,6 +143,9 @@
 
 ;; Trust me, I'm an interior decorator
 (setq custom-safe-themes t)
+
+;; Enhance!
+(set-frame-font "Menlo 18")
 
 ;; whose line is it, anyway?
 (line-number-mode 1)                         
