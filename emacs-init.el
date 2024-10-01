@@ -437,6 +437,9 @@ of windows in the frame simply by calling this command again."
      "[A-Za-z]" "[^A-Za-z]" "[']" nil ("-B") nil iso-8859-1)))
 (setq ispell-local-dictionary "canadian")
 
+;; Here are my words
+(setq ispell-personal-dictionary "~/Dropbox/.spell.en.pws")
+
 ;; fly, you fools
 (add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
 (add-hook 'org-mode-hook (lambda () (flyspell-mode 1)))

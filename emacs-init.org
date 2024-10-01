@@ -1470,6 +1470,16 @@ So let's teach Emacs about Canada before it starts an international incident, eh
 
 #+END_SRC
 
+I've got a custom dictionary stored on Dropbox. Let's use that one!
+
+#+name: spell-check-personal-dict
+#+BEGIN_SRC emacs-lisp
+;; Here are my words
+(setq ispell-personal-dictionary "~/Dropbox/.spell.en.pws")
+
+#+END_SRC
+
+
 Now that we've got ispell working, it's easy to activate spell-checking as you type with flyspell. Just hit =M-x flyspell-mode= and you've got those nifty red underlines highlighting all your mistakes.
 
 Let's activate flyspell-mode by default for text-mode and org-mode buffers:
