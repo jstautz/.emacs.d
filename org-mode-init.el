@@ -71,10 +71,9 @@
   (setq org-file-apps (quote ((auto-mode . emacs)
                               ("\\.x?html?\\'" . default)
                               ("\\.pdf\\'" . default)
-                              ("\\.celtx\\'" . system)
                               ("\\.doc\\'" . system)
+                              ("\\.docx\\'" . system)
                               ("\\.xls\\'" . system)
-                              ("\\.fdr\\'" . system)
                               ("\\.dvi\\'" . system))))
 
   ;; Show some context when digging into tags-trees / searches
