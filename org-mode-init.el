@@ -64,7 +64,9 @@
   ;; workaround for org-ctags obnoxious behavior
   (with-eval-after-load 'org-ctags (setq org-open-link-functions nil))
 
-  ;; Hide emphasis markers like *this* and /that/ to just show typeface changes
+  ;; Prettify org-mode text:
+  ;; hide emphasis markers 
+  ;; (also tried "pretty entities" for things like \alpha etc, but filenames with underscores get messy).
   (setq org-hide-emphasis-markers t)
 
   ;; Let org know how to open links to certain file types if not in Emacs
