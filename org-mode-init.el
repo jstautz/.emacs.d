@@ -322,7 +322,7 @@
           ,jcs:org-agenda-block--goals-year
          ))
 
-        ("w" "Weekly Goals"
+        ("W" "Weekly Goals"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--goals-week
          ))
@@ -334,7 +334,7 @@
           ,jcs:org-agenda-block--todo-home
           ))
 
-        ("W" "Work Tasks + Agenda"
+        ("w" "Work Tasks + Agenda"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--upcoming-week
           ,jcs:org-agenda-block--next-work
@@ -680,6 +680,11 @@
         ;;-----------------------------------------------------------------------------
         ;; Capture, Refile, Archive
         ;;-----------------------------------------------------------------------------
+
+
+        ;; Capture Targets are now defined in the lisp/secrets.el.gpg file,
+        ;; encrypted because they contain personal info. 
+
 
         ;; Where to look for refile targets
         ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
