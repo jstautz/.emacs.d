@@ -152,7 +152,7 @@
 
   ;; Definition of a "stuck project" for agenda
   (setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS-goal_month-goal_quarter-goal_year/-DONE"
-    ("NEXT" "STARTED") ("NOTES") "")))
+    ("NEXT" "STARTED" "TODO") ("NOTES") "")))
 
 ;; Agenda helper vars / functions -- Work in Progress
 
