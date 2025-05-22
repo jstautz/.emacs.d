@@ -360,7 +360,7 @@ of windows in the frame simply by calling this command again."
 
 ;; I've got the power
 (defun tramp-sudo-reopen ()
-  "Re-open the current with tramp."
+  "Re-open the current file with tramp."
   (interactive)
   (let ((file-name (format "/sudo:localhost:%s" (buffer-file-name)))
         (line (line-number-at-pos))
