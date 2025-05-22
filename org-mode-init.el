@@ -690,10 +690,9 @@
         ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
         ;; Note that because of the way my work.org file is organized, I want top-level targets there
         ;; but 2nd-level targets everywhere else.
-        (setq org-refile-targets (quote (("/Users/jstautz/org/todo.org" :maxlevel . 2)
-                                         ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 2)
-                                         ("/Users/jstautz/org/to-read.org" :maxlevel . 2))))
-
+        (setq org-refile-targets (quote (("/Users/jstautz/org/todo.org" :maxlevel . 3)
+                                         ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 3)
+                                         ("/Users/jstautz/org/read_listen_watch.org" :maxlevel . 2))))
 
         ;; Archiving options
         (setq org-archive-location (concat org-dir "archives.org::")
