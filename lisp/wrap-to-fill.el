@@ -299,7 +299,7 @@ like '- ' etc:
     this
   1) and when counting
      things
-  a) wether using numbers
+  a) whether using numbers
      or letters.
 
 See `visual-indent-use-adaptive-fill' for more info.
