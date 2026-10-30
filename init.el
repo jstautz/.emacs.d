@@ -1,15 +1,23 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Jeff's init.el file --- Where the magic begins
-;;
-;; This is the first file Emacs loads.
-;;
-;; It doesn't do much, just:
-;; - Initializes packages 
-;; - Use org-babel to bootstrap the rest of my configuration from org-files
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; init.el --- Main config -*- lexical-binding: t; -*-
 
-;(package-initialize)
+;;; Paths
+(defconst jcs:lisp-dir (expand-file-name "lisp/" user-emacs-directory))
+(add-to-list 'load-path jcs:lisp-dir)
 
-(org-babel-load-file (concat user-emacs-directory "emacs-init.org"))
+;;; Customize
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file 'noerror 'nomessage)
+
+;;; Shell environment
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :config
+  ;; PATH is set in .zshrc, so this needs an interactive shell (~700ms).
+  (setq exec-path-from-shell-warn-duration-millis 1500)
+  (exec-path-from-shell-initialize))
+
+;;; Org
+(load (expand-file-name "org-mode-init" user-emacs-directory) nil 'nomessage)
+
+;;; init.el ends here
