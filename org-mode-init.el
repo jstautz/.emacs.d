@@ -451,4 +451,20 @@ default task; otherwise use the organization task."
       org-log-into-drawer "LOGBOOK"
       org-log-repeat 'time)
 
+;; clocking in moves a TODO/NEXT task to STARTED (not during capture)
+(defun jcs:clock-in-to-started (_kw)
+  "Return STARTED for a TODO or NEXT task outside capture."
+  (when (and (member (org-get-todo-state) '("TODO" "NEXT"))
+             (not (bound-and-true-p org-capture-mode)))
+    "STARTED"))
+(setq org-clock-in-switch-to-state #'jcs:clock-in-to-started)
+
+;; remove the LOGBOOK drawer a zero-time clock-out leaves empty
+(defun jcs:remove-empty-drawer-on-clock-out ()
+  "Remove an empty drawer on the current line."
+  (save-excursion
+    (beginning-of-line 0)
+    (org-remove-empty-drawer-at (point))))
+(add-hook 'org-clock-out-hook #'jcs:remove-empty-drawer-on-clock-out 90)
+
 ;;; org-mode-init.el ends here
