@@ -477,4 +477,12 @@ default task; otherwise use the organization task."
 (setq org-default-notes-file (concat jcs:writing-dir "01 - Composting/journals/journal.txt"))
 (keymap-global-set "C-c c" #'org-capture)
 
+;;; Refile & archive
+(setq org-refile-targets `((,(concat jcs:org-dir "todo.org") :maxlevel . 3)
+                           (,(concat jcs:org-dir "someday_maybe.org") :maxlevel . 3)
+                           (,(concat jcs:org-dir "read_listen_watch.org") :maxlevel . 2))
+      ;; one flat "file/Heading/Sub" list for fido instead of level-by-level
+      org-refile-use-outline-path 'file
+      org-outline-path-complete-in-steps nil)
+
 ;;; org-mode-init.el ends here
