@@ -72,7 +72,7 @@
 
 ;;; Mode line
 ;; hide these minor-mode lighters (built-in replacement for diminish)
-(setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode)
+(setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode visual-line-mode)
       mode-line-collapse-minor-modes-to "")
 
 ;;; Keys
@@ -267,6 +267,44 @@
 (use-package htmlize
   :ensure t
   :defer t)
+
+;;; Writing
+(setq-default fill-column 120
+              indent-tabs-mode nil
+              tab-width 4)
+(setq sentence-end-double-space nil)
+(setopt doc-view-continuous t)
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+;; soft-wrap text at fill-column, centered in the window
+(add-hook 'text-mode-hook #'turn-on-visual-line-mode)
+(use-package visual-fill-column
+  :ensure t
+  :hook (visual-line-mode . visual-fill-column-mode)
+  :init
+  (setq-default visual-fill-column-center-text t))
+
+(defun jcs:unfill-paragraph ()
+  "Join a multi-line paragraph (or the region) into one line."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (call-interactively #'fill-paragraph)))
+
+;;; Spelling
+;; needs `brew install aspell'; flyspell stays off until it's on PATH
+(setopt ispell-program-name "aspell"
+        ispell-dictionary "en_CA")
+(setq ispell-personal-dictionary "~/Dropbox/.spell.en.pws")
+(when (executable-find "aspell")
+  (add-hook 'text-mode-hook #'flyspell-mode))
+(use-package flyspell
+  :defer t
+  :config
+  (keymap-set flyspell-mode-map "C-;" #'ispell-word)
+  ;; C-c $ is org-archive-subtree
+  (keymap-unset flyspell-mode-map "C-c $"))
 
 ;;; Server
 (require 'server)
