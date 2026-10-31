@@ -446,4 +446,9 @@ default task; otherwise use the organization task."
       org-clock-report-include-clocking-task t)
 (org-clock-persistence-insinuate)
 
+;; log completion and repeats with timestamps, inside a LOGBOOK drawer
+(setq org-log-done 'time
+      org-log-into-drawer "LOGBOOK"
+      org-log-repeat 'time)
+
 ;;; org-mode-init.el ends here
