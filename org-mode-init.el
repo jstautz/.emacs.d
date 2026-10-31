@@ -434,4 +434,16 @@ default task; otherwise use the organization task."
     (jcs:clock-in-organization-task-as-default)))
 (add-hook 'org-clock-out-hook #'jcs:clock-out-maybe 90)
 
+;; clock behavior: resume after restarts and idle, drop 0:00 entries
+(setq org-time-stamp-rounding-minutes '(0 5)
+      org-clock-out-when-done t
+      org-clock-out-remove-zero-time-clocks t
+      org-clock-idle-time 5
+      org-clock-in-resume t
+      org-clock-persist t
+      org-clock-persist-query-resume nil
+      org-clock-auto-clock-resolution 'when-no-clock-is-running
+      org-clock-report-include-clocking-task t)
+(org-clock-persistence-insinuate)
+
 ;;; org-mode-init.el ends here
