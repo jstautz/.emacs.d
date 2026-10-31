@@ -88,4 +88,7 @@
               '("goals.org" "someday_maybe.org" "gift_ideas.org"
                 "tech_log.txt" "read_listen_watch.org")))
 
+(setq org-agenda-dim-blocked-tasks t
+      org-agenda-tags-column 80)
+
 ;;; org-mode-init.el ends here
