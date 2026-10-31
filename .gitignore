@@ -27,3 +27,6 @@
 /.org-clock-save.el
 /.emacs.desktop
 /.emacs.desktop.lock
+
+# macOS
+.DS_Store
