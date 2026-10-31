@@ -1,18 +1,20 @@
 ;;; init.el --- Main config -*- lexical-binding: t; -*-
 
-;;; Set paths
+;;; Startup
+
+;;;; Paths
 (defconst jcs:lisp-dir (expand-file-name "lisp/" user-emacs-directory))
 (add-to-list 'load-path jcs:lisp-dir)
 
-;;; File away customizations
+;;;; Customize
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror 'nomessage)
 
-;;; Performance
+;;;; Performance
 ;; GC every 20MB allocated instead of the 0.8MB default
 (setq gc-cons-threshold 20000000)
 
-;;; Packages
+;;;; Packages
 ;; Compile any elpa packages that need it.
 (defvar byte-compile-warnings)
 (let ((byte-compile-warnings nil))
@@ -25,7 +27,7 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (setq package-archive-priorities '(("gnu" . 3) ("nongnu" . 2) ("melpa" . 1)))
 
-;;; Shell environment
+;;;; Shell environment
 (use-package exec-path-from-shell
   :ensure t
   :if (memq window-system '(mac ns))
@@ -36,6 +38,8 @@
   (exec-path-from-shell-initialize))
 
 ;;; Interface
+
+;;;; Startup screen, bell, font
 (setq inhibit-startup-screen t
       initial-scratch-message nil
       ring-bell-function #'ignore
@@ -46,17 +50,12 @@
 ;; unspecified = use the frame background
 (set-face-attribute 'fringe nil :background 'unspecified)
 
-;;; Backups & trash
-;; keep backups and auto-saves out of working directories
-(setq backup-directory-alist '((".*" . "~/.emacs.backup/"))
-      auto-save-file-name-transforms '((".*" "~/.emacs.autosave/" t))
-      vc-make-backup-files t
-      ;; no trash-directory: nil uses the macOS Trash, so Finder's "Put Back" works
-      delete-by-moving-to-trash t)
-;; Emacs creates the backup dir on demand, but not the auto-save dir
-(make-directory "~/.emacs.autosave/" t)
+;;;; Mode line
+;; hide these minor-mode lighters (built-in replacement for diminish)
+(setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode visual-line-mode org-indent-mode)
+      mode-line-collapse-minor-modes-to "")
 
-;;; Cursor & scrolling
+;;;; Cursor & scrolling
 (global-hl-line-mode 1)
 (set-face-attribute 'hl-line nil :background "grey93")
 ;; never recenter when point moves off screen; keep point's screen row when paging
@@ -70,12 +69,19 @@
 (setopt cua-enable-cua-keys nil)
 (cua-mode 1)
 
-;;; Mode line
-;; hide these minor-mode lighters (built-in replacement for diminish)
-(setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode visual-line-mode org-indent-mode)
-      mode-line-collapse-minor-modes-to "")
+;;;; Notifications
+;; macOS Notification Center (brew install terminal-notifier); clicking it
+;; brings Emacs forward. Falls back to the echo area.
+(defun jcs:notify (title message)
+  "Show MESSAGE titled TITLE as a macOS notification."
+  (if-let* ((notifier (executable-find "terminal-notifier")))
+      (start-process "terminal-notifier" nil notifier
+                     "-title" title "-message" message "-activate" "org.gnu.Emacs")
+    (message "%s: %s" title message)))
 
-;;; Keys
+;;; Keyboard
+
+;;;; Keys
 ;; use <esc> as quit vs meta prefix
 (keymap-global-set "<escape>" #'keyboard-escape-quit)
 (keymap-global-set "C-<escape>" #'top-level)
@@ -90,12 +96,20 @@
 (keymap-global-set "M-s" #'save-buffer)
 (keymap-global-set "C-z" #'undo)
 
-;;; Mac
+;;;; Mac
 ;; both Command and Option are Meta
 (setq ns-command-modifier 'meta
       ns-alternate-modifier 'meta)
 
-;;; Completion
+;;;; Jumping
+;; C-. then a character: jump to any word starting with it (ace-jump style)
+(use-package avy
+  :ensure t
+  :bind ("C-." . avy-goto-word-1))
+
+;;; Completion & editing
+
+;;;; Completion
 ;; fido = flex matching, case-insensitive; savehist keeps M-x history sorting across restarts
 (require 'icomplete)
 (require 'recentf)
@@ -148,7 +162,44 @@
       (switch-to-buffer choice))))
 (keymap-global-set "C-x b" #'jcs:switch-to-buffer-or-recent-file)
 
+;;;; Popups
+(use-package popwin
+  :ensure t
+  :config
+  (popwin-mode 1))
+
+;;;; Kill ring
+;; M-y without a preceding C-y opens the browser
+(use-package browse-kill-ring
+  :ensure t
+  :functions popwin:update-window-reference
+  :preface
+  ;; popwin replaces the window browse-kill-ring yanks into; point it at the new one
+  (defun jcs:popwin-update-kill-ring-window ()
+    (popwin:update-window-reference 'browse-kill-ring-original-window :safe t))
+  :config
+  (browse-kill-ring-default-keybindings)
+  (push "*Kill Ring*" popwin:special-display-config)
+  (add-hook 'popwin:after-popup-hook #'jcs:popwin-update-kill-ring-window))
+
+;;;; Key hints
+(use-package guide-key
+  :ensure t
+  :functions guide-key/add-local-guide-key-sequence
+  :preface
+  (defun jcs:guide-key-org-sequences ()
+    (guide-key/add-local-guide-key-sequence "C-c")
+    (guide-key/add-local-guide-key-sequence "C-c C-x"))
+  :hook (org-mode . jcs:guide-key-org-sequences)
+  ;; :hook alone defers loading, so guide-key-mode would never start
+  :demand t
+  :config
+  (setq guide-key/idle-delay 1
+        guide-key/popup-window-position 'bottom)
+  (guide-key-mode 1))
+
 ;;; Windows
+
 (keymap-global-set "M-o" #'other-window)
 
 ;; new split shows the previous buffer, not the same one twice
@@ -187,7 +238,19 @@
 (keymap-global-set "C-M-<up>" #'enlarge-window)
 (keymap-global-set "C-M-<down>" #'shrink-window)
 
-;;; Files & buffers
+;;; Files
+
+;;;; Backups & trash
+;; keep backups and auto-saves out of working directories
+(setq backup-directory-alist '((".*" . "~/.emacs.backup/"))
+      auto-save-file-name-transforms '((".*" "~/.emacs.autosave/" t))
+      vc-make-backup-files t
+      ;; no trash-directory: nil uses the macOS Trash, so Finder's "Put Back" works
+      delete-by-moving-to-trash t)
+;; Emacs creates the backup dir on demand, but not the auto-save dir
+(make-directory "~/.emacs.autosave/" t)
+
+;;;; Files & buffers
 (keymap-global-set "C-x C-b" #'ibuffer)
 (keymap-global-set "C-x C-r" #'rename-visited-file)
 ;; reload files changed outside Emacs; buffers with unsaved edits are left alone
@@ -210,7 +273,7 @@
 (setopt locate-make-command-line (lambda (s) (list "mdfind" "-name" s)))
 (setq large-file-warning-threshold 100000000)
 
-;;; Dired
+;;;; Dired
 (use-package dired
   :defer t
   :functions (dired-next-line dired-goto-next-nontrivial-file dired-do-open)
@@ -235,97 +298,19 @@
   (keymap-set dired-mode-map "<remap> <beginning-of-buffer>" #'jcs:dired-back-to-top)
   (keymap-set dired-mode-map "<remap> <end-of-buffer>" #'jcs:dired-jump-to-bottom))
 
-;;; Desktop
+;;;; Desktop
 ;; buffers, windows, registers and search rings; savehist covers minibuffer histories
 (desktop-save-mode 1)
 ;; load a locked desktop only if the Emacs that locked it is gone
 (setopt desktop-load-locked-desktop 'check-pid)
 
-;;; Popups
-(use-package popwin
-  :ensure t
-  :config
-  (popwin-mode 1))
-
-;;; Jumping
-;; C-. then a character: jump to any word starting with it (ace-jump style)
-(use-package avy
-  :ensure t
-  :bind ("C-." . avy-goto-word-1))
-
-;;; Kill ring
-;; M-y without a preceding C-y opens the browser
-(use-package browse-kill-ring
-  :ensure t
-  :functions popwin:update-window-reference
-  :preface
-  ;; popwin replaces the window browse-kill-ring yanks into; point it at the new one
-  (defun jcs:popwin-update-kill-ring-window ()
-    (popwin:update-window-reference 'browse-kill-ring-original-window :safe t))
-  :config
-  (browse-kill-ring-default-keybindings)
-  (push "*Kill Ring*" popwin:special-display-config)
-  (add-hook 'popwin:after-popup-hook #'jcs:popwin-update-kill-ring-window))
-
-;;; Key hints
-(use-package guide-key
-  :ensure t
-  :functions guide-key/add-local-guide-key-sequence
-  :preface
-  (defun jcs:guide-key-org-sequences ()
-    (guide-key/add-local-guide-key-sequence "C-c")
-    (guide-key/add-local-guide-key-sequence "C-c C-x"))
-  :hook (org-mode . jcs:guide-key-org-sequences)
-  ;; :hook alone defers loading, so guide-key-mode would never start
-  :demand t
-  :config
-  (setq guide-key/idle-delay 1
-        guide-key/popup-window-position 'bottom)
-  (guide-key-mode 1))
-
-;;; Emacs Lisp
-(defun jcs:eval-and-replace ()
-  "Replace the preceding sexp with its value."
-  (interactive)
-  (backward-kill-sexp)
-  (prin1 (eval (read (current-kill 0)) t) (current-buffer)))
-(keymap-global-set "C-c e" #'jcs:eval-and-replace)
-
-;;; Web
-(use-package web-mode
-  :ensure t
-  :defer t)
-
-;;; REST
-;; M-x restclient-mode in a buffer of HTTP requests; C-c C-c sends one
-(use-package restclient
-  :ensure t
-  :defer t)
-
-;;; Remote files
+;;;; Remote files
 ;; ssh streams small files faster than the default scp
 (setopt tramp-default-method "ssh")
 
-;;; Git
-(use-package magit
-  :ensure t
-  :defer t)
-
-;;; Markdown
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :config
-  ;; dropping a file opens it instead of inserting a link
-  (setopt markdown-yank-dnd-method 'open))
-
-;;; HTML export
-;; used by Org for colorized source blocks in HTML export
-(use-package htmlize
-  :ensure t
-  :defer t)
-
 ;;; Writing
+
+;;;; Text
 (setq-default fill-column 120
               indent-tabs-mode nil
               tab-width 4)
@@ -345,7 +330,7 @@
 
 ;; M-x unfill-paragraph is built in as of Emacs 31
 
-;;; Spelling
+;;;; Spelling
 ;; needs `brew install aspell'; flyspell stays off until it's on PATH
 (setopt ispell-program-name "aspell"
         ispell-dictionary "en_CA")
@@ -361,22 +346,54 @@
   ;; C-c $ is org-archive-subtree
   (keymap-unset flyspell-mode-map "C-c $"))
 
-;;; Notifications
-;; macOS Notification Center (brew install terminal-notifier); clicking it
-;; brings Emacs forward. Falls back to the echo area.
-(defun jcs:notify (title message)
-  "Show MESSAGE titled TITLE as a macOS notification."
-  (if-let* ((notifier (executable-find "terminal-notifier")))
-      (start-process "terminal-notifier" nil notifier
-                     "-title" title "-message" message "-activate" "org.gnu.Emacs")
-    (message "%s: %s" title message)))
+;;;; Markdown
+(use-package markdown-mode
+  :ensure t
+  :defer t
+  :config
+  ;; dropping a file opens it instead of inserting a link
+  (setopt markdown-yank-dnd-method 'open))
 
-;;; Server
+;;; Code
+
+;;;; Emacs Lisp
+(defun jcs:eval-and-replace ()
+  "Replace the preceding sexp with its value."
+  (interactive)
+  (backward-kill-sexp)
+  (prin1 (eval (read (current-kill 0)) t) (current-buffer)))
+(keymap-global-set "C-c e" #'jcs:eval-and-replace)
+
+;;;; Git
+(use-package magit
+  :ensure t
+  :defer t)
+
+;;;; Web
+(use-package web-mode
+  :ensure t
+  :defer t)
+
+;;;; REST
+;; M-x restclient-mode in a buffer of HTTP requests; C-c C-c sends one
+(use-package restclient
+  :ensure t
+  :defer t)
+
+;;;; HTML export
+;; used by Org for colorized source blocks in HTML export
+(use-package htmlize
+  :ensure t
+  :defer t)
+
+;;; Server & Org
+
+;;;; Server
 (require 'server)
 (unless (or noninteractive (server-running-p))
   (server-start))
 
-;;; Org
+;;;; Org
 (load (expand-file-name "org-mode-init" user-emacs-directory) nil 'nomessage)
 
 ;;; init.el ends here

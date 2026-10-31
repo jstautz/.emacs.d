@@ -1,16 +1,50 @@
 ;;; org-mode-init.el --- Org config -*- lexical-binding: t; -*-
 
 ;;; Setup
-;; loaded at startup: the agenda feeds appointment reminders (see Diary & appointments)
+
+;;;; Load Org
+;; all loaded at startup: the agenda feeds appointment reminders, and a
+;; clock left running is restored
 (require 'org)
+(require 'org-id)
+(require 'org-habit)
+(require 'org-agenda)
+(require 'org-clock)
+(require 'appt)
+;; vendored in lisp/ (from org-contrib)
+(require 'org-depend)
+
+;;;; Directories
 (defconst jcs:org-dir "~/org/")
 (defconst jcs:writing-dir "~/Documents/Writing/")
 
-;;; Drag and drop
-;; dropping a file opens it instead of asking attach/open/link
-(setopt org-yank-dnd-method 'open)
+;;; Editing
 
-;;; Navigation
+;;;; Outline style
+(setq org-startup-indented t
+      org-level-color-stars-only t
+      org-fontify-done-headline t
+      org-blank-before-new-entry '((heading) (plain-list-item))
+      org-tags-column 80
+      org-cycle-separator-lines 0)
+
+;;;; Speed keys, line motion, links
+;; speed keys: single-letter commands at the start of a headline (? lists them)
+(setq org-use-speed-commands t
+      org-fast-tag-selection-single-key t)
+
+;; line motion, links, code blocks
+(setq org-special-ctrl-a/e t
+      org-M-RET-may-split-line t
+      org-return-follows-link t
+      org-babel-no-eval-on-ctrl-c-ctrl-c t
+      org-link-shell-confirm-function #'y-or-n-p
+      org-fold-catch-invisible-edits 'smart)
+
+;; hide *bold* /italic/ markers (pretty entities made filenames with _ messy)
+(setq org-hide-emphasis-markers t)
+
+;;;; Navigation
 (defun jcs:org-todo-tree ()
   "Narrow to this subtree and show only its TODOs."
   (interactive)
@@ -27,7 +61,7 @@
 ;; speed key S widens (speed keys work at the start of a headline)
 (add-to-list 'org-speed-commands '("S" . jcs:widen))
 
-;;; Keys
+;;;; Global keys
 (keymap-global-set "C-c l" #'org-store-link)
 (keymap-global-set "C-c a" #'org-agenda)
 (keymap-global-set "<f5>" #'org-narrow-to-subtree)
@@ -40,31 +74,7 @@
 ;; never toggle timestamp overlays by accident
 (keymap-unset org-mode-map "C-c C-x C-t")
 
-;;; Outline style
-(setq org-startup-indented t
-      org-level-color-stars-only t
-      org-fontify-done-headline t
-      org-blank-before-new-entry '((heading) (plain-list-item))
-      org-tags-column 80
-      org-cycle-separator-lines 0)
-
-;;; Editing
-;; speed keys: single-letter commands at the start of a headline (? lists them)
-(setq org-use-speed-commands t
-      org-fast-tag-selection-single-key t)
-
-;; line motion, links, code blocks
-(setq org-special-ctrl-a/e t
-      org-M-RET-may-split-line t
-      org-return-follows-link t
-      org-babel-no-eval-on-ctrl-c-ctrl-c t
-      org-link-shell-confirm-function #'y-or-n-p
-      org-fold-catch-invisible-edits 'smart)
-
-;; hide *bold* /italic/ markers (pretty entities made filenames with _ messy)
-(setq org-hide-emphasis-markers t)
-
-;;; Links & attachments
+;;;; Links & attachments
 ;; files Org opens outside Emacs
 (setq org-file-apps '((auto-mode . emacs)
                       ("\\.x?html?\\'" . default)
@@ -78,8 +88,78 @@
         org-attach-use-inheritance t
         org-attach-method 'mv)
 
+;;;; Drag and drop
+;; dropping a file opens it instead of asking attach/open/link
+(setopt org-yank-dnd-method 'open)
+
+;;;; Lists for pasting
+(defun jcs:edit-list-for-pasting (start end)
+  "Copy the plain list in the region as tab-indented lines, for Google Docs.
+Each \"- \" bullet becomes one tab per two spaces of indentation."
+  (interactive "r")
+  (kill-new
+   (replace-regexp-in-string
+    "^\\( *\\)- "
+    (lambda (match) (make-string (/ (length (match-string 1 match)) 2) ?\t))
+    (buffer-substring-no-properties start end)))
+  (message "List copied for pasting"))
+
+;;; Tasks
+
+;;;; Priorities, habits, dependencies
+;; priorities run A-E; new tasks default to E
+(setq org-priority-default ?E
+      org-priority-lowest ?E
+      org-priority-start-cycle-with-default t
+      org-enforce-todo-dependencies nil
+      org-enforce-todo-checkbox-dependencies nil
+      org-id-include-domain nil
+      org-id-method 'uuid)
+
+;; habits: repeating tasks with a consistency graph in the agenda
+(setq org-habit-show-habits-only-for-today nil
+      org-habit-show-all-today t)
+;; habits hidden with K in the agenda come back each morning
+(defun jcs:org-show-habits-again ()
+  "Show habits in the agenda again."
+  (setq org-habit-show-habits t))
+(run-at-time "04:00" 86400 #'jcs:org-show-habits-again)
+
+;; org-depend (vendored in lisp/ from org-contrib): when a NEXT task is done,
+;; promote its next sibling TODO to NEXT
+(defun jcs:org-set-next-action-trigger ()
+  "Give a NEXT task a TRIGGER that promotes the next sibling when it's done."
+  (when (equal (org-get-todo-state) "NEXT")
+    (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
+(add-hook 'org-after-todo-state-change-hook #'jcs:org-set-next-action-trigger)
+
+;;; Capture, refile & archive
+
+;;;; Capture
+;; templates are in secrets.el.gpg (personal info); decrypt on first capture
+(defun jcs:decrypt-secrets (&rest _)
+  "Load lisp/secrets.el, which decrypts secrets.el.gpg."
+  (interactive)
+  (require 'secrets))
+(advice-add 'org-capture :before #'jcs:decrypt-secrets)
+(setq org-default-notes-file (concat jcs:writing-dir "01 - Composting/journals/journal.txt"))
+(keymap-global-set "C-c c" #'org-capture)
+
+;;;; Refile & archive
+(setq org-refile-targets `((,(concat jcs:org-dir "todo.org") :maxlevel . 3)
+                           (,(concat jcs:org-dir "someday_maybe.org") :maxlevel . 3)
+                           (,(concat jcs:org-dir "read_listen_watch.org") :maxlevel . 2))
+      ;; one flat "file/Heading/Sub" list for fido instead of level-by-level
+      org-refile-use-outline-path 'file
+      org-outline-path-complete-in-steps nil)
+
+;; archive everything into one file; don't force archived items to DONE
+(setq org-archive-location (concat jcs:org-dir "archives.org::"))
+(setopt org-archive-mark-done nil)
+
 ;;; Agenda
-(require 'org-agenda)
+
+;;;; Files & views
 (setq org-agenda-files (list (concat jcs:org-dir "inbox.org")
                              (concat jcs:org-dir "todo.org"))
       ;; also searched by C-c a s (text search)
@@ -328,7 +408,7 @@
           ,jcs:org-agenda-block--today-schedule
           ,jcs:org-agenda-block--today-tasks))))
 
-;;; Diary & appointments
+;;;; Diary & appointments
 (setopt diary-file (concat jcs:org-dir "calendar.diary"))
 ;; follow #include lines in the diary, and sort entries
 (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
@@ -336,7 +416,6 @@
 (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 
 ;; load today's timed agenda items as appointment reminders
-(require 'appt)
 (defun jcs:org-agenda-refresh-appts (&rest _)
   "Rebuild the appointment list from the agenda."
   (setq appt-time-msg-list nil)
@@ -347,38 +426,24 @@
 ;; and again just after midnight ("24:01" = 00:01 tomorrow)
 (run-at-time "24:01" 86400 #'jcs:org-agenda-refresh-appts)
 
-;;; Tasks
-;; priorities run A-E; new tasks default to E
-(setq org-priority-default ?E
-      org-priority-lowest ?E
-      org-priority-start-cycle-with-default t
-      org-enforce-todo-dependencies nil
-      org-enforce-todo-checkbox-dependencies nil
-      org-id-include-domain nil
-      org-id-method 'uuid)
+;;;; Notifications
+;; Org timers/clock and appointment reminders go to Notification Center
+(declare-function jcs:notify "init")
+(setopt org-show-notification-handler
+      (lambda (notification) (jcs:notify "Org" notification)))
 
-;; habits: repeating tasks with a consistency graph in the agenda
-(require 'org-habit)
-(setq org-habit-show-habits-only-for-today nil
-      org-habit-show-all-today t)
-;; habits hidden with K in the agenda come back each morning
-(defun jcs:org-show-habits-again ()
-  "Show habits in the agenda again."
-  (setq org-habit-show-habits t))
-(run-at-time "04:00" 86400 #'jcs:org-show-habits-again)
-
-;; org-depend (vendored in lisp/ from org-contrib): when a NEXT task is done,
-;; promote its next sibling TODO to NEXT
-(require 'org-depend)
-(defun jcs:org-set-next-action-trigger ()
-  "Give a NEXT task a TRIGGER that promotes the next sibling when it's done."
-  (when (equal (org-get-todo-state) "NEXT")
-    (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
-(add-hook 'org-after-todo-state-change-hook #'jcs:org-set-next-action-trigger)
+(defun jcs:appt-notify (_min-to-app _new-time msg)
+  "Send appointment reminder MSG (a string or list of strings) as a notification."
+  (jcs:notify "Reminder" (if (listp msg) (string-join msg "\n") msg)))
+(setq appt-display-format 'window
+      appt-disp-window-function #'jcs:appt-notify
+      ;; no reminder window is made, so there's none to delete
+      appt-delete-window-function #'ignore)
+(appt-activate 1)
 
 ;;; Clocking
-;; loaded now so a clock left running is restored at startup
-(require 'org-clock)
+
+;;;; Clock settings & punch in
 ;; choices offered for Effort and Focus properties
 (setq org-global-properties '(("Effort_ALL" . "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
                               ("Focus_ALL" . "High Medium Low"))
@@ -470,44 +535,7 @@ default task; otherwise use the organization task."
     (org-remove-empty-drawer-at (point))))
 (add-hook 'org-clock-out-hook #'jcs:remove-empty-drawer-on-clock-out 90)
 
-;;; Capture
-;; templates are in secrets.el.gpg (personal info); decrypt on first capture
-(defun jcs:decrypt-secrets (&rest _)
-  "Load lisp/secrets.el, which decrypts secrets.el.gpg."
-  (interactive)
-  (require 'secrets))
-(advice-add 'org-capture :before #'jcs:decrypt-secrets)
-(setq org-default-notes-file (concat jcs:writing-dir "01 - Composting/journals/journal.txt"))
-(keymap-global-set "C-c c" #'org-capture)
-
-;;; Refile & archive
-(setq org-refile-targets `((,(concat jcs:org-dir "todo.org") :maxlevel . 3)
-                           (,(concat jcs:org-dir "someday_maybe.org") :maxlevel . 3)
-                           (,(concat jcs:org-dir "read_listen_watch.org") :maxlevel . 2))
-      ;; one flat "file/Heading/Sub" list for fido instead of level-by-level
-      org-refile-use-outline-path 'file
-      org-outline-path-complete-in-steps nil)
-
-;; archive everything into one file; don't force archived items to DONE
-(setq org-archive-location (concat jcs:org-dir "archives.org::"))
-(setopt org-archive-mark-done nil)
-
-;;; Notifications
-;; Org timers/clock and appointment reminders go to Notification Center
-(declare-function jcs:notify "init")
-(setq org-show-notification-handler
-      (lambda (notification) (jcs:notify "Org" notification)))
-
-(defun jcs:appt-notify (_min-to-app _new-time msg)
-  "Send appointment reminder MSG (a string or list of strings) as a notification."
-  (jcs:notify "Reminder" (if (listp msg) (string-join msg "\n") msg)))
-(setq appt-display-format 'window
-      appt-disp-window-function #'jcs:appt-notify
-      ;; no reminder window is made, so there's none to delete
-      appt-delete-window-function #'ignore)
-(appt-activate 1)
-
-;;; Pomodoro
+;;;; Pomodoro
 (use-package org-pomodoro
   :ensure t
   :defer t
@@ -575,17 +603,5 @@ default task; otherwise use the organization task."
           org-pomodoro-ticking-frequency 120))
   (add-hook 'org-pomodoro-finished-hook #'jcs:org-pomodoro-breadcrumbs)
   (add-hook 'org-pomodoro-overtime-hook #'jcs:org-pomodoro-maybe-extend))
-
-;;; Lists for pasting
-(defun jcs:edit-list-for-pasting (start end)
-  "Copy the plain list in the region as tab-indented lines, for Google Docs.
-Each \"- \" bullet becomes one tab per two spaces of indentation."
-  (interactive "r")
-  (kill-new
-   (replace-regexp-in-string
-    "^\\( *\\)- "
-    (lambda (match) (make-string (/ (length (match-string 1 match)) 2) ?\t))
-    (buffer-substring-no-properties start end)))
-  (message "List copied for pasting"))
 
 ;;; org-mode-init.el ends here
