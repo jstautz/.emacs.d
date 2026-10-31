@@ -8,6 +8,10 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror 'nomessage)
 
+;;; Performance
+;; GC every 20MB allocated instead of the 0.8MB default
+(setq gc-cons-threshold 20000000)
+
 ;;; Packages
 ;; Compile any elpa packages that need it.
 (defvar byte-compile-warnings)
