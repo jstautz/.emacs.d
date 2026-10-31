@@ -335,4 +335,16 @@
 (add-hook 'diary-list-entries-hook 'diary-sort-entries t)
 (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 
+;; load today's timed agenda items as appointment reminders
+(require 'appt)
+(defun jcs:org-agenda-refresh-appts (&rest _)
+  "Rebuild the appointment list from the agenda."
+  (setq appt-time-msg-list nil)
+  (org-agenda-to-appt))
+(jcs:org-agenda-refresh-appts)
+;; r in the agenda also refreshes reminders
+(advice-add 'org-agenda-redo :after #'jcs:org-agenda-refresh-appts)
+;; and again just after midnight ("24:01" = 00:01 tomorrow)
+(run-at-time "24:01" 86400 #'jcs:org-agenda-refresh-appts)
+
 ;;; org-mode-init.el ends here
