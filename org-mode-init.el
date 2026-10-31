@@ -347,4 +347,24 @@
 ;; and again just after midnight ("24:01" = 00:01 tomorrow)
 (run-at-time "24:01" 86400 #'jcs:org-agenda-refresh-appts)
 
+;;; Tasks
+;; priorities run A-E; new tasks default to E
+(setq org-priority-default ?E
+      org-priority-lowest ?E
+      org-priority-start-cycle-with-default t
+      org-enforce-todo-dependencies nil
+      org-enforce-todo-checkbox-dependencies nil
+      org-id-include-domain nil
+      org-id-method 'uuid)
+
+;; habits: repeating tasks with a consistency graph in the agenda
+(require 'org-habit)
+(setq org-habit-show-habits-only-for-today nil
+      org-habit-show-all-today t)
+;; habits hidden with K in the agenda come back each morning
+(defun jcs:org-show-habits-again ()
+  "Show habits in the agenda again."
+  (setq org-habit-show-habits t))
+(run-at-time "04:00" 86400 #'jcs:org-show-habits-again)
+
 ;;; org-mode-init.el ends here
