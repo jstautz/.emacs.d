@@ -1,0 +1,105 @@
+# -*- mode: org -*-
+* v4.7.1    2026-09-01
+
+- In repository listings the home directory is now used as
+  ~default-directory~.  874781fe
+
+- Added ~--merge~ to ~magit-branch~ menu.  874781fe
+
+- In Dired buffers ~magit-read-repository~ now defaults to the
+  repository at point.  1b50adfc
+
+- ~magit-gitdir~ now supports returning the common Git directory.
+  #5614
+
+- Added ~--find-copies-harder~ to diff menus because ~-C~ often doesn't
+  do anything if the former isn't used as well.  Both arguments are
+  hidden by default now.  #5629
+
+Bugfixes:
+
+- ~magit-generate-changelog~ failed inside a worktree that specifies
+  the path to the Git directory using a relative path.  #5582
+
+- ~magit-local-branch-p~ recently started using ~--branches~ but that
+  was only added in Git v2.46.0.  #5625
+
+- ~magit-gitignore-in-gitdir~ did not account for linked worktrees.
+  #5614
+
+- ~magit-xref-restore~ needlessy called ~magit-refresh-buffer~.
+  ~magit-setup-buffer-internal~ already takes care of that.  #5626
+
+- ~magit--blob-normal-mode~ bound ~after-change-major-mode-hook~ to
+  suppress certain hook functions, which prevented additions to
+  that hook from persisting, which can happen due to lazy loading.
+  #5627
+
+- ~--find-copies-harder~ is no longer added if ~-C~ is used, because
+  the former renders the latter ineffective.  #5629
+
+- ~magit-toplevel~ did not work inside the Git directory of a submodule.
+  e47eb827
+
+* v4.7.0    2026-08-01
+
+- If the region marks a single commit, ~magit-patch-create~ now creates
+  a patch for that, instead of prompting.  Previously that was only
+  done if multiple commit were marked.  #4734
+
+- When reading a value for ~git diff~'s ~--find-renames~ or ~--find-copies~
+  argument, the similarity index can now be specified as a percentage
+  or as a fraction.  The input now has to exactly match the value, as
+  used by Git; e.g., "20%" or "05".  The latter is interpreted as the
+  fraction 0.05.  #4708
+
+- Added optional DIRECTORY argument to ~magit-status-quick~, intended
+  for use in third-party repository switchers.  #4636
+
+- Added new command ~magit-log-reflog~, which shows the log for all
+  objects mentioned in all reflogs.  #4748
+
+- When ~gpg.format~ specifies a format other than openpgp, the menu
+  argument ~--gpg-sign~ now acts as a boolean toggle.  Previously it
+  always wanted to read an openpgp key, making it impossible to
+  toggle ssh or x509 signing from the menu.  The used format is now
+  shown in the menu.  #5046
+
+- Added ~--reject~ to ~magit-am~ menu.  #5148
+
+- Added Git v2.55's new ~--graph-lane-limit~ to log menus.  It is hidden
+  by default and not available when using an older Git.  #5088
+
+- ~magit-file-untrack~, ~magit-file-rename~, ~magit-file-delete~ and
+  ~magit-do-async-shell-command~ can now act on directories.  #5247
+
+- ~magit-process-kill~ now first tries to interrupt the process.
+  If that fails, a second invocation instead kills it.  #5086
+
+- Added help text for the ~Filter!~ status section.  #5121
+
+- By default, submodules with untracked content are now also listed
+  in the status of the super-repository.  #5448
+
+- Added ~--redit-message~ to the ~magit-commit~ menu.  That argument and
+  ~--reuse-message~ now usually default to the commit at point, but when
+  invoked with a prefix argument, the user can instead select the
+  commit from a log.  #5602
+
+- Added new option ~magit-submodule-list-predicate~ and taught
+  ~magit-submodule-list~ to support unpopulated modules.  #5077
+
+- When ~magit-bisect-start~ and ~magit-bisect-run~ are invoked with the
+  region marking a range of consecutive commit, the commits at the
+  ends are used as the good and bad commits.  #5049
+
+- ~magit-branch-checkout~ now always passes the commit, which is to be
+  checked out, to the function used to read the worktree directory
+  from the user.  Previously this was only done for local branches.
+  #5502
+
+- Added new command ~magit-checkout-remote-ref~.  #5410
+
+- ~magit-project-status~ is no longer added to ~project-switch-commands~.
+...
+...

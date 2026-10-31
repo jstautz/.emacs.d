@@ -1,0 +1,2 @@
+;; Generated package description from llama.el  -*- mode: lisp-data; no-byte-compile: t; lexical-binding:t -*-
+(define-package "llama" "1.0.6" "Compact syntax for short lambda" '((emacs "28.1") (compat "31.1")) :commit "6850d0c91b629da14fdff2300c222289d1a0029a" :authors '(("Jonas Bernoulli" . "emacs.llama@jonas.bernoulli.dev")) :maintainer '("Jonas Bernoulli" . "emacs.llama@jonas.bernoulli.dev") :keywords '("extensions") :url "https://github.com/tarsius/llama")
