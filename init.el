@@ -291,6 +291,11 @@
   (prin1 (eval (read (current-kill 0)) t) (current-buffer)))
 (keymap-global-set "C-c e" #'jcs:eval-and-replace)
 
+;;; Web
+(use-package web-mode
+  :ensure t
+  :defer t)
+
 ;;; Git
 (use-package magit
   :ensure t
