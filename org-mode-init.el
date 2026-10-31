@@ -504,7 +504,73 @@ default task; otherwise use the organization task."
       appt-delete-window-function #'ignore)
 (appt-activate 1)
 
-;; alert (used by org-pomodoro) also uses Notification Center
-(setopt alert-default-style 'notifier)
+;;; Pomodoro
+(use-package org-pomodoro
+  :ensure t
+  :defer t
+  :functions org-pomodoro-start
+  :defines alert-default-style
+  :preface
+  (defun jcs:org-pomodoro-variable-start (&optional minutes)
+    "Start a pomodoro of MINUTES (default 24)."
+    (interactive "MPomodoro duration (default 24): ")
+    (let ((n (string-to-number (or minutes ""))))
+      (setq org-pomodoro-length (if (>= n 1) n 24)))
+    (org-pomodoro))
+
+  (defun jcs:org-pomodoro-maybe-extend ()
+    "On overtime, offer to extend the pomodoro instead of breaking."
+    (interactive)
+    (when (y-or-n-p "Extend current Pomodoro? ")
+      (setq org-pomodoro-length
+            (string-to-number (read-string "Extend Pomodoro duration: ")))
+      (org-pomodoro-start))
+    (org-pomodoro))
+
+  ;; after each pomodoro, a scratch Org buffer for notes to resume from
+  (defun jcs:org-pomodoro-breadcrumbs ()
+    "Open *Pomodoro Notes* with a breadcrumbs template."
+    (switch-to-buffer (get-buffer-create "*Pomodoro Notes*"))
+    (org-mode)
+    (goto-char (point-min))
+    (insert "* ")
+    (org-insert-time-stamp (current-time) t t)
+    (insert "\n\n\n----------Breadcrumbs----------\n\n"
+            "<One sentence describing what I was just doing.>\n\n"
+            "A list of pointers to things I need to remember when I get back:\n\n"
+            "- <First thing I shouldn’t forget\n- Second thing I shouldn’t forget>\n\n"
+            "You do not have to make full sentences, just jotting down individual words "
+            "that make sense to you is enough. They merely function as pointers back to "
+            "your memory.\n\n"
+            "----------Priming for Next Session----------\n\n"
+            "<One sentence describing what you think you will be doing when you come "
+            "back from your break.>\n\n"
+            "Now visualize what doing this will entail:\n\n"
+            "- Are there any decisions that you need to make before you can continue?\n"
+            "- Are there any questions that need answering before you can continue?\n"
+            "- Do you need any specific resources before you can continue?\n\n"
+            "<One question that needs answering shortly after you come back from "
+            "your break.>\n\n"))
+  :init
+  (keymap-global-set "C-c p" #'jcs:org-pomodoro-variable-start)
+  (add-to-list 'org-speed-commands '("p" . jcs:org-pomodoro-variable-start))
+  :config
+  ;; org-pomodoro's alert library also uses Notification Center (terminal-notifier)
+  (setq alert-default-style 'notifier)
+  (let ((alarm (expand-file-name "resources/alarm_clock.aif" user-emacs-directory)))
+    (setq org-pomodoro-length 24
+          org-pomodoro-short-break-length 6
+          org-pomodoro-manual-break t
+          org-pomodoro-keep-killed-pomodoro-time t
+          org-pomodoro-finished-sound alarm
+          org-pomodoro-overtime-sound alarm
+          org-pomodoro-short-break-sound alarm
+          org-pomodoro-long-break-sound alarm
+          org-pomodoro-ticking-sound-p t
+          org-pomodoro-ticking-sound (expand-file-name "resources/ticks.aif" user-emacs-directory)
+          org-pomodoro-ticking-sound-states '(:pomodoro)
+          org-pomodoro-ticking-frequency 120))
+  (add-hook 'org-pomodoro-finished-hook #'jcs:org-pomodoro-breadcrumbs)
+  (add-hook 'org-pomodoro-overtime-hook #'jcs:org-pomodoro-maybe-extend))
 
 ;;; org-mode-init.el ends here
