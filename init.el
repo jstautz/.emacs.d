@@ -97,8 +97,31 @@
 
 ;;; Completion
 ;; fido = flex matching, case-insensitive; savehist keeps M-x history sorting across restarts
+(require 'icomplete)
 (require 'recentf)
 (fido-vertical-mode 1)
+;; ido-style TAB: fill in the selected candidate without exiting
+(keymap-set icomplete-fido-mode-map "TAB" #'icomplete-force-complete)
+
+;; ido-style C-f at end of input: redo the prompt without fido, so RET
+;; takes exactly what you typed
+(defun jcs:fido-fallback ()
+  "Move forward, or at end of input, repeat this prompt without fido."
+  (interactive)
+  (if (not (eolp))
+      (forward-char)
+    (let ((command current-minibuffer-command)
+          (input (minibuffer-contents)))
+      (run-at-time 0 nil
+                   (lambda ()
+                     (let ((icomplete-mode nil))
+                       (minibuffer-with-setup-hook
+                           (lambda ()
+                             (delete-minibuffer-contents)
+                             (insert input))
+                         (call-interactively command)))))
+      (abort-recursive-edit))))
+(keymap-set icomplete-fido-mode-map "C-f" #'jcs:fido-fallback)
 (recentf-mode 1)
 (savehist-mode 1)
 
@@ -159,8 +182,8 @@
 (keymap-global-set "C-~" #'jcs:toggle-windows-split)
 
 ;; resize windows from the keyboard (overrides C-M-<arrow> sexp motion)
-(keymap-global-set "C-M-<left>" #'shrink-window-horizontally)
-(keymap-global-set "C-M-<right>" #'enlarge-window-horizontally)
+(keymap-global-set "C-M-<left>" #'enlarge-window-horizontally)
+(keymap-global-set "C-M-<right>" #'shrink-window-horizontally)
 (keymap-global-set "C-M-<up>" #'enlarge-window)
 (keymap-global-set "C-M-<down>" #'shrink-window)
 
@@ -260,7 +283,10 @@
 ;;; Markdown
 (use-package markdown-mode
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  ;; dropping a file opens it instead of inserting a link
+  (setopt markdown-yank-dnd-method 'open))
 
 ;;; HTML export
 ;; used by Org for colorized source blocks in HTML export
@@ -286,11 +312,7 @@
   :init
   (setq-default visual-fill-column-center-text t))
 
-(defun jcs:unfill-paragraph ()
-  "Join a multi-line paragraph (or the region) into one line."
-  (interactive)
-  (let ((fill-column (point-max)))
-    (call-interactively #'fill-paragraph)))
+;; M-x unfill-paragraph is built in as of Emacs 31
 
 ;;; Spelling
 ;; needs `brew install aspell'; flyspell stays off until it's on PATH
