@@ -160,6 +160,52 @@
 (keymap-global-set "C-M-<up>" #'enlarge-window)
 (keymap-global-set "C-M-<down>" #'shrink-window)
 
+;;; Files & buffers
+(keymap-global-set "C-x C-b" #'ibuffer)
+(keymap-global-set "C-x C-r" #'rename-visited-file)
+
+(defun jcs:delete-current-buffer-file ()
+  "Delete the file visited by this buffer, then kill the buffer."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename t)
+        (kill-buffer)
+        (message "File '%s' successfully removed" filename)))))
+;; replaces the C-x C-k keyboard-macro prefix (F3/F4 still record/play)
+(keymap-global-set "C-x C-k" #'jcs:delete-current-buffer-file)
+
+;; M-x locate uses Spotlight
+(setopt locate-make-command-line (lambda (s) (list "mdfind" "-name" s)))
+(setq large-file-warning-threshold 100000000)
+
+;;; Dired
+(use-package dired
+  :defer t
+  :functions (dired-next-line dired-goto-next-nontrivial-file dired-do-open)
+  :preface
+  (defun jcs:dired-back-to-top ()
+    "Move to the first file, skipping . and .."
+    (interactive)
+    (goto-char (point-min))
+    (dired-next-line 1)
+    (dired-goto-next-nontrivial-file))
+  (defun jcs:dired-jump-to-bottom ()
+    "Move to the last file."
+    (interactive)
+    (goto-char (point-max))
+    (dired-next-line -1))
+  :config
+  ;; macOS ls has no --dired; saying so up front skips the warning
+  (setopt dired-use-ls-dired nil)
+  (keymap-set dired-mode-map "r" #'wdired-change-to-wdired-mode)
+  ;; open in the default macOS app
+  (keymap-set dired-mode-map "z" #'dired-do-open)
+  (keymap-set dired-mode-map "<remap> <beginning-of-buffer>" #'jcs:dired-back-to-top)
+  (keymap-set dired-mode-map "<remap> <end-of-buffer>" #'jcs:dired-jump-to-bottom))
+
 ;;; Desktop
 ;; buffers, windows, registers and search rings; savehist covers minibuffer histories
 (desktop-save-mode 1)
