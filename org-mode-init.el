@@ -113,4 +113,219 @@
       '("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS-goal_month-goal_quarter-goal_year/-DONE"
         ("NEXT" "STARTED" "TODO") ("NOTES") ""))
 
+;; reusable agenda blocks, combined into custom views below
+(defvar jcs:org-agenda-block--purpose-header
+  '(tags "TOPOFAGENDA"
+         ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n")
+          (org-tags-match-list-sublevels nil)))
+  "Top of Agenda.")
+
+(defvar jcs:org-agenda-block--today-schedule
+  '(agenda "" ((org-agenda-overriding-header "Today's Schedule:")
+               (org-agenda-span 'day)
+               (org-agenda-start-on-weekday nil)
+               (org-agenda-start-day "+0d")))
+  "A block showing a 1 day schedule.")
+
+(defvar jcs:org-agenda-block--upcoming-week
+  '(agenda "" ((org-agenda-overriding-header "Next 7 Days:")
+               (org-agenda-span 7)
+               (org-agenda-start-on-weekday nil)
+               (org-agenda-start-day "+0d")))
+  "A block showing my schedule for the next 7 days.")
+
+(defvar jcs:org-agenda-block--inbox
+  '(tags "REFILE"
+         ((org-agenda-overriding-header "Inbox items to process / refile:")))
+  "Items from my inbox and/or needing refiling.")
+
+(defvar jcs:org-agenda-block--estimate
+  '(tags-todo "+Effort=\"\""
+              ((org-agenda-overriding-header "Tasks to estimate:")))
+  "Tasks I need to add estimates to.")
+
+(defvar jcs:org-agenda-block--goals-year
+  '(tags "goal_year"
+         ((org-agenda-overriding-header "Yearly OKRs:")))
+  "Yearly Goals")
+
+(defvar jcs:org-agenda-block--goals-quarter
+  '(tags "goal_quarter"
+         ((org-agenda-overriding-header "Quarterly OKRs:")))
+  "Quarterly Goals")
+
+(defvar jcs:org-agenda-block--goals-month
+  '(tags "goal_month"
+         ((org-agenda-overriding-header "Monthly Goals:")))
+  "Monthly Goals")
+
+(defvar jcs:org-agenda-block--goals-week
+  '(tags "goal_week"
+         ((org-agenda-overriding-header "Weekly Goals:")))
+  "Weekly Goals")
+
+(defvar jcs:org-agenda-block--tasks-today
+  '(tags-todo "+PRIORITY=\"A\""
+              ((org-agenda-overriding-header "Today's Priorities:")))
+  "Tasks for Today (A priority tasks)")
+
+(defvar jcs:org-agenda-block--tasks-next
+  '(todo "NEXT"
+         ((org-agenda-overriding-header "All Next Actions (except future scheduled):")
+          (org-agenda-todo-ignore-scheduled 'future)))
+  "All Next Actions, except those with scheduled dates set in the future")
+
+(defvar jcs:org-agenda-block--next-home
+  '(tags-todo "home-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Home Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Home next actions, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--todo-home
+  '(tags-todo "home-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Home Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Home backlog, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--next-work
+  '(tags-todo "work-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Work Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Work next actions, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--todo-work
+  '(tags-todo "work-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Work Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Work backlog, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--next-coaching
+  '(tags-todo "coaching-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Coaching Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Coaching next actions, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--todo-coaching
+  '(tags-todo "coaching-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Coaching Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Coaching backlog, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--next-writing
+  '(tags-todo "writing-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Writing Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing next actions, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--todo-writing
+  '(tags-todo "writing-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Writing Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing backlog, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--next-writing-mgr
+  '(tags-todo "writing_mgr-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Writing Manager Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing_Mgr next actions, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--todo-writing-mgr
+  '(tags-todo "writing_mgr-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Writing Manager Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing_Mgr backlog, except future-scheduled ones.")
+
+(defvar jcs:org-agenda-block--today-tasks
+  '(tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
+              ((org-agenda-overriding-header "Today's tasks\n------------")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Priority A and B tasks are tasks for Today.")
+
+
+;; custom views: C-c a SPC overview, w work, h home, G goals, T today, ...
+(setq org-agenda-custom-commands
+      `((" " "Overview"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--upcoming-week
+          ,jcs:org-agenda-block--inbox
+          (org-agenda-list-stuck-projects)
+          ,jcs:org-agenda-block--estimate
+          ,jcs:org-agenda-block--goals-year
+          ,jcs:org-agenda-block--goals-quarter
+          ,jcs:org-agenda-block--goals-month
+          ,jcs:org-agenda-block--goals-week
+          ,jcs:org-agenda-block--tasks-today
+          ,jcs:org-agenda-block--tasks-next))
+
+        ("G" "Goals"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--goals-week
+          ,jcs:org-agenda-block--goals-month
+          ,jcs:org-agenda-block--goals-quarter
+          ,jcs:org-agenda-block--goals-year))
+
+        ("W" "Weekly Goals"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--goals-week))
+
+        ("h" "Home Tasks + Agenda"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--upcoming-week
+          ,jcs:org-agenda-block--next-home
+          ,jcs:org-agenda-block--todo-home))
+
+        ("w" "Work Tasks + Agenda"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--upcoming-week
+          ,jcs:org-agenda-block--next-work
+          ,jcs:org-agenda-block--todo-work))
+
+        ("c" "Coaching Tasks + Agenda"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--upcoming-week
+          ,jcs:org-agenda-block--next-coaching
+          ,jcs:org-agenda-block--todo-coaching))
+
+        ("r" "Writing Tasks"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--next-writing
+          ,jcs:org-agenda-block--todo-writing))
+
+        ("g" "Writing Manager Tasks"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--next-writing-mgr
+          ,jcs:org-agenda-block--todo-writing-mgr))
+
+        ("e" "errands + phone" tags-todo "errands|phone")
+
+        ("R" "reading" tags-todo "reading")
+
+        ("L" "listen/watch" tags-todo "listen_watch")
+
+        ("D" "Daily review"
+         agenda ""
+         ((org-agenda-span 'day)
+          (org-agenda-start-on-weekday 0)
+          (org-agenda-start-with-log-mode t)
+          (org-agenda-use-time-grid nil)
+          (org-agenda-toggle-diary nil)
+          (org-agenda-skip-function
+           '(org-agenda-skip-entry-if 'nottodo 'done))))
+
+        ("T" "TODAY A or B Priority tasks"
+         (,jcs:org-agenda-block--purpose-header
+          ,jcs:org-agenda-block--today-schedule
+          ,jcs:org-agenda-block--today-tasks))))
+
 ;;; org-mode-init.el ends here
