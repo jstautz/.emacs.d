@@ -376,4 +376,16 @@
     (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
 (add-hook 'org-after-todo-state-change-hook #'jcs:org-set-next-action-trigger)
 
+;;; Clocking
+;; loaded now so a clock left running is restored at startup
+(require 'org-clock)
+;; choices offered for Effort and Focus properties
+(setq org-global-properties '(("Effort_ALL" . "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
+                              ("Focus_ALL" . "High Medium Low"))
+      org-clock-into-drawer t
+      org-clock-sound nil
+      org-clock-mode-line-total 'current
+      org-clock-history-length 10
+      org-clock-clocked-in-display 'mode-line)
+
 ;;; org-mode-init.el ends here
