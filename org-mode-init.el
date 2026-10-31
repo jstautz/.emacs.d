@@ -485,4 +485,8 @@ default task; otherwise use the organization task."
       org-refile-use-outline-path 'file
       org-outline-path-complete-in-steps nil)
 
+;; archive everything into one file; don't force archived items to DONE
+(setq org-archive-location (concat jcs:org-dir "archives.org::"))
+(setopt org-archive-mark-done nil)
+
 ;;; org-mode-init.el ends here
