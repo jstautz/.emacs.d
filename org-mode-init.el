@@ -136,12 +136,6 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
 ;;; Capture, refile & archive
 
 ;;;; Capture
-;; templates are in secrets.el.gpg (personal info); decrypt on first capture
-(defun jcs:decrypt-secrets (&rest _)
-  "Load lisp/secrets.el, which decrypts secrets.el.gpg."
-  (interactive)
-  (require 'secrets))
-(advice-add 'org-capture :before #'jcs:decrypt-secrets)
 (setq org-default-notes-file (concat jcs:writing-dir "01 - Composting/journals/journal.txt"))
 (keymap-global-set "C-c c" #'org-capture)
 
