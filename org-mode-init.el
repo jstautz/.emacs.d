@@ -73,4 +73,9 @@
                       ("\\.xls\\'" . system)
                       ("\\.dvi\\'" . system)))
 
+;; tag attachments so they're findable; children inherit the parent's attach dir
+(setopt org-attach-auto-tag "attachment"
+        org-attach-use-inheritance t
+        org-attach-method 'mv)
+
 ;;; org-mode-init.el ends here
