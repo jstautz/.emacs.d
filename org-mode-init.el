@@ -573,4 +573,16 @@ default task; otherwise use the organization task."
   (add-hook 'org-pomodoro-finished-hook #'jcs:org-pomodoro-breadcrumbs)
   (add-hook 'org-pomodoro-overtime-hook #'jcs:org-pomodoro-maybe-extend))
 
+;;; Lists for pasting
+(defun jcs:edit-list-for-pasting (start end)
+  "Copy the plain list in the region as tab-indented lines, for Google Docs.
+Each \"- \" bullet becomes one tab per two spaces of indentation."
+  (interactive "r")
+  (kill-new
+   (replace-regexp-in-string
+    "^\\( *\\)- "
+    (lambda (match) (make-string (/ (length (match-string 1 match)) 2) ?\t))
+    (buffer-substring-no-properties start end)))
+  (message "List copied for pasting"))
+
 ;;; org-mode-init.el ends here
