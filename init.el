@@ -364,6 +364,10 @@
   (prin1 (eval (read (current-kill 0)) t) (current-buffer)))
 (keymap-global-set "C-c e" #'jcs:eval-and-replace)
 
+;;;; Diff
+;; unified like git/magit; -a diffs files with odd bytes as text, not "binary"
+(setq diff-switches "-u -a")
+
 ;;;; Git
 (use-package magit
   :ensure t
