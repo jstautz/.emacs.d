@@ -26,6 +26,11 @@
   (setq exec-path-from-shell-warn-duration-millis 1500)
   (exec-path-from-shell-initialize))
 
+;;; Server
+(require 'server)
+(unless (or noninteractive (server-running-p))
+  (server-start))
+
 ;;; Org
 (load (expand-file-name "org-mode-init" user-emacs-directory) nil 'nomessage)
 
