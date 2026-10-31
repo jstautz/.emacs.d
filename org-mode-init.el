@@ -101,4 +101,16 @@
                                     (tags todo-state-down priority-down))
       org-agenda-span 'week)
 
+;; TODO lists: hide future-scheduled items, include sublevels
+(setq org-agenda-tags-todo-honor-ignore-options nil
+      org-agenda-todo-ignore-scheduled 'future
+      org-agenda-todo-list-sublevels t
+      org-tags-match-list-sublevels t
+      org-agenda-start-with-clockreport-mode nil
+      org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3)
+      ;; stuck = a level-2 project (not inbox, habits or goals) with no next action
+      org-stuck-projects
+      '("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS-goal_month-goal_quarter-goal_year/-DONE"
+        ("NEXT" "STARTED" "TODO") ("NOTES") ""))
+
 ;;; org-mode-init.el ends here
