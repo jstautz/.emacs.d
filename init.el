@@ -361,6 +361,16 @@
   ;; C-c $ is org-archive-subtree
   (keymap-unset flyspell-mode-map "C-c $"))
 
+;;; Notifications
+;; macOS Notification Center (brew install terminal-notifier); clicking it
+;; brings Emacs forward. Falls back to the echo area.
+(defun jcs:notify (title message)
+  "Show MESSAGE titled TITLE as a macOS notification."
+  (if-let* ((notifier (executable-find "terminal-notifier")))
+      (start-process "terminal-notifier" nil notifier
+                     "-title" title "-message" message "-activate" "org.gnu.Emacs")
+    (message "%s: %s" title message)))
+
 ;;; Server
 (require 'server)
 (unless (or noninteractive (server-running-p))

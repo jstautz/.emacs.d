@@ -489,4 +489,22 @@ default task; otherwise use the organization task."
 (setq org-archive-location (concat jcs:org-dir "archives.org::"))
 (setopt org-archive-mark-done nil)
 
+;;; Notifications
+;; Org timers/clock and appointment reminders go to Notification Center
+(declare-function jcs:notify "init")
+(setq org-show-notification-handler
+      (lambda (notification) (jcs:notify "Org" notification)))
+
+(defun jcs:appt-notify (_min-to-app _new-time msg)
+  "Send appointment reminder MSG (a string or list of strings) as a notification."
+  (jcs:notify "Reminder" (if (listp msg) (string-join msg "\n") msg)))
+(setq appt-display-format 'window
+      appt-disp-window-function #'jcs:appt-notify
+      ;; no reminder window is made, so there's none to delete
+      appt-delete-window-function #'ignore)
+(appt-activate 1)
+
+;; alert (used by org-pomodoro) also uses Notification Center
+(setopt alert-default-style 'notifier)
+
 ;;; org-mode-init.el ends here
