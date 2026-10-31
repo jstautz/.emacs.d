@@ -396,8 +396,11 @@
 (defun jcs:clock-in-organization-task-as-default ()
   "Clock in to the organization task and make it the default."
   (interactive)
-  (org-with-point-at (org-id-find jcs:work-org-task-id 'marker)
-    (org-clock-in '(16))))
+  (let ((marker (org-id-find jcs:work-org-task-id 'marker)))
+    (unless marker
+      (user-error "Can't find the organization task (ID %s)" jcs:work-org-task-id))
+    (org-with-point-at marker
+      (org-clock-in '(16)))))
 
 (defun jcs:punch-in (arg)
   "Start continuous clocking.
