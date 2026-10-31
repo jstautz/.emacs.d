@@ -328,4 +328,11 @@
           ,jcs:org-agenda-block--today-schedule
           ,jcs:org-agenda-block--today-tasks))))
 
+;;; Diary & appointments
+(setopt diary-file (concat jcs:org-dir "calendar.diary"))
+;; follow #include lines in the diary, and sort entries
+(add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+(add-hook 'diary-list-entries-hook 'diary-sort-entries t)
+(add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
+
 ;;; org-mode-init.el ends here
