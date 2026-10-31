@@ -48,4 +48,9 @@
       org-tags-column 80
       org-cycle-separator-lines 0)
 
+;;; Editing
+;; speed keys: single-letter commands at the start of a headline (? lists them)
+(setq org-use-speed-commands t
+      org-fast-tag-selection-single-key t)
+
 ;;; org-mode-init.el ends here
