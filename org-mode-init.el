@@ -37,4 +37,7 @@
 (keymap-global-set "C-S-<f5>" #'jcs:widen)
 (keymap-global-set "<f6>" #'org-clock-goto)
 
+;; never toggle timestamp overlays by accident
+(keymap-unset org-mode-map "C-c C-x C-t")
+
 ;;; org-mode-init.el ends here
