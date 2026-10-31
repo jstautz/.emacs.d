@@ -27,4 +27,14 @@
 ;; speed key S widens (speed keys work at the start of a headline)
 (add-to-list 'org-speed-commands '("S" . jcs:widen))
 
+;;; Keys
+(keymap-global-set "C-c l" #'org-store-link)
+(keymap-global-set "C-c a" #'org-agenda)
+(keymap-global-set "<f5>" #'org-narrow-to-subtree)
+(keymap-global-set "M-<f5>" #'jcs:org-todo-tree)
+(keymap-global-set "S-<f5>" #'jcs:widen)
+;; same as S-<f5>, for keyboards where Fn/Ctrl get mixed up
+(keymap-global-set "C-S-<f5>" #'jcs:widen)
+(keymap-global-set "<f6>" #'org-clock-goto)
+
 ;;; org-mode-init.el ends here
