@@ -121,6 +121,12 @@
       (switch-to-buffer choice))))
 (keymap-global-set "C-x b" #'jcs:switch-to-buffer-or-recent-file)
 
+;;; Desktop
+;; buffers, windows, registers and search rings; savehist covers minibuffer histories
+(desktop-save-mode 1)
+;; load a locked desktop only if the Emacs that locked it is gone
+(setopt desktop-load-locked-desktop 'check-pid)
+
 ;;; Popups
 (use-package popwin
   :ensure t
