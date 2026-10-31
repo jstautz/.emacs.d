@@ -190,6 +190,8 @@
 ;;; Files & buffers
 (keymap-global-set "C-x C-b" #'ibuffer)
 (keymap-global-set "C-x C-r" #'rename-visited-file)
+;; reload files changed outside Emacs; buffers with unsaved edits are left alone
+(global-auto-revert-mode 1)
 
 (defun jcs:delete-current-buffer-file ()
   "Delete the file visited by this buffer, then kill the buffer."
