@@ -367,4 +367,13 @@
   (setq org-habit-show-habits t))
 (run-at-time "04:00" 86400 #'jcs:org-show-habits-again)
 
+;; org-depend (vendored in lisp/ from org-contrib): when a NEXT task is done,
+;; promote its next sibling TODO to NEXT
+(require 'org-depend)
+(defun jcs:org-set-next-action-trigger ()
+  "Give a NEXT task a TRIGGER that promotes the next sibling when it's done."
+  (when (equal (org-get-todo-state) "NEXT")
+    (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
+(add-hook 'org-after-todo-state-change-hook #'jcs:org-set-next-action-trigger)
+
 ;;; org-mode-init.el ends here
