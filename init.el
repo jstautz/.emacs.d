@@ -121,6 +121,45 @@
       (switch-to-buffer choice))))
 (keymap-global-set "C-x b" #'jcs:switch-to-buffer-or-recent-file)
 
+;;; Windows
+(keymap-global-set "M-o" #'other-window)
+
+;; new split shows the previous buffer, not the same one twice
+(defun jcs:split-below-last-buffer ()
+  "Split the window below and show the previous buffer there."
+  (interactive)
+  (select-window (split-window-below))
+  (switch-to-next-buffer))
+
+(defun jcs:split-right-last-buffer ()
+  "Split the window right and show the previous buffer there."
+  (interactive)
+  (select-window (split-window-right))
+  (switch-to-next-buffer))
+
+(keymap-global-set "C-x 2" #'jcs:split-below-last-buffer)
+(keymap-global-set "C-x 3" #'jcs:split-right-last-buffer)
+
+;; zoom one window full-frame and back; the split is kept in register u
+(defun jcs:toggle-windows-split ()
+  "Toggle between one window and the previous split of windows."
+  (interactive)
+  (unless (window-minibuffer-p)
+    (if (< 1 (count-windows))
+        (progn
+          (window-configuration-to-register ?u)
+          (delete-other-windows))
+      (jump-to-register ?u))))
+
+(keymap-global-set "C-`" #'jcs:toggle-windows-split)
+(keymap-global-set "C-~" #'jcs:toggle-windows-split)
+
+;; resize windows from the keyboard (overrides C-M-<arrow> sexp motion)
+(keymap-global-set "C-M-<left>" #'shrink-window-horizontally)
+(keymap-global-set "C-M-<right>" #'enlarge-window-horizontally)
+(keymap-global-set "C-M-<up>" #'enlarge-window)
+(keymap-global-set "C-M-<down>" #'shrink-window)
+
 ;;; Desktop
 ;; buffers, windows, registers and search rings; savehist covers minibuffer histories
 (desktop-save-mode 1)
