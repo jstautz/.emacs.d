@@ -78,4 +78,14 @@
         org-attach-use-inheritance t
         org-attach-method 'mv)
 
+;;; Agenda
+(require 'org-agenda)
+(setq org-agenda-files (list (concat jcs:org-dir "inbox.org")
+                             (concat jcs:org-dir "todo.org"))
+      ;; also searched by C-c a s (text search)
+      org-agenda-text-search-extra-files
+      (mapcar (lambda (file) (concat jcs:org-dir file))
+              '("goals.org" "someday_maybe.org" "gift_ideas.org"
+                "tech_log.txt" "read_listen_watch.org")))
+
 ;;; org-mode-init.el ends here
