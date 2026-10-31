@@ -437,7 +437,7 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
 
 ;;; Clocking
 
-;;;; Clock settings & punch in
+;;;; Clock settings
 ;; choices offered for Effort and Focus properties
 (setq org-global-properties '(("Effort_ALL" . "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
                               ("Focus_ALL" . "High Medium Low"))
@@ -446,55 +446,6 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
       org-clock-mode-line-total 'current
       org-clock-history-length 10
       org-clock-clocked-in-display 'mode-line)
-
-;; punch in: keep a clock running all day, falling back to the work
-;; "General organization" task in todo.org whenever nothing else is clocked
-(defvar jcs:work-org-task-id "DB00839E-39A9-4023-8494-25EA0BDCF16D")
-(defvar jcs:keep-clock-running nil)
-
-(defun jcs:clock-in-organization-task-as-default ()
-  "Clock in to the organization task and make it the default."
-  (interactive)
-  (let ((marker (org-id-find jcs:work-org-task-id 'marker)))
-    (unless marker
-      (user-error "Can't find the organization task (ID %s)" jcs:work-org-task-id))
-    (org-with-point-at marker
-      (org-clock-in '(16)))))
-
-(defun jcs:punch-in (arg)
-  "Start continuous clocking.
-With \\[universal-argument] on a task (here or in the agenda), make it the
-default task; otherwise use the organization task."
-  (interactive "p")
-  (setq jcs:keep-clock-running t)
-  (if (equal major-mode 'org-agenda-mode)
-      (let* ((marker (org-get-at-bol 'org-hd-marker))
-             (tags (org-with-point-at marker (org-get-tags))))
-        (if (and (eq arg 4) tags)
-            (org-agenda-clock-in '(16))
-          (jcs:clock-in-organization-task-as-default)))
-    (save-restriction
-      (widen)
-      (if (and (equal major-mode 'org-mode) (not (org-before-first-heading-p)) (eq arg 4))
-          (org-clock-in '(16))
-        (jcs:clock-in-organization-task-as-default)))))
-
-(defun jcs:punch-out ()
-  "Stop continuous clocking."
-  (interactive)
-  (setq jcs:keep-clock-running nil)
-  (when (org-clock-is-active)
-    (org-clock-out))
-  (org-agenda-remove-restriction-lock))
-
-(defun jcs:clock-out-maybe ()
-  "After clocking out, clock back in to the default task while punched in."
-  (when (and jcs:keep-clock-running
-             (not org-clock-clocking-in)
-             (marker-buffer org-clock-default-task)
-             (not org-clock-resolving-clocks-due-to-idleness))
-    (jcs:clock-in-organization-task-as-default)))
-(add-hook 'org-clock-out-hook #'jcs:clock-out-maybe 90)
 
 ;; clock behavior: resume after restarts and idle, drop 0:00 entries
 (setq org-time-stamp-rounding-minutes '(0 5)
