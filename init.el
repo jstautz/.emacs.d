@@ -302,6 +302,10 @@
   :ensure t
   :defer t)
 
+;;; Remote files
+;; ssh streams small files faster than the default scp
+(setopt tramp-default-method "ssh")
+
 ;;; Git
 (use-package magit
   :ensure t
