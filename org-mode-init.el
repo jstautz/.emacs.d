@@ -61,4 +61,7 @@
       org-link-shell-confirm-function #'y-or-n-p
       org-fold-catch-invisible-edits 'smart)
 
+;; hide *bold* /italic/ markers (pretty entities made filenames with _ messy)
+(setq org-hide-emphasis-markers t)
+
 ;;; org-mode-init.el ends here
