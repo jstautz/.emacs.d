@@ -63,6 +63,19 @@
 (keymap-global-set "C-<escape>" #'top-level)
 ;; quit deliberately, via M-x save-buffers-kill-emacs
 (keymap-global-unset "C-x C-c")
+;; keys I hit by accident (C-x C-q read-only, C-x . fill prefix, M-` menu bar)
+(keymap-global-unset "C-x C-q")
+(keymap-global-unset "<f2>")
+(keymap-global-unset "C-x .")
+(keymap-global-unset "M-`")
+;; muscle memory: Cmd-s saves; replaces the M-s search prefix
+(keymap-global-set "M-s" #'save-buffer)
+(keymap-global-set "C-z" #'undo)
+
+;;; Mac
+;; both Command and Option are Meta
+(setq ns-command-modifier 'meta
+      ns-alternate-modifier 'meta)
 
 ;;; Completion
 ;; fido = flex matching, case-insensitive; savehist keeps M-x history sorting across restarts
