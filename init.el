@@ -247,6 +247,12 @@
   :config
   (popwin-mode 1))
 
+;;; Jumping
+;; C-. then a character: jump to any word starting with it (ace-jump style)
+(use-package avy
+  :ensure t
+  :bind ("C-." . avy-goto-word-1))
+
 ;;; Kill ring
 ;; M-y without a preceding C-y opens the browser
 (use-package browse-kill-ring
@@ -327,6 +333,8 @@
   :defer t
   :config
   (keymap-set flyspell-mode-map "C-;" #'ispell-word)
+  ;; leave C-. to avy (flyspell binds it to auto-correct)
+  (keymap-unset flyspell-mode-map "C-.")
   ;; C-c $ is org-archive-subtree
   (keymap-unset flyspell-mode-map "C-c $"))
 
