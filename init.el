@@ -296,6 +296,12 @@
   :ensure t
   :defer t)
 
+;;; REST
+;; M-x restclient-mode in a buffer of HTTP requests; C-c C-c sends one
+(use-package restclient
+  :ensure t
+  :defer t)
+
 ;;; Git
 (use-package magit
   :ensure t
