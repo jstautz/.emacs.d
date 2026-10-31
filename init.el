@@ -103,24 +103,24 @@
 ;; ido-style TAB: fill in the selected candidate without exiting
 (keymap-set icomplete-fido-mode-map "TAB" #'icomplete-force-complete)
 
-;; ido-style C-f at end of input: redo the prompt without fido, so RET
-;; takes exactly what you typed
+;; ido-style C-f at end of input: turn fido off in this prompt only, so
+;; RET takes exactly what you typed
 (defun jcs:fido-fallback ()
-  "Move forward, or at end of input, repeat this prompt without fido."
+  "Move forward, or at end of input, turn off fido for this prompt."
   (interactive)
   (if (not (eolp))
       (forward-char)
-    (let ((command current-minibuffer-command)
-          (input (minibuffer-contents)))
-      (run-at-time 0 nil
-                   (lambda ()
-                     (let ((icomplete-mode nil))
-                       (minibuffer-with-setup-hook
-                           (lambda ()
-                             (delete-minibuffer-contents)
-                             (insert input))
-                         (call-interactively command)))))
-      (abort-recursive-edit))))
+    (remove-hook 'post-command-hook #'icomplete-post-command-hook t)
+    (delete-overlay icomplete-overlay)
+    ;; fido's keymaps are layered over the prompt's own; peel them off
+    (let ((map (current-local-map))
+          (layers (list icomplete-minibuffer-map icomplete-fido-mode-map
+                        icomplete-vertical-mode-minibuffer-map)))
+      (while (seq-some (lambda (layer) (memq layer map)) layers)
+        (setq map (keymap-parent map)))
+      (use-local-map map))
+    (kill-local-variable 'completion-styles)
+    (message "fido off for this prompt")))
 (keymap-set icomplete-fido-mode-map "C-f" #'jcs:fido-fallback)
 (recentf-mode 1)
 (savehist-mode 1)
