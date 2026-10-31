@@ -72,7 +72,7 @@
 
 ;;; Mode line
 ;; hide these minor-mode lighters (built-in replacement for diminish)
-(setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode visual-line-mode)
+(setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode visual-line-mode org-indent-mode)
       mode-line-collapse-minor-modes-to "")
 
 ;;; Keys

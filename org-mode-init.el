@@ -40,4 +40,12 @@
 ;; never toggle timestamp overlays by accident
 (keymap-unset org-mode-map "C-c C-x C-t")
 
+;;; Outline style
+(setq org-startup-indented t
+      org-level-color-stars-only t
+      org-fontify-done-headline t
+      org-blank-before-new-entry '((heading) (plain-list-item))
+      org-tags-column 80
+      org-cycle-separator-lines 0)
+
 ;;; org-mode-init.el ends here
