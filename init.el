@@ -52,6 +52,20 @@
 ;; Emacs creates the backup dir on demand, but not the auto-save dir
 (make-directory "~/.emacs.autosave/" t)
 
+;;; Cursor & scrolling
+(global-hl-line-mode 1)
+(set-face-attribute 'hl-line nil :background "grey93")
+;; never recenter when point moves off screen; keep point's screen row when paging
+(setq scroll-conservatively 1000
+      scroll-preserve-screen-position t)
+;; scroll the view without moving point
+(keymap-global-set "M-n" #'scroll-up-line)
+(keymap-global-set "M-p" #'scroll-down-line)
+(delete-selection-mode 1)
+;; CUA only for rectangles: C-RET starts one; no C-x/C-c/C-v hijacking
+(setopt cua-enable-cua-keys nil)
+(cua-mode 1)
+
 ;;; Mode line
 ;; hide these minor-mode lighters (built-in replacement for diminish)
 (setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode)
