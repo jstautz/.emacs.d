@@ -42,6 +42,16 @@
 ;; unspecified = use the frame background
 (set-face-attribute 'fringe nil :background 'unspecified)
 
+;;; Backups & trash
+;; keep backups and auto-saves out of working directories
+(setq backup-directory-alist '((".*" . "~/.emacs.backup/"))
+      auto-save-file-name-transforms '((".*" "~/.emacs.autosave/" t))
+      vc-make-backup-files t
+      ;; no trash-directory: nil uses the macOS Trash, so Finder's "Put Back" works
+      delete-by-moving-to-trash t)
+;; Emacs creates the backup dir on demand, but not the auto-save dir
+(make-directory "~/.emacs.autosave/" t)
+
 ;;; Mode line
 ;; hide these minor-mode lighters (built-in replacement for diminish)
 (setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode)
