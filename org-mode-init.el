@@ -64,4 +64,13 @@
 ;; hide *bold* /italic/ markers (pretty entities made filenames with _ messy)
 (setq org-hide-emphasis-markers t)
 
+;;; Links & attachments
+;; files Org opens outside Emacs
+(setq org-file-apps '((auto-mode . emacs)
+                      ("\\.x?html?\\'" . default)
+                      ("\\.pdf\\'" . default)
+                      ("\\.docx?\\'" . system)
+                      ("\\.xls\\'" . system)
+                      ("\\.dvi\\'" . system)))
+
 ;;; org-mode-init.el ends here
