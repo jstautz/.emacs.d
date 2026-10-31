@@ -91,4 +91,14 @@
 (setq org-agenda-dim-blocked-tasks t
       org-agenda-tags-column 80)
 
+;; default views and sorting
+(setq org-agenda-include-diary t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-unavailable-files t
+      org-agenda-sorting-strategy '((agenda todo-state-down time-up priority-down)
+                                    (todo todo-state-down priority-down)
+                                    (tags todo-state-down priority-down))
+      org-agenda-span 'week)
+
 ;;; org-mode-init.el ends here
