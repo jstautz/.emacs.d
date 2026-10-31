@@ -53,4 +53,12 @@
 (setq org-use-speed-commands t
       org-fast-tag-selection-single-key t)
 
+;; line motion, links, code blocks
+(setq org-special-ctrl-a/e t
+      org-M-RET-may-split-line t
+      org-return-follows-link t
+      org-babel-no-eval-on-ctrl-c-ctrl-c t
+      org-link-shell-confirm-function #'y-or-n-p
+      org-fold-catch-invisible-edits 'smart)
+
 ;;; org-mode-init.el ends here
