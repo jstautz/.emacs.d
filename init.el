@@ -15,12 +15,19 @@
 (setq gc-cons-threshold 20000000)
 
 ;;;; Packages
-;; Compile any elpa packages that need it.
+;; Compile any elpa packages that need it, without upstream code's warnings.
 (defvar byte-compile-warnings)
-(let ((byte-compile-warnings nil))
+(defvar warning-minimum-level)
+(defvar warning-minimum-log-level)
+(let ((byte-compile-warnings nil)
+      (warning-minimum-level :error)
+      (warning-minimum-log-level :error))
   (pcase-dolist (`(,_ ,desc) package-alist)
     (unless (directory-files (package-desc-dir desc) nil "\\.elc\\'")
       (package-recompile desc))))
+;; native compilation runs later in the background; log its warnings to
+;; *Async-native-compile-log* instead of popping up *Warnings*
+(setopt native-comp-async-report-warnings-errors 'silent)
 ;; prefer GNU/NonGNU ELPA when a package is in more than one archive
 ;; (use-package's :ensure loads package.el anyway)
 (require 'package)
