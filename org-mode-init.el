@@ -435,7 +435,7 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
       appt-delete-window-function #'ignore)
 (appt-activate 1)
 
-;;; Clocking
+;;; Time Tracking
 
 ;;;; Clock settings
 ;; choices offered for Effort and Focus properties

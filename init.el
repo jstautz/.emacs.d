@@ -2,11 +2,11 @@
 
 ;;; Startup
 
-;;;; Paths
+;;;; Set paths
 (defconst jcs:lisp-dir (expand-file-name "lisp/" user-emacs-directory))
 (add-to-list 'load-path jcs:lisp-dir)
 
-;;;; Customize
+;;;; Set separate customize file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror 'nomessage)
 
@@ -15,7 +15,7 @@
 (setq gc-cons-threshold 20000000)
 
 ;;;; Packages
-;; Compile any elpa packages that need it, without upstream code's warnings.
+;; Compile any elpa packages that need it. Supress upstream code warnings.
 (defvar byte-compile-warnings)
 (defvar warning-minimum-level)
 (defvar warning-minimum-log-level)
@@ -25,7 +25,7 @@
   (pcase-dolist (`(,_ ,desc) package-alist)
     (unless (directory-files (package-desc-dir desc) nil "\\.elc\\'")
       (package-recompile desc))))
-;; native compilation runs later in the background; log its warnings to
+;; native compilation runs later in the background; log warnings to
 ;; *Async-native-compile-log* instead of popping up *Warnings*
 (setopt native-comp-async-report-warnings-errors 'silent)
 ;; prefer GNU/NonGNU ELPA when a package is in more than one archive
@@ -39,7 +39,7 @@
   :ensure t
   :if (memq window-system '(mac ns))
   :config
-  ;; PATH is set in .zshrc, so this needs an interactive shell (~700ms).
+  ;; PATH is set in .zshrc, so this needs an interactive shell
   ;; TODO update .zshrc, .profile, .zshenv files to save load time
   (setq exec-path-from-shell-warn-duration-millis 1500)
   (exec-path-from-shell-initialize))
@@ -58,7 +58,7 @@
 (set-face-attribute 'fringe nil :background 'unspecified)
 
 ;;;; Mode line
-;; hide these minor-mode lighters (built-in replacement for diminish)
+;; hide these minor-modes
 (setq mode-line-collapse-minor-modes '(auto-revert-mode guide-key-mode visual-line-mode org-indent-mode)
       mode-line-collapse-minor-modes-to "")
 
@@ -68,11 +68,11 @@
 ;; never recenter when point moves off screen; keep point's screen row when paging
 (setq scroll-conservatively 1000
       scroll-preserve-screen-position t)
-;; scroll the view without moving point
+;; M-n/M-p scroll the view without moving point
 (keymap-global-set "M-n" #'scroll-up-line)
 (keymap-global-set "M-p" #'scroll-down-line)
 (delete-selection-mode 1)
-;; CUA only for rectangles: C-RET starts one; no C-x/C-c/C-v hijacking
+;; C-RET allows CUA rectangle edit. But don't remap C-x/C-c/C-v!
 (setopt cua-enable-cua-keys nil)
 (cua-mode 1)
 
@@ -397,7 +397,7 @@
   :ensure t
   :defer t)
 
-;;; Server & Org
+;;; Start emacs server + load Org-Mode config
 
 ;;;; Server
 (require 'server)
