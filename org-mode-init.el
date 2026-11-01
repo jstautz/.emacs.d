@@ -1,6 +1,8 @@
 ;;; org-mode-init.el --- Org config -*- lexical-binding: t; -*-
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Load Org
 ;; all loaded at startup: the agenda feeds appointment reminders, and a
@@ -18,7 +20,9 @@
 (defconst jcs:org-dir "~/org/")
 (defconst jcs:writing-dir "~/Documents/Writing/")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Editing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Outline style
 (setq org-startup-indented t
@@ -104,7 +108,9 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
     (buffer-substring-no-properties start end)))
   (message "List copied for pasting"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Tasks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Priorities, habits, dependencies
 ;; priorities run A-E; new tasks default to E
@@ -133,7 +139,9 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
     (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
 (add-hook 'org-after-todo-state-change-hook #'jcs:org-set-next-action-trigger)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Capture, refile & archive
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Capture
 (setq org-default-notes-file (concat jcs:writing-dir "01 - Composting/journals/journal.txt"))
@@ -151,7 +159,9 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
 (setq org-archive-location (concat jcs:org-dir "archives.org::"))
 (setopt org-archive-mark-done nil)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Agenda
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Files & views
 (setq org-agenda-files (list (concat jcs:org-dir "inbox.org")
@@ -435,7 +445,9 @@ Each \"- \" bullet becomes one tab per two spaces of indentation."
       appt-delete-window-function #'ignore)
 (appt-activate 1)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Time Tracking
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Clock settings
 ;; choices offered for Effort and Focus properties
