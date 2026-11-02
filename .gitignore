@@ -6,6 +6,8 @@
 # Package.el runtime state
 /elpa/archives/
 /elpa/gnupg/
+# a git clone from :vc; reinstalls itself from package-vc-selected-packages
+/elpa/eglot-booster/
 
 # Runtime state
 /auto-save-list/
@@ -20,7 +22,9 @@
 /url/
 /eshell/
 /multisession/
+/tree-sitter/
 /projects
+/projects.eld
 /history
 /network-security.data
 /.org-id-locations
@@ -28,6 +32,9 @@
 /org-clock-save.el
 /.emacs.desktop
 /.emacs.desktop.lock
+
+# Machine-local config
+/lisp/local.el
 
 # macOS
 .DS_Store

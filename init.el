@@ -107,6 +107,8 @@
 (keymap-global-unset "M-`")
 ;; muscle memory: Cmd-s saves; replaces the M-s search prefix
 (keymap-global-set "M-s" #'save-buffer)
+;; ...so the search prefix (occur, symbol at point, highlight) moves to C-c s
+(keymap-global-set "C-c s" search-map)
 (keymap-global-set "C-z" #'undo)
 
 ;;;; Mac
@@ -182,6 +184,15 @@
   :ensure t
   :config
   (popwin-mode 1))
+
+;;;; Results lists
+;; occur, grep and compile lists pop up without focus; step through them from
+;; the code. completion lists bind the same keys while open (M-RET picks)
+(keymap-global-set "M-<down>" #'next-error)
+(keymap-global-set "M-<up>" #'previous-error)
+;; if you do M-o into a list, moving with n/p shows each match in the source
+(add-hook 'occur-mode-hook #'next-error-follow-minor-mode)
+(add-hook 'compilation-mode-hook #'next-error-follow-minor-mode)
 
 ;;;; Kill ring
 ;; M-y without a preceding C-y opens the browser
@@ -387,6 +398,84 @@
   (prin1 (eval (read (current-kill 0)) t) (current-buffer)))
 (keymap-global-set "C-c e" #'jcs:eval-and-replace)
 
+;;;; Editing code
+;; M-f/M-b/M-d stop at camelCase humps; faded inline completion, TAB accepts
+(add-hook 'prog-mode-hook #'subword-mode)
+(add-hook 'prog-mode-hook #'completion-preview-mode)
+;; follow a project's .editorconfig (indent, final newline, ...)
+(editorconfig-mode 1)
+
+;;;; Project search
+;; C-x p g and xref searches use ripgrep instead of grep
+(setopt xref-search-program 'ripgrep)
+
+;;;; Tree-sitter
+;; grammars: M-x treesit-install-language-grammar for typescript, tsx, python
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+
+;;;; LSP
+;; servers: npm install -g @typescript/native-preview (tsgo);
+;; uv tool install basedpyright
+(use-package eglot
+  :hook ((typescript-ts-mode tsx-ts-mode js-ts-mode python-ts-mode) . eglot-ensure)
+  :config
+  ;; no event log, and don't block on connect: big repos make both slow
+  (setq eglot-events-buffer-config '(:size 0)
+        eglot-sync-connect nil
+        eglot-autoshutdown t)
+  (add-to-list 'eglot-server-programs
+               '((typescript-ts-mode tsx-ts-mode js-ts-mode) . ("tsgo" "--lsp" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(python-ts-mode . ("basedpyright-langserver" "--stdio")))
+  (keymap-set eglot-mode-map "C-c r" #'eglot-rename)
+  (keymap-set eglot-mode-map "C-c ." #'eglot-code-actions)
+  (keymap-set eglot-mode-map "C-c o" #'eglot-code-action-organize-imports)
+  ;; don't offer to watch files for the server: eglot lists every project
+  ;; directory and macOS spends a file descriptor per watch, so a big repo
+  ;; freezes Emacs and runs out. after a branch switch, M-x eglot-reconnect
+  (cl-defmethod eglot-client-capabilities :around (_server)
+    (let ((caps (cl-call-next-method)))
+      (plist-put (plist-get caps :workspace)
+                 :didChangeWatchedFiles '(:dynamicRegistration :json-false))
+      caps)))
+
+;; faster JSON-RPC to the server; needs
+;; cargo install --git https://github.com/blahgeek/emacs-lsp-booster
+(use-package eglot-booster
+  :vc (:url "https://github.com/jdtsmith/eglot-booster")
+  :if (executable-find "emacs-lsp-booster")
+  :after eglot
+  :config
+  (eglot-booster-mode 1))
+
+;;;; Diagnostics
+;; eglot reports errors through flymake; M-x flymake-show-buffer-diagnostics lists them
+(use-package flymake
+  :defer t
+  :config
+  (keymap-set flymake-mode-map "M-g e" #'flymake-goto-next-error)
+  (keymap-set flymake-mode-map "M-g E" #'flymake-goto-prev-error))
+
+;;;; Formatting
+;; format on save; `npx' runs the project's own node_modules/.bin copy
+(use-package apheleia
+  :ensure t
+  :demand t
+  :preface
+  ;; oxfmt only in projects that configure it; elsewhere apheleia's default (prettier)
+  (defun jcs:apheleia-maybe-oxfmt ()
+    (when (locate-dominating-file default-directory ".oxfmtrc.json")
+      (setq-local apheleia-formatter 'oxfmt)))
+  :hook ((typescript-ts-mode tsx-ts-mode js-ts-mode scss-mode markdown-mode)
+         . jcs:apheleia-maybe-oxfmt)
+  :config
+  (setf (alist-get 'oxfmt apheleia-formatters)
+        '(npx "oxfmt" "--stdin-filepath" filepath))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (apheleia-global-mode 1))
+
 ;;;; Diff
 ;; unified like git/magit; -a diffs files with odd bytes as text, not "binary"
 (setq diff-switches "-u -a")
@@ -424,5 +513,9 @@
 
 ;;;; Org
 (load (expand-file-name "org-mode-init" user-emacs-directory) nil 'nomessage)
+
+;;;; Machine-local
+;; settings for this machine only (git-ignored); fine if it's missing
+(load (expand-file-name "local" jcs:lisp-dir) 'noerror 'nomessage)
 
 ;;; init.el ends here

@@ -19,6 +19,7 @@ Rebuilt from scratch for Emacs 31 in late 2026. Previously I'd been using org-ba
 - =org-mode-init.el= --- My org-mode setup. It's gnarly but works for me.
 - =custom.el= --- Scratch space for =M-x customize=. Changes I like will eventually graduate to =init.el=.
 - =lisp/= --- Single-file libraries that aren't packages (e.g. =org-depend.el=, from org-contrib).
+- =lisp/local.el= --- Optional, git-ignored settings for one machine. See [[#machine-local-config][Machine-local config]].
 - =elpa/= --- Third-party packages vendored in. 
 - =resources/= --- Sounds for org-pomodoro.
 
@@ -27,11 +28,41 @@ Rebuilt from scratch for Emacs 31 in late 2026. Previously I'd been using org-ba
 - *Built-in options prioritized.* Emacs 31 ships with a lot of what I used to install: =use-package=, fido, latest org-mode, etc.
 - *Packages are checked in.* I wanted to make sure fresh checkouts work out of the box and packages are pinned. Any package upgrades are intentional via =M-x package-upgrade= + a commit.
 - *Compiled files aren't checked in.* On a fresh clone, the first launch byte-compiles everything in =elpa/=. Takes a few seconds.
+- *Exception: =eglot-booster=.* It's not in a package archive, so =use-package :vc= clones it from GitHub on first launch. The clone is git-ignored.
 
 ** Dependencies
 
 - Emacs 31+ on macOS
 - =brew install aspell terminal-notifier= (spell-checking + notifications)
+
+*** Coding (optional)
+
+The IDE setup is built-in eglot + tree-sitter, plus apheleia for format-on-save. Each piece checks for its tools, so anything missing just turns that feature off.
+
+- *Tree-sitter grammars.* =M-x treesit-install-language-grammar= for =typescript=, =tsx= and =python=. They build into =tree-sitter/= (git-ignored, compiled per machine). =python= isn't offered until =python.el= loads, so run =M-x load-library RET python= first.
+- *Language servers.* TypeScript/JavaScript: =npm install -g @typescript/native-preview= (=tsgo=). Python: =uv tool install basedpyright=.
+- *Faster LSP.* =cargo install --git https://github.com/blahgeek/emacs-lsp-booster=. Skipped if it's not on =PATH=.
+- *Formatters.* Python uses =ruff= (=brew install ruff=). JS/TS/SCSS/Markdown use =oxfmt= in projects with an =.oxfmtrc.json=, run from the project's own =node_modules/.bin=; elsewhere, apheleia's default (prettier).
+- *Project search.* =brew install ripgrep= for =C-x p g=.
+
+Eglot doesn't offer file watching to servers: on macOS it costs a file descriptor per directory, and a big repo freezes Emacs. After changing files outside Emacs (a branch switch, codegen), run =M-x eglot-reconnect=.
+
+** Machine-local config
+:PROPERTIES:
+:CUSTOM_ID: machine-local-config
+:END:
+
+=init.el= ends by loading =lisp/local.el= if it exists. It's git-ignored, so it's the place for anything that only makes sense on one machine (or shouldn't be public): project paths, per-repo settings, work-specific hooks.
+
+Per-repo settings work well as a directory class, which applies variables to every file under a path without touching that repo:
+
+#+begin_src emacs-lisp
+(dir-locals-set-class-variables
+ 'my-repo
+ '((nil . ((eglot-workspace-configuration
+            . (:typescript (:preferences (:importModuleSpecifier "non-relative"))))))))
+(dir-locals-set-directory-class (expand-file-name "~/src/my-repo/") 'my-repo)
+#+end_src
 
 ** Disclaimers
 
