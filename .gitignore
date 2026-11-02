@@ -1,9 +1,34 @@
+# Compiled
 *.elc
-.org-id-locations
-auto-save-list/
-bookmarks
-.org-clock-save.el
-tramp
-recentf
+*.eln
+/eln-cache/
+
+# Package.el runtime state
+/elpa/archives/
+/elpa/gnupg/
+
+# Runtime state
+/auto-save-list/
+/bookmarks
+/recentf
+/recentf.eld
+*~
+/savehist
+/places
+/tramp
+/transient/
+/url/
+/eshell/
+/multisession/
+/projects
+/history
+/network-security.data
+/.org-id-locations
+/.org-clock-save.el
+/org-clock-save.el
 /.emacs.desktop
 /.emacs.desktop.lock
+
+# macOS
+.DS_Store
+/.#*

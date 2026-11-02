@@ -1,0 +1,2 @@
+;; Generated package description from htmlize.el  -*- no-byte-compile: t -*-
+(define-package "htmlize" "1.59" "Convert buffer text and decorations to HTML" '((emacs "26.1")) :commit "a24ed5a939a32c625b034b0b6d7f46340c100394" :authors '(("Hrvoje Niksic" . "hniksic@gmail.com")) :maintainer '("Hrvoje Niksic" . "hniksic@gmail.com") :keywords '("hypermedia" "extensions") :url "https://github.com/emacsorphanage/htmlize")

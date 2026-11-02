@@ -1,161 +1,203 @@
+;;; org-mode-init.el --- Org config -*- lexical-binding: t; -*-
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;; My Org-mode configs
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Setup
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;; Relevant directories
-  (setq org-dir (concat home-dir "org/")
-        writing-dir (concat home-dir "Documents/Writing/"))
+;;;; Load Org
+;; all loaded at startup: the agenda feeds appointment reminders, and a
+;; clock left running is restored
+(require 'org)
+(require 'org-id)
+(require 'org-habit)
+(require 'org-agenda)
+(require 'org-clock)
+(require 'appt)
+;; vendored in lisp/ (from org-contrib)
+(require 'org-depend)
 
-  ;; Standard org-mode setup
-  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (add-hook 'org-mode-hook 'turn-on-font-lock)
-  (add-hook 'org-mode-hook #'(lambda()
-                              (local-unset-key (kbd "C-c SPC"))))
+;;;; Directories
+(defconst jcs:org-dir "~/org/")
+(defconst jcs:writing-dir "~/Documents/Writing/")
 
-  ;; Use org-contrib library
-  (use-package org-contrib)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Editing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;;-----------------------------------------------------------------------------
-  ;; Org interface tweaks
-  ;;-----------------------------------------------------------------------------
+;;;; Outline style
+(setq org-startup-indented t
+      org-level-color-stars-only t
+      org-fontify-done-headline t
+      org-blank-before-new-entry '((heading) (plain-list-item))
+      org-tags-column 80
+      org-cycle-separator-lines 0)
 
-  ;; Keybindings
-  (define-key global-map "\C-cl" 'org-store-link)
-  (define-key global-map "\C-ca" 'org-agenda)
-  (global-set-key (kbd "<f5>") 'org-narrow-to-subtree)
-  (global-set-key (kbd "<M-f5>") 'jcs:org-todo-tree)
-  (global-set-key (kbd "<S-f5>") 'jcs:widen)
-  (global-set-key (kbd "<f6>") 'org-clock-goto)
-  ;; Because typos. When switching between laptop keyboard and USB keyboard
-  (global-set-key (kbd "<C-S-f5>") 'jcs:widen)
+;;;; Speed keys, line motion, links
+;; speed keys: single-letter commands at the start of a headline (? lists them)
+(setq org-use-speed-commands t
+      org-fast-tag-selection-single-key t)
 
-  ;; I never want to accidentally turn on timestamp overlays.
-  (org-defkey org-mode-map "\C-c\C-x\C-t" nil)
+;; line motion, links, code blocks
+(setq org-special-ctrl-a/e t
+      org-M-RET-may-split-line t
+      org-return-follows-link t
+      org-babel-no-eval-on-ctrl-c-ctrl-c t
+      org-link-shell-confirm-function #'y-or-n-p
+      org-fold-catch-invisible-edits 'smart)
 
-  (org-defkey org-mode-map "\C-a" 'org-beginning-of-line)
-  (org-defkey org-mode-map "\C-e" 'org-end-of-line)
-  (org-defkey org-mode-map "\C-k" 'org-kill-line)
+;; hide *bold* /italic/ markers (pretty entities made filenames with _ messy)
+(setq org-hide-emphasis-markers t)
 
-  ;; Outline structure/style
-  (setq org-startup-indented t
-        org-odd-levels-only nil
-        org-hide-leading-stars nil
-        org-level-color-stars-only t
-        org-fontify-done-headline t
-        org-blank-before-new-entry (quote ((heading) (plain-list-item)))
-        org-tags-column 80
-        org-cycle-separator-lines 0)
+;;;; Navigation
+(defun jcs:org-todo-tree ()
+  "Narrow to this subtree and show only its TODOs."
+  (interactive)
+  (org-narrow-to-subtree)
+  (org-show-todo-tree nil))
 
-  ;; Editing/Movement tweaks -- turn on speed commands, fast tags, and ido
-  (setq org-use-speed-commands t
-        org-completion-use-ido t
-        org-fast-tag-selection-single-key t)
+(defun jcs:widen ()
+  "Widen, re-show the current entry, and clear sparse-tree highlights."
+  (interactive)
+  (widen)
+  (org-reveal)
+  (org-remove-occur-highlights))
 
-  ;; Editing/Movement tweaks -- handling line navigation, links, code blocks
-  (setq org-special-ctrl-a/e t
-        org-M-RET-may-split-line t
-        org-return-follows-link t
-        org-babel-no-eval-on-ctrl-c-ctrl-c t
-        org-confirm-shell-link-function (quote y-or-n-p)
-        org-catch-invisible-edits 'smart)
+;; speed key S widens (speed keys work at the start of a headline)
+(add-to-list 'org-speed-commands '("S" . jcs:widen))
 
-  ;; workaround for org-ctags obnoxious behavior
-  (with-eval-after-load 'org-ctags (setq org-open-link-functions nil))
+;;;; Global keys
+(keymap-global-set "C-c l" #'org-store-link)
+(keymap-global-set "C-c a" #'org-agenda)
+(keymap-global-set "<f5>" #'org-narrow-to-subtree)
+(keymap-global-set "M-<f5>" #'jcs:org-todo-tree)
+(keymap-global-set "S-<f5>" #'jcs:widen)
+;; same as S-<f5>, for keyboards where Fn/Ctrl get mixed up
+(keymap-global-set "C-S-<f5>" #'jcs:widen)
+(keymap-global-set "<f6>" #'org-clock-goto)
 
-  ;; Prettify org-mode text:
-  ;; hide emphasis markers 
-  ;; (also tried "pretty entities" for things like \alpha etc, but filenames with underscores get messy).
-  (setq org-hide-emphasis-markers t)
+;; never toggle timestamp overlays by accident
+(keymap-unset org-mode-map "C-c C-x C-t")
 
-  ;; Let org know how to open links to certain file types if not in Emacs
-  (setq org-file-apps (quote ((auto-mode . emacs)
-                              ("\\.x?html?\\'" . default)
-                              ("\\.pdf\\'" . default)
-                              ("\\.doc\\'" . system)
-                              ("\\.docx\\'" . system)
-                              ("\\.xls\\'" . system)
-                              ("\\.dvi\\'" . system))))
+;;;; Links & attachments
+;; files Org opens outside Emacs
+(setq org-file-apps '((auto-mode . emacs)
+                      ("\\.x?html?\\'" . default)
+                      ("\\.pdf\\'" . default)
+                      ("\\.docx?\\'" . system)
+                      ("\\.xls\\'" . system)
+                      ("\\.dvi\\'" . system)))
 
-  ;; Show some context when digging into tags-trees / searches
-  (setq org-show-following-heading (quote ((default)))
-        org-show-hierarchy-above (quote ((default . t) (tags-tree)))
-        org-show-siblings (quote ((default) (isearch t))))
+;; tag attachments so they're findable; children inherit the parent's attach dir
+(setopt org-attach-auto-tag "attachment"
+        org-attach-use-inheritance t
+        org-attach-method 'mv)
 
-  ;; Add tags when attaching, so's I can find attachments later
-  ;; TODO am I actually using this? May not be important if I'm using specific project directories vs org's internal structure
-  (setq org-attach-auto-tag "attachment")
+;;;; Drag and drop
+;; dropping a file opens it instead of asking attach/open/link
+(setopt org-yank-dnd-method 'open)
 
-  ;; Also, inherit attachment directory properties -- so all tasks in a project know where to look for attachments
-  (setq org-attach-use-inheritance 1)
+;;;; Lists for pasting
+(defun jcs:edit-list-for-pasting (start end)
+  "Copy the plain list in the region as tab-indented lines, for Google Docs.
+Each \"- \" bullet becomes one tab per two spaces of indentation."
+  (interactive "r")
+  (kill-new
+   (replace-regexp-in-string
+    "^\\( *\\)- "
+    (lambda (match) (make-string (/ (length (match-string 1 match)) 2) ?\t))
+    (buffer-substring-no-properties start end)))
+  (message "List copied for pasting"))
 
-  ;; Speaking of attachments, let's set the default method to "move"
-  (setq org-attach-method 'mv)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Tasks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;; Priorities, habits, dependencies
+;; priorities run A-E; new tasks default to E
+(setq org-priority-default ?E
+      org-priority-lowest ?E
+      org-priority-start-cycle-with-default t
+      org-enforce-todo-dependencies nil
+      org-enforce-todo-checkbox-dependencies nil
+      org-id-include-domain nil
+      org-id-method 'uuid)
 
-  ;; A couple custom navigation functions
-  (defun jcs:org-todo-tree ()
-    (interactive)
-    (org-narrow-to-subtree)
-    (org-show-todo-tree nil))
+;; habits: repeating tasks with a consistency graph in the agenda
+(setq org-habit-show-habits-only-for-today nil
+      org-habit-show-all-today t)
+;; habits hidden with K in the agenda come back each morning
+(defun jcs:org-show-habits-again ()
+  "Show habits in the agenda again."
+  (setq org-habit-show-habits t))
+(run-at-time "04:00" 86400 #'jcs:org-show-habits-again)
 
-  (defun jcs:widen ()
-    (interactive)
-    (widen)
-    (org-reveal)
-    (org-remove-occur-highlights))
+;; org-depend (vendored in lisp/ from org-contrib): when a NEXT task is done,
+;; promote its next sibling TODO to NEXT
+(defun jcs:org-set-next-action-trigger ()
+  "Give a NEXT task a TRIGGER that promotes the next sibling when it's done."
+  (when (equal (org-get-todo-state) "NEXT")
+    (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
+(add-hook 'org-after-todo-state-change-hook #'jcs:org-set-next-action-trigger)
 
-  (add-to-list 'org-speed-commands (cons "S" 'jcs:widen))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Capture, refile & archive
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;;-----------------------------------------------------------------------------
-  ;; Agenda setup
-  ;;-----------------------------------------------------------------------------
-  (setq org-agenda-files '("~/org/inbox.org"
-                           "~/org/todo.org"))
+;;;; Capture
+(setq org-default-notes-file (concat jcs:writing-dir "01 - Composting/journals/journal.txt"))
+(keymap-global-set "C-c c" #'org-capture)
 
-  ;; TODO: why can't I replace these with (concat org-dir "filename.org")?
-  ;;  gives me "Wrong type argument: stringp, (concat org-dir "flagged.org")"
+;;;; Refile & archive
+(setq org-refile-targets `((,(concat jcs:org-dir "todo.org") :maxlevel . 3)
+                           (,(concat jcs:org-dir "someday_maybe.org") :maxlevel . 3)
+                           (,(concat jcs:org-dir "read_listen_watch.org") :maxlevel . 2))
+      ;; one flat "file/Heading/Sub" list for fido instead of level-by-level
+      org-refile-use-outline-path 'file
+      org-outline-path-complete-in-steps nil)
 
-  ;; Search on other files, too
-  (setq org-agenda-text-search-extra-files '("~/org/goals.org"
-                                             "~/org/someday_maybe.org"
-                                             "~/org/gift_ideas.org"
-                                             "~/org/tech_log.txt"
-                                             "~/org/read_listen_watch.org"))
+;; archive everything into one file; don't force archived items to DONE
+(setq org-archive-location (concat jcs:org-dir "archives.org::"))
+(setopt org-archive-mark-done nil)
 
-  ;; Agenda interface tweaks
-  (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
-  (setq org-agenda-dim-blocked-tasks t
-        org-agenda-tags-column 80
-        org-agenda-start-with-follow-mode nil
-        org-agenda-compact-blocks nil)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Agenda
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;; Files & views
+(setq org-agenda-files (list (concat jcs:org-dir "inbox.org")
+                             (concat jcs:org-dir "todo.org"))
+      ;; also searched by C-c a s (text search)
+      org-agenda-text-search-extra-files
+      (mapcar (lambda (file) (concat jcs:org-dir file))
+              '("goals.org" "someday_maybe.org" "gift_ideas.org"
+                "tech_log.txt" "read_listen_watch.org")))
 
-  ;; Default agenda views & sorting
-  (setq org-agenda-include-diary t
-        org-agenda-skip-deadline-if-done t
-        org-agenda-skip-scheduled-if-done t
-        org-agenda-skip-unavailable-files t
-        org-agenda-sorting-strategy (quote ((agenda todo-state-down time-up priority-down) (todo todo-state-down priority-down) (tags todo-state-down priority-down)))
-        org-agenda-span (quote week))
+(setq org-agenda-dim-blocked-tasks t
+      org-agenda-tags-column 80)
 
-  ;; Agenda TODO options
-  (setq org-agenda-tags-todo-honor-ignore-options nil
-        org-agenda-todo-ignore-scheduled (quote future)
-        org-agenda-todo-list-sublevels t
-        org-tags-match-list-sublevels t)
+;; default views and sorting
+(setq org-agenda-include-diary t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-unavailable-files t
+      org-agenda-sorting-strategy '((agenda todo-state-down time-up priority-down)
+                                    (todo todo-state-down priority-down)
+                                    (tags todo-state-down priority-down))
+      org-agenda-span 'week)
 
-  ;; Options for clock reports in agenda
-  (setq org-agenda-start-with-clockreport-mode nil
-        org-agenda-clockreport-parameter-plist (quote (:link t :maxlevel 3)))
+;; TODO lists: hide future-scheduled items, include sublevels
+(setq org-agenda-tags-todo-honor-ignore-options nil
+      org-agenda-todo-ignore-scheduled 'future
+      org-agenda-todo-list-sublevels t
+      org-tags-match-list-sublevels t
+      org-agenda-start-with-clockreport-mode nil
+      org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3)
+      ;; stuck = a level-2 project (not inbox, habits or goals) with no next action
+      org-stuck-projects
+      '("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS-goal_month-goal_quarter-goal_year/-DONE"
+        ("NEXT" "STARTED" "TODO") ("NOTES") ""))
 
-  ;; Definition of a "stuck project" for agenda
-  (setq org-stuck-projects (quote ("+LEVEL=2-REFILE-UNFILED-HABITS-GOALS-goal_month-goal_quarter-goal_year/-DONE"
-    ("NEXT" "STARTED" "TODO") ("NOTES") "")))
-
-;; Agenda helper vars / functions -- Work in Progress
-
+;; reusable agenda blocks, combined into custom views below
 (defvar jcs:org-agenda-block--purpose-header
   '(tags "TOPOFAGENDA"
          ((org-agenda-overriding-header "\nI am the sunlight that ignites creative transformation\n")
@@ -164,143 +206,140 @@
 
 (defvar jcs:org-agenda-block--today-schedule
   '(agenda "" ((org-agenda-overriding-header "Today's Schedule:")
-           (org-agenda-span 'day)
-           (org-agenda-ndays 1)
-           (org-agenda-start-on-weekday nil)
-           (org-agenda-start-day "+0d")))
+               (org-agenda-span 'day)
+               (org-agenda-start-on-weekday nil)
+               (org-agenda-start-day "+0d")))
   "A block showing a 1 day schedule.")
 
 (defvar jcs:org-agenda-block--upcoming-week
   '(agenda "" ((org-agenda-overriding-header "Next 7 Days:")
-           (org-agenda-span 7)
-           (org-agenda-start-on-weekday nil)
-           (org-agenda-start-day "+0d")))
+               (org-agenda-span 7)
+               (org-agenda-start-on-weekday nil)
+               (org-agenda-start-day "+0d")))
   "A block showing my schedule for the next 7 days.")
 
 (defvar jcs:org-agenda-block--inbox
   '(tags "REFILE"
-     ((org-agenda-overriding-header "Inbox items to process / refile:")))
+         ((org-agenda-overriding-header "Inbox items to process / refile:")))
   "Items from my inbox and/or needing refiling.")
 
 (defvar jcs:org-agenda-block--estimate
   '(tags-todo "+Effort=\"\""
-     ((org-agenda-overriding-header "Tasks to estimate:")))
+              ((org-agenda-overriding-header "Tasks to estimate:")))
   "Tasks I need to add estimates to.")
 
 (defvar jcs:org-agenda-block--goals-year
   '(tags "goal_year"
-     ((org-agenda-overriding-header "Yearly OKRs:")))
+         ((org-agenda-overriding-header "Yearly OKRs:")))
   "Yearly Goals")
 
 (defvar jcs:org-agenda-block--goals-quarter
   '(tags "goal_quarter"
-     ((org-agenda-overriding-header "Quarterly OKRs:")))
+         ((org-agenda-overriding-header "Quarterly OKRs:")))
   "Quarterly Goals")
 
 (defvar jcs:org-agenda-block--goals-month
   '(tags "goal_month"
-     ((org-agenda-overriding-header "Monthly Goals:")))
+         ((org-agenda-overriding-header "Monthly Goals:")))
   "Monthly Goals")
 
 (defvar jcs:org-agenda-block--goals-week
   '(tags "goal_week"
-     ((org-agenda-overriding-header "Weekly Goals:")))
+         ((org-agenda-overriding-header "Weekly Goals:")))
   "Weekly Goals")
 
 (defvar jcs:org-agenda-block--tasks-today
-'(tags-todo "+PRIORITY=\"A\""
-     ((org-agenda-overriding-header "Today's Priorities:")))
+  '(tags-todo "+PRIORITY=\"A\""
+              ((org-agenda-overriding-header "Today's Priorities:")))
   "Tasks for Today (A priority tasks)")
 
 (defvar jcs:org-agenda-block--tasks-next
-'(todo "NEXT"
-     ((org-agenda-overriding-header "All Next Actions (except future scheduled):")
-      (org-agenda-todo-ignore-scheduled 'future)))
+  '(todo "NEXT"
+         ((org-agenda-overriding-header "All Next Actions (except future scheduled):")
+          (org-agenda-todo-ignore-scheduled 'future)))
   "All Next Actions, except those with scheduled dates set in the future")
 
 (defvar jcs:org-agenda-block--next-home
-'(tags-todo "home-REFILE/!NEXT|STARTED"
-     ((org-agenda-overriding-header "Home Next/Started Actions -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Next actions for the Home context, except those with scheduled dates in the future")
+  '(tags-todo "home-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Home Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Home next actions, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--todo-home
-'(tags-todo "home-REFILE/!TODO|WAITING"
-     ((org-agenda-overriding-header "Home Backlog -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Backlog of actions for the Home context, except those with scheduled dates in the future")
+  '(tags-todo "home-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Home Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Home backlog, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--next-work
-'(tags-todo "work-REFILE/!NEXT|STARTED"
-     ((org-agenda-overriding-header "Work Next/Started Actions -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Next actions for the Work context, except those with scheduled dates in the future")
+  '(tags-todo "work-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Work Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Work next actions, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--todo-work
-'(tags-todo "work-REFILE/!TODO|WAITING"
-     ((org-agenda-overriding-header "Work Backlog -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Backlog of actions for the Work context, except those with scheduled dates in the future")
+  '(tags-todo "work-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Work Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Work backlog, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--next-coaching
-'(tags-todo "coaching-REFILE/!NEXT|STARTED"
-     ((org-agenda-overriding-header "Coaching Next/Started Actions -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Next actions for the Coaching context, except those with scheduled dates in the future")
+  '(tags-todo "coaching-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Coaching Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Coaching next actions, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--todo-coaching
-'(tags-todo "coaching-REFILE/!TODO|WAITING"
-     ((org-agenda-overriding-header "Coaching Backlog -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Backlog of actions for the Coaching context, except those with scheduled dates in the future")
+  '(tags-todo "coaching-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Coaching Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Coaching backlog, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--next-writing
-'(tags-todo "writing-REFILE/!NEXT|STARTED"
-     ((org-agenda-overriding-header "Writing Next/Started Actions -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Next actions for the Writing context, except those with scheduled dates in the future")
+  '(tags-todo "writing-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Writing Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing next actions, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--todo-writing
-'(tags-todo "writing-REFILE/!TODO|WAITING"
-     ((org-agenda-overriding-header "Writing Backlog -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Backlog of actions for the Writing context, except those with scheduled dates in the future")
+  '(tags-todo "writing-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Writing Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing backlog, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--next-writing-mgr
-'(tags-todo "writing_mgr-REFILE/!NEXT|STARTED"
-     ((org-agenda-overriding-header "Writing Manager Next/Started Actions -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Next actions for the Writing_Mgr context, except those with scheduled dates in the future")
+  '(tags-todo "writing_mgr-REFILE/!NEXT|STARTED"
+              ((org-agenda-overriding-header "Writing Manager Next/Started Actions -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing_Mgr next actions, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--todo-writing-mgr
-'(tags-todo "writing_mgr-REFILE/!TODO|WAITING"
-     ((org-agenda-overriding-header "Writing Manager Backlog -- Not scheduled")
-      (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
-  "Backlog of actions for the Writing_Mgr context, except those with scheduled dates in the future")
+  '(tags-todo "writing_mgr-REFILE/!TODO|WAITING"
+              ((org-agenda-overriding-header "Writing Manager Backlog -- Not scheduled")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
+  "Writing_Mgr backlog, except future-scheduled ones.")
 
 (defvar jcs:org-agenda-block--today-tasks
   '(tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
-    ((org-agenda-overriding-header "Today's tasks\n------------")
-     (org-agenda-todo-ignore-scheduled 'future)
-      (org-agenda-tags-todo-honor-ignore-options t)))
+              ((org-agenda-overriding-header "Today's tasks\n------------")
+               (org-agenda-todo-ignore-scheduled 'future)
+               (org-agenda-tags-todo-honor-ignore-options t)))
   "Priority A and B tasks are tasks for Today.")
 
 
-;; Custom Agenda Commands
-
+;; custom views: C-c a SPC overview, w work, h home, G goals, T today, ...
 (setq org-agenda-custom-commands
-      `(
-        (" " "Overview"
+      `((" " "Overview"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--upcoming-week
           ,jcs:org-agenda-block--inbox
@@ -311,54 +350,46 @@
           ,jcs:org-agenda-block--goals-month
           ,jcs:org-agenda-block--goals-week
           ,jcs:org-agenda-block--tasks-today
-          ,jcs:org-agenda-block--tasks-next
-          ))
+          ,jcs:org-agenda-block--tasks-next))
 
         ("G" "Goals"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--goals-week
           ,jcs:org-agenda-block--goals-month
           ,jcs:org-agenda-block--goals-quarter
-          ,jcs:org-agenda-block--goals-year
-         ))
+          ,jcs:org-agenda-block--goals-year))
 
         ("W" "Weekly Goals"
          (,jcs:org-agenda-block--purpose-header
-          ,jcs:org-agenda-block--goals-week
-         ))
+          ,jcs:org-agenda-block--goals-week))
 
         ("h" "Home Tasks + Agenda"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--upcoming-week
           ,jcs:org-agenda-block--next-home
-          ,jcs:org-agenda-block--todo-home
-          ))
+          ,jcs:org-agenda-block--todo-home))
 
         ("w" "Work Tasks + Agenda"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--upcoming-week
           ,jcs:org-agenda-block--next-work
-          ,jcs:org-agenda-block--todo-work
-          ))
+          ,jcs:org-agenda-block--todo-work))
 
         ("c" "Coaching Tasks + Agenda"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--upcoming-week
           ,jcs:org-agenda-block--next-coaching
-          ,jcs:org-agenda-block--todo-coaching
-          ))
+          ,jcs:org-agenda-block--todo-coaching))
 
         ("r" "Writing Tasks"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--next-writing
-          ,jcs:org-agenda-block--todo-writing
-          ))
+          ,jcs:org-agenda-block--todo-writing))
 
         ("g" "Writing Manager Tasks"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--next-writing-mgr
-          ,jcs:org-agenda-block--todo-writing-mgr
-          ))
+          ,jcs:org-agenda-block--todo-writing-mgr))
 
         ("e" "errands + phone" tags-todo "errands|phone")
 
@@ -374,558 +405,160 @@
           (org-agenda-use-time-grid nil)
           (org-agenda-toggle-diary nil)
           (org-agenda-skip-function
-           '(org-agenda-skip-entry-if 'nottodo 'done))
-          ))
+           '(org-agenda-skip-entry-if 'nottodo 'done))))
 
         ("T" "TODAY A or B Priority tasks"
          (,jcs:org-agenda-block--purpose-header
           ,jcs:org-agenda-block--today-schedule
-          ,jcs:org-agenda-block--today-tasks
-          ))
-      ))
-
-        ;; A couple of helper functions for org agendas from Bernt Hansen
-        ;;   http://doc.norang.ca/org-mode.html
-        (defun jcs:is-project-p ()
-          "Any task with a todo keyword subtask"
-          (let ((has-subtask)
-                (subtree-end (save-excursion (org-end-of-subtree t)))
-                (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-            (save-excursion
-              (forward-line 1)
-              (while (and (not has-subtask)
-                          (< (point) subtree-end)
-                          (re-search-forward "^\*+ " subtree-end t))
-                (when (member (org-get-todo-state) org-todo-keywords-1)
-                  (setq has-subtask t))))
-            (and is-a-task has-subtask)))
-
-        (defun jcs:skip-projects ()
-          "Skip trees that are projects"
-          (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-            (cond
-             ((jcs:is-project-p)
-              next-headline)
-             (t
-              nil))))
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; Diary and appt settings
-        ;;-----------------------------------------------------------------------------
-        (setq diary-file (concat org-dir "calendar.diary"))
-        (add-hook 'diary-display-hook 'fancy-diary-display)
-        (setq diary-list-entries-hook
-              '(diary-include-other-diary-files diary-sort-entries))
-        (add-hook 'diary-mark-diary-entries-hook 'diary-mark-included-diary-files)
-
-        (require 'appt)
-        (setq org-agenda-include-diary t)
-        (setq appt-time-msg-list nil)
-        (org-agenda-to-appt)
-
-        ;; Re-load agenda dates/items into appt whenever I load agenda view
-        (defadvice  org-agenda-redo (after org-agenda-redo-add-appts)
-          "Pressing `r' on the agenda will also add appointments."
-          (progn 
-            (setq appt-time-msg-list nil)
-            (org-agenda-to-appt)))
-
-        (ad-activate 'org-agenda-redo)
-
-        ;; Reset the appointments every day at one minute after midnight
-        (run-at-time "24:01" 86400 'org-agenda-redo)
-
-        ;; Set Agenda view to show Habits again each day at 4am
-        (run-at-time "04:00" 86400 '(lambda () (setq org-habit-show-habits t)))
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; TODOs and Tags
-        ;;-----------------------------------------------------------------------------
-        (setq org-default-priority 69
-              org-lowest-priority 69
-              org-priority-start-cycle-with-default t
-              org-enforce-todo-checkbox-dependencies nil
-              org-enforce-todo-dependencies nil)
-
-        ;; Org-habit options for tracking repeating 'habit' tasks
-        (require 'org-habit)
-        (setq org-habit-show-habits-only-for-today nil
-              org-habit-show-all-today t)
-
-        ;; Options for setting IDs on TODO items when exporting
-        (setq org-id-include-domain nil
-              org-id-method (quote uuidgen))
-
-        ;;-----------------------------------------------------------------------------
-        ;; TODO dependencies with org-depend
-        ;;-----------------------------------------------------------------------------
-
-        (require 'org-depend)
-
-        ;; When TODO state is changed to NEXT and this is a next action,
-        ;; add a TRIGGER property so that any sibling TODOs are promoted to NEXT actions
-        ;; when this one gets completed.
-
-        (defun jcs:org-set-next-action-trigger ()
-          (interactive)
-          (when (equal (org-get-todo-state) "NEXT")
-            (org-set-property "TRIGGER" "chain-find-next(NEXT,todo-only)")))
-
-        (add-hook 'org-after-todo-state-change-hook 'jcs:org-set-next-action-trigger)
-
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; Time tracking, logging, & effort estimates
-        ;;-----------------------------------------------------------------------------
-
-        ;; My values for time estimates and focus levels
-        (setq org-global-properties (quote (("Effort_ALL" .
-                                             "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
-                                            ("Focus_ALL" . "High Medium Low"))))
-
-        ;; Some basic clocking display options
-        (setq org-clock-into-drawer t
-              org-clock-sound nil
-              org-clock-mode-line-total 'current
-              org-clock-history-length 10
-              org-clock-clocked-in-display 'mode-line)
-
-        ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
-        (setq org-clock-out-remove-zero-time-clocks t)
-
-        ;; I want my clock to display in the frame title.
-        ;; This is a quick hack to see if productivity apps recognize this.
-        ;; TODO: Do I actually want/need this?
-        (add-hook 'org-clock-in-hook 'jcs:clock-in-frame)
-        (add-hook 'org-clock-out-hook 'jcs:clock-out-frame)
-
-        (defun jcs:clock-in-frame ()
-          (setq frame-title-format '("" "[" org-clock-current-task "]")))
-
-        (defun jcs:clock-out-frame ()
-          (setq frame-title-format '("" "%b")))
-
-
-        ;; Set the default task while at work -- This is the "General organization" task in todo.org
-        (defvar jcs:work-org-task-id "DB00839E-39A9-4023-8494-25EA0BDCF16D")
-
-        (setq jcs:keep-clock-running nil)
-
-        (defun jcs:clock-in-organization-task-as-default ()
-          (interactive)
-          (org-with-point-at (org-id-find jcs:work-org-task-id 'marker)
-            (org-clock-in '(16))))
-
-
-          ;;-----------------------------------------------------------------------------
-          ;; jcs:getcals --- Sync my Google Calendars to emacs diary
-          ;;-----------------------------------------------------------------------------
-          (require 'icalendar)
-
-          (defun getcal (url)
-            "Download ics file and add to diary"
-            (let ((tmpfile (url-file-local-copy url)))
-              (icalendar-import-file tmpfile "~/org/calendar.diary" t)
-              (kill-buffer (car (last (split-string tmpfile "/"))))
-              )
-            )
-
-          ;; Grab google calendars from secrets.el.gpg
-          (defun jcs:getcals ()
-            (interactive)
-            (if (not (boundp 'google-calendars))
-                (jcs:decrypt-secrets))
-              (find-file "~/org/calendar.diary")
-              (flush-lines "^[& ]")
-              (dolist (url google-calendars) (getcal url))
-              (kill-buffer "calendar.diary"))
-
-
-          ;;-----------------------------------------------------------------------------
-          ;; jcs:clock functions --- Functions to clock into/out of  a particular item in
-          ;; projects.org (OR create a new item and clock into it)
-          ;; (NOTE: Doesn't work at the moment -- fix this)
-          ;;-----------------------------------------------------------------------------
-           (defun jcs:clock-in-to-string (theString &optional theCategory)
-            "Clock into a particular item in ~/org/work.org file. Takes optional Category param."
-            (interactive)
-            (save-excursion
-              (let (filepath filename mybuffer)
-                (setq filepath "/Users/jstautz/org/work.org"
-                      filename (file-name-nondirectory filepath)
-                      mybuffer (find-file filepath))
-                (goto-char (point-min))
-                (widen) 
-                ;; if no category defined, try to find string in file and clock in
-                (if (eq theCategory nil)
-                    (if (search-forward theString nil t)
-                        (org-clock-in)
-                      ;; if not found in buffer, insert new item at end and clock into it
-                      (goto-char (point-max))
-                      (insert (concat "*** " theString))
-                      (goto-char (point-max))
-                      (org-clock-in))
-                  ;; thecategory is non-nil, so this is a new item w/ category
-                  (goto-char (point-max))
-                  (insert (concat "*** " theString "\n  :PROPERTIES:\n  :CATEGORY: " theCategory "\n  :END:\n"))
-                  (goto-char (point-max))
-                  (org-clock-in)))))
-
-          (defun jcs:clock-out (&optional theString theCategory)
-            (org-clock-out))
-
-
-        (defun jcs:punch-in (arg)
-          "Start continuous clocking and set the default task to the
-        selected task.  If no task is selected set the Organization task
-        as the default task."
-          (interactive "p")
-          (setq jcs:keep-clock-running t)
-          (if (equal major-mode 'org-agenda-mode)
-              ;;
-              ;; We're in the agenda
-              ;;
-              (let* ((marker (org-get-at-bol 'org-hd-marker))
-                     (tags (org-with-point-at marker (org-get-tags-at))))
-                (if (and (eq arg 4) tags)
-                    (org-agenda-clock-in '(16))
-                  (jcs:clock-in-organization-task-as-default)))
-            ;;
-            ;; We are not in the agenda
-            ;;
-            (save-restriction
-              (widen)
-              ; Find the tags on the current task
-              (if (and (equal major-mode 'org-mode) (not (org-before-first-heading-p)) (eq arg 4))
-                  (org-clock-in '(16))
-                (jcs:clock-in-organization-task-as-default)))))
-
-        (defun jcs:punch-out ()
-          (interactive)
-          (setq jcs:keep-clock-running nil)
-          (when (org-clock-is-active)
-            (org-clock-out))
-          (org-agenda-remove-restriction-lock))
-
-
-        (defun jcs:clock-in-default-task ()
-          (save-excursion
-            (org-with-point-at org-clock-default-task
-              (org-clock-in))))
-
-
-        (defun jcs:clock-out-maybe ()
-          (when (and jcs:keep-clock-running
-                     (not org-clock-clocking-in)
-                     (marker-buffer org-clock-default-task)
-                     (not org-clock-resolving-clocks-due-to-idleness))
-            (jcs:clock-in-organization-task-as-default)))
-
-        (add-hook 'org-clock-out-hook 'jcs:clock-out-maybe 'append)
-
-      ;; Shift-up and shift-down move a time stamp +/- 5 mins. But don't round when adding time stamps.
-        (setq org-time-stamp-rounding-minutes (quote (0 5)))
-
-        ;; Clock out when moving task to a done state
-        (setq org-clock-out-when-done t)
-
-        ;; Idle time / resume options
-        (setq org-clock-idle-time 5
-              org-clock-in-resume t)
-
-        ;;org clocks if I restart emacs w/ running clock
-        (setq org-clock-persist t
-              org-clock-persist-file "~/.emacs.d/.org-clock-save.el")
-        (org-clock-persistence-insinuate)
-        ;; Do not prompt to resume an active clock
-        (setq org-clock-persist-query-resume nil)
-
-        ;; Enable auto clock resolution for finding open clocks
-        (setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
-
-        ;; Include current clocking task in clock reports
-        (setq org-clock-report-include-clocking-task t)
-
-
-        ;; When and how to log TODO changes and scheduling changes
-        (setq org-log-done (quote time)
-              org-log-into-drawer "LOGBOOK"
-              org-log-repeat (quote time))
-
-        ;; Change task to STARTED when clocking in -- from Bernt Hansen
-        (setq org-clock-in-switch-to-state 'jcs:clock-in-to-started)
-
-        (defun jcs:clock-in-to-started (kw)
-          "Switch task from TODO or NEXT to STARTED when clocking in.
-        Skips capture tasks."
-          (if (and (member (org-get-todo-state) (list "TODO" "NEXT"))
-                   (not (and (boundp 'org-capture-mode) org-capture-mode)))
-              "STARTED"))
-
-        ;; Get rid of empty clock/property drawers -- from Bernt Hansen
-        (defun jcs:remove-empty-drawer-on-clock-out ()
-          (interactive)
-          (save-excursion
-            (beginning-of-line 0)
-            (org-remove-empty-drawer-at (point))))
-
-        (add-hook 'org-clock-out-hook 'jcs:remove-empty-drawer-on-clock-out 'append)
-
-
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; Capture, Refile, Archive
-        ;;-----------------------------------------------------------------------------
-
-
-        ;; Capture Targets are now defined in the lisp/secrets.el.gpg file,
-        ;; encrypted because they contain personal info. 
-
-
-        ;; Where to look for refile targets
-        ;; TODO figure out a more concise way to to this using org-agenda-files, minus inbox, plus someday
-        ;; Note that because of the way my work.org file is organized, I want top-level targets there
-        ;; but 2nd-level targets everywhere else.
-        (setq org-refile-targets (quote (("/Users/jstautz/org/todo.org" :maxlevel . 3)
-                                         ("/Users/jstautz/org/someday_maybe.org" :maxlevel . 3)
-                                         ("/Users/jstautz/org/read_listen_watch.org" :maxlevel . 2))))
-
-        ;; Archiving options
-        (setq org-archive-location (concat org-dir "archives.org::")
-              org-archive-mark-done nil)
-
-        ;; Refile to date tree -- useful for refiling into a journal file organized in org datetree format
-        ;; NOTE: this is finicky right now and I'm not sure why. Need to review at some point.
-        (defun org-refile-to-datetree ()
-          "Refile a subtree to a datetree corresponding to its timestamp."
-          (interactive)
-          (let* ((datetree-date (org-entry-get nil "TIMESTAMP" t))
-                 (date (org-date-to-gregorian datetree-date)))
-            (when date
-              (save-excursion
-                (org-cut-subtree)
-                (org-datetree-find-date-create date nil)
-                (org-narrow-to-subtree)
-                (show-subtree)
-                (org-end-of-subtree t)
-                (newline)
-                (goto-char (point-max))
-                (org-paste-subtree 4)
-                (widen)))))
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; Exporting and Publishing
-        ;;-----------------------------------------------------------------------------
-        (setq org-export-with-TeX-macros nil
-              org-table-export-default-format "orgtbl-to-csv")
-
-        ;; Export calendar options
-        (setq org-combined-agenda-icalendar-file (concat org-dir "org.ics")
-              org-icalendar-combined-name "Org"
-              org-icalendar-include-todo t
-              org-icalendar-store-UID t)
-
-        ;; Testing some agenda export functions
-        (setq org-agenda-exporter-settings
-                        '((htmlize-output-type 'css)))
-
-        ;; Set styles for htmlize agenda export
-        (setq org-agenda-export-html-style "<style type=\"text/css\">
-               p { font-weight: normal; color: gray; }
-               .org-agenda-structure {
-                  font-size: 110%;
-                  color: #003399;
-                  font-weight: 600;
-               }
-               .org-todo {
-                  color: #cc6666;
-                  font-weight: bold;
-               }
-               .org-agenda-done {
-                  color: #339933;
-               }
-               .org-done {
-                  color: #339933;
-               }
-               .title { text-align: center; }
-               .todo, .deadline { color: red; }
-               .done { color: green; }
-            </style>")
-
-        ;; Some publishing settings stolen from Bernt Hansen
-
-        ;; Inline images in HTML instead of producting links to the image
-        (setq org-html-inline-images t)
-        ;; Do not use sub or superscripts - I currently don't need this functionality in my documents
-        (setq org-export-with-sub-superscripts nil)
-        ; Use org.css from the norang website for export document stylesheets
-        (setq org-html-head "<link rel=\"stylesheet\" href=\"org.css\" type=\"text/css\" />")
-        (setq org-html-head-include-default-style nil)
-
-        ;;-----------------------------------------------------------------------------
-        ;; Notifications -- use terminal-notifier to send org & calendar notifications
-        ;;-----------------------------------------------------------------------------
-
-        ;; Send org notifications to terminal-notify
-        (setq org-show-notification-handler '(lambda (notification) (terminal-notifier-notify "org-mode notification:" notification)))
-
-        ;; Send Appt reminders to terminal-notify
-        (progn
-          (appt-activate 1)
-          (setq appt-display-format 'window
-                appt-disp-window-function (function my-appt-disp-window))
-          (defun my-appt-disp-window (min-to-app new-time msg)
-            (terminal-notifier-notify "Reminder" (format "%s" msg))))
-
-        ;; Also trying jweigley's alert package (dependency of org-pomodoro)
-        (setq alert-default-style 'notifier)
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; Fontify source blocks in org-mode (babel)
-        ;;-----------------------------------------------------------------------------
-
-        (setq org-src-fontify-natively t)
-
-        ;;-----------------------------------------------------------------------------
-        ;; Org-pomodoro setup
-        ;;-----------------------------------------------------------------------------
-
-        (use-package org-pomodoro)
-
-        (setq org-pomodoro-manual-break t
-              org-pomodoro-keep-killed-pomodoro-time t
-              org-pomodoro-finished-sound "/Users/jstautz/.emacs.d/resources/alarm_clock.aif"
-              org-pomodoro-overtime-sound org-pomodoro-finished-sound
-              org-pomodoro-short-break-sound org-pomodoro-finished-sound
-              org-pomodoro-long-break-sound org-pomodoro-finished-sound
-              org-pomodoro-ticking-sound-p t
-              org-pomodoro-ticking-sound "/Users/jstautz/.emacs.d/resources/ticks.aif"
-              org-pomodoro-ticking-sound-states '(:pomodoro)
-              org-pomodoro-ticking-frequency 120
-              org-pomodoro-short-break-length 6
-              org-pomodoro-length 24)
-
-        (defun jcs:org-pomodoro-variable-start (&optional arg)
-          "Start a pomodoro with a variable timer. Pomodoro will end after specified time, defaults to 25 minutes."
-          (interactive "MPomodoro duration (default 24): ")
-          (setq org-pomodoro-length 24)
-          (if (>= (string-to-number arg) 1)
-              (setq org-pomodoro-length (string-to-number arg)))
-          (org-pomodoro))
-
-        (defun jcs:raise-emacs ()
-          "Raise Emacs"
-          (ns-do-applescript "tell application \"Emacs\" to activate"))
-
-        (defun jcs:org-pomodoro-maybe-extend ()
-          "Query the user to extend the pomodoro with additional time, delaying the break."
-          (interactive)
-          (if (y-or-n-p "Extend current Pomodoro? ")
-              (progn
-                (setq org-pomodoro-length (string-to-number (read-string "Extend Pomodoro duration: ")))
-                (org-pomodoro-start)))
-          (org-pomodoro))
-
-        (defun jcs:org-pomodoro-breadcrumbs ()
-          (progn
-            (switch-to-buffer (get-buffer-create "*Pomodoro Notes*"))
-            (org-mode)
-            (goto-char (point-min))
-            (insert "* ")
-            (org-insert-time-stamp (current-time) t t)
-            (insert "\n\n\n----------Breadcrumbs----------\n\n<One sentence describing what I was just doing.>\n\nA list of pointers to things I need to remember when I get back:\n\n- <First thing I shouldn’t forget\n- Second thing I shouldn’t forget>\n\nYou do not have to make full sentences, just jotting down individual words that make sense to you is enough. They merely function as pointers back to your memory.\n\n----------Priming for Next Session----------\n\n<One sentence describing what you think you will be doing when you come back from your break.>\n\nNow visualize what doing this will entail:\n\n- Are there any decisions that you need to make before you can continue?\n- Are there any questions that need answering before you can continue?\n- Do you need any specific resources before you can continue?\n\n<One question that needs answering shortly after you come back from your break.>\n\n")))
-
-        (add-hook 'org-pomodoro-finished-hook 'jcs:org-pomodoro-breadcrumbs)
-
-        (add-hook 'org-pomodoro-overtime-hook 'jcs:org-pomodoro-maybe-extend)
-
-
-        (define-key global-map "\C-cp" 'jcs:org-pomodoro-variable-start)
-        (add-to-list 'org-speed-commands (cons "p" 'jcs:org-pomodoro-variable-start))
-
-        ;;-----------------------------------------------------------------------------
-        ;; Ditaa setup
-        ;;-----------------------------------------------------------------------------
-
-        (org-babel-do-load-languages
-         'org-babel-load-languages
-         '((ditaa . t)))
-        (setq org-ditaa-jar-path (concat home-dir "bin/ditaa.jar"))
-
-        (diminish 'org-indent-mode)
-
-
-        ;;-----------------------------------------------------------------------------
-        ;; Setting up org capture. 
-        ;;-----------------------------------------------------------------------------
-
-
-        (setq org-default-notes-file (concat writing-dir "01 - Composting/journals/journal.txt"))
-        (global-set-key (kbd "C-c c") #'org-capture)
-
-        ;; NOTE: Org-capture templates moved to secrets.el.gpg -- new templates contain sensitive info.
-
-        ;;-----------------------------------------------------------------------------
-        ;; Handler for obsidian: links
-        ;;-----------------------------------------------------------------------------
-
-        ;; obsidan link handling for obsidian:// links
-        (defun org-obsidian-link-open (slash-message-id)
-          "Handler for org-link-set-parameters that opens a obsidian:// link in obsidian"
-          ;; remove any / at the start of slash-message-id to create real note-id
-          (let ((message-id
-                 (replace-regexp-in-string (rx bos (* "/"))
-                                           ""
-                                           slash-message-id)))
-            (do-applescript
-             (concat "tell application \"Obsidian\" to open location \"obsidian://"
-                     message-id
-                     "\" activate"))))
-         ;; on obsdian://aoeu link, this will call handler with //aoeu
-         (org-link-set-parameters "obsidian" :follow #'org-obsidian-link-open)
-
-        ;;-----------------------------------------------------------------------------
-        ;; Working but really shitty elisp to export org-mode bullet list to google docs
-        ;;-----------------------------------------------------------------------------
-
-  (defun jcs:edit-list-for-pasting (start end)
-    "Takes an org-mode plain list with - bullets and creates a tab-indented version suitable for pasting into a word processor or Google Docs."
-    (interactive "r")
-    (save-excursion
-      (save-restriction
-        (narrow-to-region (- start 1) end)
-        (goto-char (point-min))
-        (while (search-forward "\n- " nil t)
-          (replace-match "\n"))
-
-        (goto-char (point-min))
-        (while (search-forward "\n  - " nil t)
-          (replace-match "\n\t"))
-
-        (goto-char (point-min))
-        (while (search-forward "\n    - " nil t)
-          (replace-match "\n\t\t"))
-
-        (goto-char (point-min))
-        (while (search-forward "\n      - " nil t)
-          (replace-match "\n\t\t\t"))
-
-        (goto-char (point-min))
-        (while (search-forward "\n        - " nil t)
-          (replace-match "\n\t\t\t\t"))
-
-        (goto-char (point-min))
-        (while (search-forward "\n          - " nil t)
-          (replace-match "\n\t\t\t\t\t"))
-
-        (goto-char (point-min))
-        (while (search-forward "\n            - " nil t)
-          (replace-match "\n\t\t\t\t\t\t"))
-
-          (copy-region-as-kill (point-min) (point-max)))))
+          ,jcs:org-agenda-block--today-tasks))))
+
+;;;; Diary & appointments
+(setopt diary-file (concat jcs:org-dir "calendar.diary"))
+;; follow #include lines in the diary, and sort entries
+(add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+(add-hook 'diary-list-entries-hook 'diary-sort-entries t)
+(add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
+
+;; load today's timed agenda items as appointment reminders
+(defun jcs:org-agenda-refresh-appts (&rest _)
+  "Rebuild the appointment list from the agenda."
+  (setq appt-time-msg-list nil)
+  (org-agenda-to-appt))
+(jcs:org-agenda-refresh-appts)
+;; r in the agenda also refreshes reminders
+(advice-add 'org-agenda-redo :after #'jcs:org-agenda-refresh-appts)
+;; and again just after midnight ("24:01" = 00:01 tomorrow)
+(run-at-time "24:01" 86400 #'jcs:org-agenda-refresh-appts)
+
+;;;; Notifications
+;; Org timers/clock and appointment reminders go to Notification Center
+(declare-function jcs:notify "init")
+(setopt org-show-notification-handler
+      (lambda (notification) (jcs:notify "Org" notification)))
+
+(defun jcs:appt-notify (_min-to-app _new-time msg)
+  "Send appointment reminder MSG (a string or list of strings) as a notification."
+  (jcs:notify "Reminder" (if (listp msg) (string-join msg "\n") msg)))
+(setq appt-display-format 'window
+      appt-disp-window-function #'jcs:appt-notify
+      ;; no reminder window is made, so there's none to delete
+      appt-delete-window-function #'ignore)
+(appt-activate 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Time Tracking
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;; Clock settings
+;; choices offered for Effort and Focus properties
+(setq org-global-properties '(("Effort_ALL" . "0:05 0:15 0:30 1:00 2:00 4:00 8:00")
+                              ("Focus_ALL" . "High Medium Low"))
+      org-clock-into-drawer t
+      org-clock-sound nil
+      org-clock-mode-line-total 'current
+      org-clock-history-length 10
+      org-clock-clocked-in-display 'mode-line)
+
+;; clock behavior: resume after restarts and idle, drop 0:00 entries
+(setq org-time-stamp-rounding-minutes '(0 5)
+      org-clock-out-when-done t
+      org-clock-out-remove-zero-time-clocks t
+      org-clock-idle-time 5
+      org-clock-in-resume t
+      org-clock-persist t
+      org-clock-persist-query-resume nil
+      org-clock-auto-clock-resolution 'when-no-clock-is-running
+      org-clock-report-include-clocking-task t)
+(org-clock-persistence-insinuate)
+
+;; log completion and repeats with timestamps, inside a LOGBOOK drawer
+(setq org-log-done 'time
+      org-log-into-drawer "LOGBOOK"
+      org-log-repeat 'time)
+
+;; clocking in moves a TODO/NEXT task to STARTED (not during capture)
+(defun jcs:clock-in-to-started (_kw)
+  "Return STARTED for a TODO or NEXT task outside capture."
+  (when (and (member (org-get-todo-state) '("TODO" "NEXT"))
+             (not (bound-and-true-p org-capture-mode)))
+    "STARTED"))
+(setq org-clock-in-switch-to-state #'jcs:clock-in-to-started)
+
+;; remove the LOGBOOK drawer a zero-time clock-out leaves empty
+(defun jcs:remove-empty-drawer-on-clock-out ()
+  "Remove an empty drawer on the current line."
+  (save-excursion
+    (beginning-of-line 0)
+    (org-remove-empty-drawer-at (point))))
+(add-hook 'org-clock-out-hook #'jcs:remove-empty-drawer-on-clock-out 90)
+
+;;;; Pomodoro
+(use-package org-pomodoro
+  :ensure t
+  :defer t
+  :functions org-pomodoro-start
+  :defines alert-default-style
+  :preface
+  (defun jcs:org-pomodoro-variable-start (&optional minutes)
+    "Start a pomodoro of MINUTES (default 24)."
+    (interactive "MPomodoro duration (default 24): ")
+    (let ((n (string-to-number (or minutes ""))))
+      (setq org-pomodoro-length (if (>= n 1) n 24)))
+    (org-pomodoro))
+
+  (defun jcs:org-pomodoro-maybe-extend ()
+    "On overtime, offer to extend the pomodoro instead of breaking."
+    (interactive)
+    (when (y-or-n-p "Extend current Pomodoro? ")
+      (setq org-pomodoro-length
+            (string-to-number (read-string "Extend Pomodoro duration: ")))
+      (org-pomodoro-start))
+    (org-pomodoro))
+
+  ;; after each pomodoro, a scratch Org buffer for notes to resume from
+  (defun jcs:org-pomodoro-breadcrumbs ()
+    "Open *Pomodoro Notes* with a breadcrumbs template."
+    (switch-to-buffer (get-buffer-create "*Pomodoro Notes*"))
+    (org-mode)
+    (goto-char (point-min))
+    (insert "* ")
+    (org-insert-time-stamp (current-time) t t)
+    (insert "\n\n\n----------Breadcrumbs----------\n\n"
+            "<One sentence describing what I was just doing.>\n\n"
+            "A list of pointers to things I need to remember when I get back:\n\n"
+            "- <First thing I shouldn’t forget\n- Second thing I shouldn’t forget>\n\n"
+            "You do not have to make full sentences, just jotting down individual words "
+            "that make sense to you is enough. They merely function as pointers back to "
+            "your memory.\n\n"
+            "----------Priming for Next Session----------\n\n"
+            "<One sentence describing what you think you will be doing when you come "
+            "back from your break.>\n\n"
+            "Now visualize what doing this will entail:\n\n"
+            "- Are there any decisions that you need to make before you can continue?\n"
+            "- Are there any questions that need answering before you can continue?\n"
+            "- Do you need any specific resources before you can continue?\n\n"
+            "<One question that needs answering shortly after you come back from "
+            "your break.>\n\n"))
+  :init
+  (keymap-global-set "C-c p" #'jcs:org-pomodoro-variable-start)
+  (add-to-list 'org-speed-commands '("p" . jcs:org-pomodoro-variable-start))
+  :config
+  ;; org-pomodoro's alert library also uses Notification Center (terminal-notifier)
+  (setq alert-default-style 'notifier)
+  (let ((alarm (expand-file-name "resources/alarm_clock.aif" user-emacs-directory)))
+    (setq org-pomodoro-length 24
+          org-pomodoro-short-break-length 6
+          org-pomodoro-manual-break t
+          org-pomodoro-keep-killed-pomodoro-time t
+          org-pomodoro-finished-sound alarm
+          org-pomodoro-overtime-sound alarm
+          org-pomodoro-short-break-sound alarm
+          org-pomodoro-long-break-sound alarm
+          org-pomodoro-ticking-sound-p t
+          org-pomodoro-ticking-sound (expand-file-name "resources/ticks.aif" user-emacs-directory)
+          org-pomodoro-ticking-sound-states '(:pomodoro)
+          org-pomodoro-ticking-frequency 120))
+  (add-hook 'org-pomodoro-finished-hook #'jcs:org-pomodoro-breadcrumbs)
+  (add-hook 'org-pomodoro-overtime-hook #'jcs:org-pomodoro-maybe-extend))
+
+;;; org-mode-init.el ends here

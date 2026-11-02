@@ -1,24 +1,45 @@
 #+AUTHOR: Jeff Stautz
 
-* Jeff's Emacs config 
+* Jeff's Emacs config
 
-I'm using a [[http://en.wikipedia.org/wiki/Literate_programming][literate programming]] approach to organize my Emacs configuration. 
+#+begin_quote
+People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen --- the editor should get used to us.
 
-Instead of peppering my elisp with pithy comments, I've gone the other way: I use org-mode outlines to thoroughly document my thinking, and I sprinkle this explanation with hunks of elisp.
+--- [[http://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
+#+end_quote
 
-My init.el uses org-babel to extract these code blocks from my .org documentation files and load my configuration. Neat, huh?
+This is my Emacs config. There are many configs like it, but this one is mine.
 
-Read [[https://github.com/jstautz/.emacs.d/blob/master/emacs-init.org][my base configuration here]].
+Rebuilt from scratch for Emacs 31 in late 2026. Previously I'd been using org-babel to organize my config in a [[http://en.wikipedia.org/wiki/Literate_programming][literate programming]] way, but for the sake of simplicity I've gone back to plain ol' elisp.
 
-I use org-mode a hell of a lot, and my org setup is a little convoluted. I've pulled the configuration for it into [[https://github.com/jstautz/.emacs.d/blob/master/org-mode-init.org][a separate file here]].
+** What's in here
+
+- =early-init.el= --- Fix native compilation on macOS 27+, hide toolbars before anything renders.
+- =init.el= --- Everything except org-mode.
+- =org-mode-init.el= --- My org-mode setup. It's gnarly but works for me.
+- =custom.el= --- Scratch space for =M-x customize=. Changes I like will eventually graduate to =init.el=.
+- =lisp/= --- Single-file libraries that aren't packages (e.g. =org-depend.el=, from org-contrib).
+- =elpa/= --- Third-party packages vendored in. 
+- =resources/= --- Sounds for org-pomodoro.
+
+** Handling packages
+
+- *Built-in options prioritized.* Emacs 31 ships with a lot of what I used to install: =use-package=, fido, latest org-mode, etc.
+- *Packages are checked in.* I wanted to make sure fresh checkouts work out of the box and packages are pinned. Any package upgrades are intentional via =M-x package-upgrade= + a commit.
+- *Compiled files aren't checked in.* On a fresh clone, the first launch byte-compiles everything in =elpa/=. Takes a few seconds.
+
+** Dependencies
+
+- Emacs 31+ on macOS
+- =brew install aspell terminal-notifier= (spell-checking + notifications)
 
 ** Disclaimers
 
 Fair warning:
 
 - This is a perpetual work in progress.
-- No attempts have been made to make this setup portable. It's full of weird environment idiosyncracies, and there are probably a bunch of undocumented dependencies.
-- Only tested with Emacs 27.2 on OS X
+- No attempts have been made to make this setup portable. It could have weird environment idiosyncrasies.
+- Only tested with Emacs 31.1 on macOS.
 - Your mileage, as they say, may vary.
 - I'm not responsible if any of this blows up on you.
 
@@ -28,19 +49,19 @@ Fair warning:
 :END:
 
 #+begin_example
-Copyright (C)  2018-2022  Jeff Stautz
+Copyright (C)  2018-2026  Jeff Stautz
 
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts, and no Back-Cover Texts.
-  
+
 Code in this document is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your option) any
 later version.
-  
+
 This code is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#+end_example 
+#+end_example
