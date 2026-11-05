@@ -384,7 +384,8 @@
   :defer t
   :config
   ;; dropping a file opens it instead of inserting a link
-  (setopt markdown-yank-dnd-method 'open))
+  (setopt markdown-yank-dnd-method 'open)
+  (setopt markdown-list-indent-width 2))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code
@@ -468,7 +469,7 @@
   (defun jcs:apheleia-maybe-oxfmt ()
     (when (locate-dominating-file default-directory ".oxfmtrc.json")
       (setq-local apheleia-formatter 'oxfmt)))
-  :hook ((typescript-ts-mode tsx-ts-mode js-ts-mode scss-mode markdown-mode)
+  :hook ((typescript-ts-mode tsx-ts-mode js-ts-mode scss-mode)
          . jcs:apheleia-maybe-oxfmt)
   :config
   (setf (alist-get 'oxfmt apheleia-formatters)
